@@ -87,6 +87,8 @@ public class EnchantedBookItem extends Item {
     @Override
     public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
         assert pStack.getTag() != null;
+        // maybe delete this line later \/
+        super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
         int maxWidthTooltip = 165;
         int successRate = pStack.getTag().getInt("SuccessRate");
         CompoundTag enchantmentTag = pStack.getTag().getCompound("Enchantment");
@@ -140,7 +142,7 @@ public class EnchantedBookItem extends Item {
 
     @Override
     public boolean overrideStackedOnOther(ItemStack pStack, Slot pSlot, ClickAction pAction, Player pPlayer) {
-        if (pPlayer.level().isClientSide) return true;
+
         ItemStack otherStack = pSlot.getItem();
 
         if (pAction == ClickAction.PRIMARY && (otherStack.isEnchanted() || otherStack.isEnchantable())) {
@@ -152,17 +154,17 @@ public class EnchantedBookItem extends Item {
             assert enchantment != null;
             boolean canEnchantGeneral = enchantment.canEnchant(otherStack);
 
-            // canEnchant checks if the enchantment can go on that specific item generally speaking
-            //TODO - build out the error handling in matt-mods,
-            // EnchantmentHelper is nice but doesnt give you room for specific errors
-            // its Itemstack.enchant method is good. isEnchantmentCompatible lacks specific errors
+
             // TODO - take into account the success rate!!
+            // TODO - Custom isaac noise on failure
+            // TODO - Rainbow color enchantments
 
             if (canEnchantGeneral && !otherStack.isEnchanted()) {
                 // No enchantments on the other item so it can be applied
                 otherStack.enchant(enchantment, enchantmentLevel);
                 pPlayer.playSound(SoundEvents.PLAYER_LEVELUP);
                 pStack.shrink(1);
+                return true;
             } else if (canEnchantGeneral) {
                 // Loop through each of the otherStacks enchant and make sure they are compatible with the incoming enchant
                 Map<Enchantment, Integer> otherStackEnchantmentsInfo = EnchantmentHelper.getEnchantments(otherStack);
@@ -170,31 +172,12 @@ public class EnchantedBookItem extends Item {
                 if (otherStackEnchants.contains(enchantment)) {
                     int otherEnchantLevel = otherStackEnchantmentsInfo.get(enchantment);
                     if (otherEnchantLevel == enchantment.getMaxLevel()) {
-                        pPlayer.sendSystemMessage(
-                                Component.literal("This item already has this enchantment maxed!").withStyle(ChatFormatting.RED)
-                        );
+                        sendClientMessage(pPlayer, Component.literal("This item already has this enchantment maxed!").withStyle(ChatFormatting.RED));
+                        return true;
                     } else if (enchantmentLevel < otherEnchantLevel) {
-                        pPlayer.sendSystemMessage(
-                                Component.literal("This item already has this enchantment!").withStyle(ChatFormatting.RED)
-                        );
+                        sendClientMessage(pPlayer, Component.literal("This item already has this enchantment!").withStyle(ChatFormatting.RED));
+                        return true;
                     } else {
-                        for (Enchantment otherEnchantment : otherStackEnchants) {
-                            boolean isCompatible = otherEnchantment.isCompatibleWith(enchantment);
-
-                            if (!isCompatible) {
-                                pPlayer.sendSystemMessage(
-                                        Component.literal(otherEnchantment.getFullname(1).getString())
-                                                .append(" is not compatible with ")
-                                                .append(Component.literal(enchantment.getFullname(1).getString()))
-                                                .withStyle(ChatFormatting.RED)
-                                );
-                                return true;
-                            }
-                        }
-                        // Enchant good to go, enchant that thing!
-                        otherStack.enchant(enchantment, enchantmentLevel);
-                        pPlayer.playSound(SoundEvents.PLAYER_LEVELUP);
-                        pStack.shrink(1);
                         if (otherEnchantLevel == enchantmentLevel) {
                             otherStackEnchantmentsInfo.put(enchantment, otherEnchantLevel + 1 );
                         } else {
@@ -203,16 +186,32 @@ public class EnchantedBookItem extends Item {
                         EnchantmentHelper.setEnchantments(otherStackEnchantmentsInfo, otherStack);
                         pPlayer.playSound(SoundEvents.PLAYER_LEVELUP);
                         pStack.shrink(1);
+                        return true;
                     }
+                } else {
+                    for (Enchantment otherEnchantment : otherStackEnchants) {
+                        boolean isCompatible = otherEnchantment.isCompatibleWith(enchantment);
+
+                        if (!isCompatible) {
+                            sendClientMessage(pPlayer, Component.translatable(enchantment.getDescriptionId())
+                                    .append(" is not compatible with ")
+                                    .append(Component.translatable(otherEnchantment.getDescriptionId()))
+                                    .withStyle(ChatFormatting.RED) );
+                            return true;
+                        }
+                    }
+                    // Enchant good to go, enchant that thing!
+                    otherStack.enchant(enchantment, enchantmentLevel);
+                    pPlayer.playSound(SoundEvents.PLAYER_LEVELUP);
+                    pStack.shrink(1);
                 }
 
 
-
             } else {
-                pPlayer.sendSystemMessage(Component.literal("Enchantment cannot be applied to this item").withStyle(ChatFormatting.RED));
+                sendClientMessage(pPlayer, Component.literal("Enchantment cannot be applied to this item").withStyle(ChatFormatting.RED));
                 return true;
             }
-            return true;
+            return false;
         } else {
             return false;
         }
@@ -234,8 +233,23 @@ public class EnchantedBookItem extends Item {
     }
 
 
+    private void sendClientMessage(Player pPlayer, Component textComponent) {
+        if (pPlayer.level().isClientSide) {
+            pPlayer.sendSystemMessage(textComponent);
+        }
+    }
 
-    Component getApplicableIcons(Enchantment enchantment) {
+    private boolean isSuccessfulEnchant(int successRate) {
+        return random.nextInt(100) < successRate;
+    }
+
+    // Applies enchants safely by overwriting previous enchants to avoid duplication
+    private void applyEnchantsSafely( Map<Enchantment, Integer> enchants, ItemStack item) {
+
+    }
+
+
+    private Component getApplicableIcons(Enchantment enchantment) {
         MutableComponent text = Component.translatable("");
         for (String itemName : baseIconItems) {
             ItemStack item = UtilFunctions.getItemStackFromString(itemName);
@@ -251,4 +265,6 @@ public class EnchantedBookItem extends Item {
         }
         return text;
     }
+
+
 }
