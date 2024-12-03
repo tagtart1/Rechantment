@@ -1,6 +1,6 @@
 package net.tagtart.rechantment.datagen;
 
-import net.adamtwitty.adammod.datagen.loot.ModBlockLootTables;
+import net.tagtart.rechantment.datagen.loot.ModBlockLootTables;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;

@@ -1,6 +1,6 @@
-package net.adamtwitty.adammod.datagen;
+package net.tagtart.rechantment.datagen;
 
-import net.adamtwitty.adammod.AdamMod;
+import net.tagtart.rechantment.Rechantment;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.concurrent.CompletableFuture;
 
-@Mod.EventBusSubscriber(modid = AdamMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = Rechantment.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DataGenerators {
 
     @SubscribeEvent
@@ -21,16 +21,16 @@ public class DataGenerators {
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
-        generator.addProvider(event.includeServer(), new net.adamtwitty.adammod.datagen.ModRecipeProvider(packOutput));
-        generator.addProvider(event.includeServer(), net.adamtwitty.adammod.datagen.ModLootTableProvider.create(packOutput));
+        generator.addProvider(event.includeServer(), new net.tagtart.rechantment.datagen.ModRecipeProvider(packOutput));
+        generator.addProvider(event.includeServer(), net.tagtart.rechantment.datagen.ModLootTableProvider.create(packOutput));
 
-        generator.addProvider(event.includeClient(), new net.adamtwitty.adammod.datagen.ModBlockStateProvider(packOutput, existingFileHelper));
+        generator.addProvider(event.includeClient(), new net.tagtart.rechantment.datagen.ModBlockStateProvider(packOutput, existingFileHelper));
         generator.addProvider(event.includeClient(), new ModItemModelProvider(packOutput, existingFileHelper));
 
-        net.adamtwitty.adammod.datagen.ModBlockTagGenerator blockTagGenerator = generator.addProvider(event.includeServer(),
-                new net.adamtwitty.adammod.datagen.ModBlockTagGenerator(packOutput, lookupProvider, existingFileHelper));
+        net.tagtart.rechantment.datagen.ModBlockTagGenerator blockTagGenerator = generator.addProvider(event.includeServer(),
+                new net.tagtart.rechantment.datagen.ModBlockTagGenerator(packOutput, lookupProvider, existingFileHelper));
 
-        generator.addProvider(event.includeServer(), new net.adamtwitty.adammod.datagen.ModItemTagGenerator(packOutput, lookupProvider, blockTagGenerator.contentsGetter(), existingFileHelper));
+        generator.addProvider(event.includeServer(), new net.tagtart.rechantment.datagen.ModItemTagGenerator(packOutput, lookupProvider, blockTagGenerator.contentsGetter(), existingFileHelper));
 
     }
 }
