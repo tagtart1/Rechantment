@@ -140,9 +140,9 @@ public class EnchantedBookItem extends Item {
 
     @Override
     public boolean overrideStackedOnOther(ItemStack pStack, Slot pSlot, ClickAction pAction, Player pPlayer) {
-
+        if (pPlayer.level().isClientSide) return true;
         ItemStack otherStack = pSlot.getItem();
-        boolean canBeApplied = false;
+
         if (pAction == ClickAction.PRIMARY && (otherStack.isEnchanted() || otherStack.isEnchantable())) {
             CompoundTag enchantmentTag = pStack.getTag().getCompound("Enchantment");
             int enchantmentLevel = enchantmentTag.getInt("lvl");
@@ -160,29 +160,58 @@ public class EnchantedBookItem extends Item {
 
             if (canEnchantGeneral && !otherStack.isEnchanted()) {
                 // No enchantments on the other item so it can be applied
-                canBeApplied = true;
                 otherStack.enchant(enchantment, enchantmentLevel);
                 pPlayer.playSound(SoundEvents.PLAYER_LEVELUP);
                 pStack.shrink(1);
             } else if (canEnchantGeneral) {
                 // Loop through each of the otherStacks enchant and make sure they are compatible with the incoming enchant
-                Collection<Enchantment> enchants = EnchantmentHelper.getEnchantments(otherStack).keySet();
-                boolean isCompatible = EnchantmentHelper.isEnchantmentCompatible(enchants, enchantment);
-                if (isCompatible) {
-                    canBeApplied = true;
-                    pPlayer.playSound(SoundEvents.PLAYER_LEVELUP);
+                Map<Enchantment, Integer> otherStackEnchantmentsInfo = EnchantmentHelper.getEnchantments(otherStack);
+                Collection<Enchantment> otherStackEnchants = otherStackEnchantmentsInfo.keySet();
+                if (otherStackEnchants.contains(enchantment)) {
+                    int otherEnchantLevel = otherStackEnchantmentsInfo.get(enchantment);
+                    if (otherEnchantLevel == enchantment.getMaxLevel()) {
+                        pPlayer.sendSystemMessage(
+                                Component.literal("This item already has this enchantment maxed!").withStyle(ChatFormatting.RED)
+                        );
+                    } else if (enchantmentLevel < otherEnchantLevel) {
+                        pPlayer.sendSystemMessage(
+                                Component.literal("This item already has this enchantment!").withStyle(ChatFormatting.RED)
+                        );
+                    } else {
+                        for (Enchantment otherEnchantment : otherStackEnchants) {
+                            boolean isCompatible = otherEnchantment.isCompatibleWith(enchantment);
 
-                } else {
-                    // maybe a funny fart noise on failed?
-                    pPlayer.playSound(SoundEvents.ITEM_BREAK);
-                    canBeApplied = false;
+                            if (!isCompatible) {
+                                pPlayer.sendSystemMessage(
+                                        Component.literal(otherEnchantment.getFullname(1).getString())
+                                                .append(" is not compatible with ")
+                                                .append(Component.literal(enchantment.getFullname(1).getString()))
+                                                .withStyle(ChatFormatting.RED)
+                                );
+                                return true;
+                            }
+                        }
+                        // Enchant good to go, enchant that thing!
+                        otherStack.enchant(enchantment, enchantmentLevel);
+                        pPlayer.playSound(SoundEvents.PLAYER_LEVELUP);
+                        pStack.shrink(1);
+                        if (otherEnchantLevel == enchantmentLevel) {
+                            otherStackEnchantmentsInfo.put(enchantment, otherEnchantLevel + 1 );
+                        } else {
+                            otherStackEnchantmentsInfo.put(enchantment, enchantmentLevel );
+                        }
+                        EnchantmentHelper.setEnchantments(otherStackEnchantmentsInfo, otherStack);
+                        pPlayer.playSound(SoundEvents.PLAYER_LEVELUP);
+                        pStack.shrink(1);
+                    }
                 }
+
+
+
+            } else {
+                pPlayer.sendSystemMessage(Component.literal("Enchantment cannot be applied to this item").withStyle(ChatFormatting.RED));
+                return true;
             }
-            pPlayer.sendSystemMessage(Component.literal("Can be applied: " + canBeApplied));
-
-
-
-            pPlayer.playSound(SoundEvents.PLAYER_LEVELUP);
             return true;
         } else {
             return false;

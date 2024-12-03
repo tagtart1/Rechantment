@@ -1,6 +1,7 @@
 package net.tagtart.rechantment;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
