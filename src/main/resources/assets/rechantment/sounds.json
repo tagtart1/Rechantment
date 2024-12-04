@@ -1,0 +1,8 @@
+{
+  "enchanted_book_fail": {
+    "subtitles": "sounds.rechantment.enchanted_book_fail",
+    "sounds": [
+        "rechantment:enchanted_book_fail"
+    ]
+  }
+}

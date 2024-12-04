@@ -1,6 +1,8 @@
 package net.tagtart.rechantment.item.custom;
 
+import net.minecraft.sounds.SoundSource;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
+import net.tagtart.rechantment.sound.ModSounds;
 import net.tagtart.rechantment.util.UtilFunctions;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -144,7 +146,6 @@ public class EnchantedBookItem extends Item {
     public boolean overrideStackedOnOther(ItemStack pStack, Slot pSlot, ClickAction pAction, Player pPlayer) {
 
         ItemStack otherStack = pSlot.getItem();
-
         if (pAction == ClickAction.PRIMARY && (otherStack.isEnchanted() || otherStack.isEnchantable())) {
             CompoundTag enchantmentTag = pStack.getTag().getCompound("Enchantment");
             int enchantmentLevel = enchantmentTag.getInt("lvl");
@@ -158,11 +159,11 @@ public class EnchantedBookItem extends Item {
             Collection<Enchantment> otherStackEnchants = otherStackEnchantmentsInfo.keySet();
 
             // TODO - take into account the success rate!!
-            // TODO - Custom isaac noise on failure
             // TODO - Rainbow color enchantments
 
             if (canEnchantGeneral && !otherStack.isEnchanted()) {
                 // No enchantments on the other item so it can be applied
+
                 otherStackEnchantmentsInfo.put(enchantment, enchantmentLevel);
                 applyEnchantsSafely(otherStackEnchantmentsInfo, otherStack, pPlayer, pStack);
                 return true;
@@ -201,6 +202,7 @@ public class EnchantedBookItem extends Item {
                     // Enchant good to go, enchant that thing!
                     otherStackEnchantmentsInfo.put(enchantment, enchantmentLevel);
                     applyEnchantsSafely(otherStackEnchantmentsInfo, otherStack, pPlayer, pStack);
+                    return true;
                 }
 
 
@@ -208,10 +210,14 @@ public class EnchantedBookItem extends Item {
                 sendClientMessage(pPlayer, Component.literal("Enchantment cannot be applied to this item").withStyle(ChatFormatting.RED));
                 return true;
             }
-            return false;
+
         } else {
             return false;
         }
+    }
+
+    private class EnchantAttemptResults {
+
     }
 
     private Pair<String, ChatFormatting> getRarityInfo(String enchantmentRaw) {
@@ -243,12 +249,16 @@ public class EnchantedBookItem extends Item {
     // Applies enchants safely by overwriting previous enchants to avoid duplication
     private void applyEnchantsSafely( Map<Enchantment, Integer> enchants, ItemStack item, Player pPlayer, ItemStack enchantedBook) {
         assert enchantedBook.getTag() != null;
-        int successRate = enchantedBook.getTag().getInt("SucessRate");
+        // if (pPlayer.level().isClientSide()) return;
+        int successRate = enchantedBook.getTag().getInt("SuccessRate");
         if (isSuccessfulEnchant(successRate)) {
             EnchantmentHelper.setEnchantments(enchants, item);
             pPlayer.playSound(SoundEvents.PLAYER_LEVELUP);
+            sendClientMessage(pPlayer, Component.literal("Successfully enchanted."));
         } else {
             // Play bad sound
+            pPlayer.playSound(ModSounds.ENCHANTED_BOOK_FAIL.get(), 1.5f, 1f);
+            sendClientMessage(pPlayer, Component.literal("Enchantment failed to apply to item, lol."));
         }
         // Break the book regardless of success or not
         enchantedBook.shrink(1);

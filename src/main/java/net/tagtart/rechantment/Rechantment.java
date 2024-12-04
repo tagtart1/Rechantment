@@ -17,6 +17,8 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.tagtart.rechantment.block.ModBlocks;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.item.ModItems;
+import net.tagtart.rechantment.networking.ModPackets;
+import net.tagtart.rechantment.sound.ModSounds;
 import net.tagtart.rechantment.util.ModItemProperties;
 import org.slf4j.Logger;
 
@@ -35,6 +37,7 @@ public class Rechantment
 
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
+        ModSounds.register(modEventBus);
         modEventBus.addListener(this::commonSetup);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, RechantmentCommonConfigs.SPEC, "rechantment-config.toml");
@@ -46,7 +49,9 @@ public class Rechantment
 
     private void commonSetup(final FMLCommonSetupEvent event)
     {
-
+            event.enqueueWork(() -> {
+                ModPackets.register();
+            });
     }
 
     // Add the example block item to the building blocks tab

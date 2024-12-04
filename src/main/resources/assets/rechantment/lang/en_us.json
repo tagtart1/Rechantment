@@ -58,6 +58,7 @@
   "enchantment.minecraft.quick_charge.description": "Decreases the charging time of crossbows.",
   "enchantment.minecraft.piercing.description": "Arrows can pass through multiple entities.",
   "enchantment.minecraft.mending.description": "Repairs the item when gaining XP orbs.",
-  "enchantment.minecraft.vanishing_curse.description": "Item is forever destroyed upon death."
+  "enchantment.minecraft.vanishing_curse.description": "Item is forever destroyed upon death.",
 
+  "sounds.rechantment.enchanted_book_fail": "Book failed to enchant item sound"
 }
