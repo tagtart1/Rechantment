@@ -154,6 +154,8 @@ public class EnchantedBookItem extends Item {
             assert enchantment != null;
             boolean canEnchantGeneral = enchantment.canEnchant(otherStack);
 
+            Map<Enchantment, Integer> otherStackEnchantmentsInfo = EnchantmentHelper.getEnchantments(otherStack);
+            Collection<Enchantment> otherStackEnchants = otherStackEnchantmentsInfo.keySet();
 
             // TODO - take into account the success rate!!
             // TODO - Custom isaac noise on failure
@@ -161,14 +163,12 @@ public class EnchantedBookItem extends Item {
 
             if (canEnchantGeneral && !otherStack.isEnchanted()) {
                 // No enchantments on the other item so it can be applied
-                otherStack.enchant(enchantment, enchantmentLevel);
-                pPlayer.playSound(SoundEvents.PLAYER_LEVELUP);
-                pStack.shrink(1);
+                otherStackEnchantmentsInfo.put(enchantment, enchantmentLevel);
+                applyEnchantsSafely(otherStackEnchantmentsInfo, otherStack, pPlayer, pStack);
                 return true;
             } else if (canEnchantGeneral) {
                 // Loop through each of the otherStacks enchant and make sure they are compatible with the incoming enchant
-                Map<Enchantment, Integer> otherStackEnchantmentsInfo = EnchantmentHelper.getEnchantments(otherStack);
-                Collection<Enchantment> otherStackEnchants = otherStackEnchantmentsInfo.keySet();
+
                 if (otherStackEnchants.contains(enchantment)) {
                     int otherEnchantLevel = otherStackEnchantmentsInfo.get(enchantment);
                     if (otherEnchantLevel == enchantment.getMaxLevel()) {
@@ -183,9 +183,7 @@ public class EnchantedBookItem extends Item {
                         } else {
                             otherStackEnchantmentsInfo.put(enchantment, enchantmentLevel );
                         }
-                        EnchantmentHelper.setEnchantments(otherStackEnchantmentsInfo, otherStack);
-                        pPlayer.playSound(SoundEvents.PLAYER_LEVELUP);
-                        pStack.shrink(1);
+                        applyEnchantsSafely(otherStackEnchantmentsInfo, otherStack, pPlayer, pStack);
                         return true;
                     }
                 } else {
@@ -201,9 +199,8 @@ public class EnchantedBookItem extends Item {
                         }
                     }
                     // Enchant good to go, enchant that thing!
-                    otherStack.enchant(enchantment, enchantmentLevel);
-                    pPlayer.playSound(SoundEvents.PLAYER_LEVELUP);
-                    pStack.shrink(1);
+                    otherStackEnchantmentsInfo.put(enchantment, enchantmentLevel);
+                    applyEnchantsSafely(otherStackEnchantmentsInfo, otherStack, pPlayer, pStack);
                 }
 
 
@@ -244,8 +241,17 @@ public class EnchantedBookItem extends Item {
     }
 
     // Applies enchants safely by overwriting previous enchants to avoid duplication
-    private void applyEnchantsSafely( Map<Enchantment, Integer> enchants, ItemStack item) {
-
+    private void applyEnchantsSafely( Map<Enchantment, Integer> enchants, ItemStack item, Player pPlayer, ItemStack enchantedBook) {
+        assert enchantedBook.getTag() != null;
+        int successRate = enchantedBook.getTag().getInt("SucessRate");
+        if (isSuccessfulEnchant(successRate)) {
+            EnchantmentHelper.setEnchantments(enchants, item);
+            pPlayer.playSound(SoundEvents.PLAYER_LEVELUP);
+        } else {
+            // Play bad sound
+        }
+        // Break the book regardless of success or not
+        enchantedBook.shrink(1);
     }
 
 
