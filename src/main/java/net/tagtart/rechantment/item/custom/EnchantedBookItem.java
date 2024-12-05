@@ -216,9 +216,7 @@ public class EnchantedBookItem extends Item {
         }
     }
 
-    private class EnchantAttemptResults {
 
-    }
 
     private Pair<String, ChatFormatting> getRarityInfo(String enchantmentRaw) {
         if (RechantmentCommonConfigs.SIMPLE_ENCHANTMENTS.get().contains(enchantmentRaw)) {
