@@ -1,7 +1,7 @@
 package net.tagtart.rechantment;
 
 import com.mojang.logging.LogUtils;
-import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -16,7 +16,10 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.tagtart.rechantment.block.ModBlocks;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
+import net.tagtart.rechantment.item.ModCreativeModeTabs;
 import net.tagtart.rechantment.item.ModItems;
+import net.tagtart.rechantment.screen.ModMenuTypes;
+import net.tagtart.rechantment.screen.RechantmentTableScreen;
 import net.tagtart.rechantment.util.ModItemProperties;
 import org.slf4j.Logger;
 
@@ -33,8 +36,13 @@ public class Rechantment
     {
         IEventBus modEventBus = context.getModEventBus();
 
+        ModMenuTypes.register(modEventBus);
+
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
+
+        ModCreativeModeTabs.register(modEventBus);
+
         modEventBus.addListener(this::commonSetup);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, RechantmentCommonConfigs.SPEC, "rechantment-config.toml");
@@ -46,7 +54,6 @@ public class Rechantment
 
     private void commonSetup(final FMLCommonSetupEvent event)
     {
-
     }
 
     // Add the example block item to the building blocks tab
@@ -59,7 +66,6 @@ public class Rechantment
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event)
     {
-
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
@@ -70,6 +76,7 @@ public class Rechantment
         public static void onClientSetup(FMLClientSetupEvent event)
         {
             ModItemProperties.addCustomItemProperties();
+            MenuScreens.register(ModMenuTypes.RECHANTMENT_TABLE_MENU.get(), RechantmentTableScreen::new);
         }
     }
 }
