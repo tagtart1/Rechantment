@@ -1,11 +1,14 @@
 package net.tagtart.rechantment.util;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.tagtart.rechantment.config.RechantmentCommonConfigs;
+import oshi.util.tuples.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,5 +49,20 @@ public class UtilFunctions {
         }
 
         return new ItemStack(item);
+    }
+
+    public static Pair<String, ChatFormatting> getRarityInfo(String enchantmentRaw) {
+        if (RechantmentCommonConfigs.SIMPLE_ENCHANTMENTS.get().contains(enchantmentRaw)) {
+            return new Pair<>("simple", ChatFormatting.GRAY);
+        } else if (RechantmentCommonConfigs.ELITE_ENCHANTMENTS.get().contains(enchantmentRaw)) {
+            return new Pair<>("elite", ChatFormatting.AQUA);
+        } else if (RechantmentCommonConfigs.UNIQUE_ENCHANTMENTS.get().contains(enchantmentRaw)) {
+            return new Pair<>("unique", ChatFormatting.GREEN);
+        } else if (RechantmentCommonConfigs.ULTIMATE_ENCHANTMENTS.get().contains(enchantmentRaw)) {
+            return new Pair<>("ultimate", ChatFormatting.YELLOW);
+        } else if (RechantmentCommonConfigs.LEGENDARY_ENCHANTMENTS.get().contains(enchantmentRaw)) {
+            return new Pair<>("legendary", ChatFormatting.GOLD);
+        }
+        return new Pair<>("simple", ChatFormatting.GRAY);
     }
 }

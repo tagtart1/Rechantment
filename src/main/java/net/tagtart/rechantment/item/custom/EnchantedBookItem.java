@@ -80,7 +80,7 @@ public class EnchantedBookItem extends Item {
         String[] enchantmentInfo = enchantmentRaw.split(":");
         String enchantmentSource = enchantmentInfo[0];
         String enchantmentName = enchantmentInfo[1];
-        Pair<String, ChatFormatting> enchantRarityInfo = getRarityInfo(enchantmentRaw);
+        Pair<String, ChatFormatting> enchantRarityInfo = UtilFunctions.getRarityInfo(enchantmentRaw);
 
         int enchantmentLvl = enchantmentTag.getInt("lvl");
         String romanLevel = Component.translatable("enchantment.level." + enchantmentLvl).getString();
@@ -210,7 +210,7 @@ public class EnchantedBookItem extends Item {
                                         .append(" is not compatible with ")
                                         .append(Component.translatable(otherEnchantment.getDescriptionId()))
                                         .withStyle(ChatFormatting.RED) );
-
+                                return true;
                             }
                         }
                         // Enchant good to go, enchant that thing!
@@ -258,20 +258,6 @@ public class EnchantedBookItem extends Item {
 
 
 
-    private Pair<String, ChatFormatting> getRarityInfo(String enchantmentRaw) {
-        if (RechantmentCommonConfigs.SIMPLE_ENCHANTMENTS.get().contains(enchantmentRaw)) {
-            return new Pair<>("simple", ChatFormatting.GRAY);
-        } else if (RechantmentCommonConfigs.ELITE_ENCHANTMENTS.get().contains(enchantmentRaw)) {
-            return new Pair<>("elite", ChatFormatting.AQUA);
-        } else if (RechantmentCommonConfigs.UNIQUE_ENCHANTMENTS.get().contains(enchantmentRaw)) {
-            return new Pair<>("unique", ChatFormatting.GREEN);
-        } else if (RechantmentCommonConfigs.ULTIMATE_ENCHANTMENTS.get().contains(enchantmentRaw)) {
-            return new Pair<>("ultimate", ChatFormatting.YELLOW);
-        } else if (RechantmentCommonConfigs.LEGENDARY_ENCHANTMENTS.get().contains(enchantmentRaw)) {
-            return new Pair<>("legendary", ChatFormatting.GOLD);
-        }
-        return new Pair<>("simple", ChatFormatting.GRAY);
-    }
 
 
 
