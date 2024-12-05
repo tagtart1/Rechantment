@@ -8,6 +8,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.networking.packet.EnchantItemC2SPacket;
+import net.tagtart.rechantment.networking.packet.SyncEnchantItemS2CPacket;
 
 public class ModPackets {
     private static SimpleChannel INSTANCE;
@@ -32,6 +33,12 @@ public class ModPackets {
                 .decoder(EnchantItemC2SPacket::new)
                 .encoder(EnchantItemC2SPacket::toBytes)
                 .consumerMainThread(EnchantItemC2SPacket::handle)
+                .add();
+
+        net.messageBuilder(SyncEnchantItemS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SyncEnchantItemS2CPacket::new)
+                .encoder(SyncEnchantItemS2CPacket::toBytes)
+                .consumerMainThread(SyncEnchantItemS2CPacket::handle)
                 .add();
     }
 
