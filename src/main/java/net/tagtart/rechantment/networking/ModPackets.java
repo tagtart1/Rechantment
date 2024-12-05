@@ -10,6 +10,7 @@ import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.networking.packet.EnchantItemC2SPacket;
 import net.tagtart.rechantment.networking.packet.SyncEnchantItemS2CPacket;
 
+// EVERYTHING IN HERE IS NOT USED CURRENTLY, JUST BOILERPLATE
 public class ModPackets {
     private static SimpleChannel INSTANCE;
 

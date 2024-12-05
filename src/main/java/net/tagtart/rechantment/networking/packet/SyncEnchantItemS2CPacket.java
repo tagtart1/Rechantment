@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Supplier;
 
+
+// EVERYTHING IN HERE IS NOT USED CURRENTLY, JUST BOILERPLATE
 public class SyncEnchantItemS2CPacket {
     private final int inventoryIndex;
     private final ItemStack updatedItem;

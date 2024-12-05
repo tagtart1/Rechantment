@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Supplier;
 
+// EVERYTHING IN HERE IS NOT USED CURRENTLY, JUST BOILERPLATE
 public class EnchantItemC2SPacket {
     private final ItemStack bookStack;
     private final ItemStack itemToEnchantStack;

@@ -173,8 +173,6 @@ public class EnchantedBookItem extends Item {
                 Collection<Enchantment> otherStackEnchants = otherStackEnchantmentsInfo.keySet();
 
 
-                // TODO - Rainbow color enchantments
-
                 if (canEnchantGeneral && !itemToEnchantStack.isEnchanted()) {
                     // No enchantments on the other item so it can be applied
 
@@ -255,15 +253,6 @@ public class EnchantedBookItem extends Item {
         Random random = new Random();
         return random.nextInt(100) < successRate;
     }
-
-
-
-
-
-
-
-
-
 
     private Component getApplicableIcons(Enchantment enchantment) {
         MutableComponent text = Component.translatable("");
