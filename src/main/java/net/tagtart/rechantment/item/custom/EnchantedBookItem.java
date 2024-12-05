@@ -1,10 +1,13 @@
 package net.tagtart.rechantment.item.custom;
 
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.networking.ModPackets;
 import net.tagtart.rechantment.networking.packet.EnchantItemC2SPacket;
+import net.tagtart.rechantment.networking.packet.SyncEnchantItemS2CPacket;
 import net.tagtart.rechantment.sound.ModSounds;
 import net.tagtart.rechantment.util.UtilFunctions;
 import net.minecraft.ChatFormatting;
@@ -147,19 +150,110 @@ public class EnchantedBookItem extends Item {
     }
 
     @Override
-    public boolean overrideStackedOnOther(@NotNull ItemStack pStack, Slot pSlot, @NotNull ClickAction pAction, @NotNull Player pPlayer) {
+    public boolean overrideStackedOnOther(@NotNull ItemStack bookStack, Slot pSlot, @NotNull ClickAction pAction, @NotNull Player pPlayer) {
 
-        ItemStack otherStack = pSlot.getItem();
-        if (pAction == ClickAction.PRIMARY && (otherStack.isEnchanted() || otherStack.isEnchantable())) {
+        ItemStack itemToEnchantStack = pSlot.getItem();
+        if (pAction == ClickAction.PRIMARY && (itemToEnchantStack.isEnchanted() || itemToEnchantStack.isEnchantable())) {
             if (!pPlayer.level().isClientSide()) {
-                ModPackets.sentToServer(new EnchantItemC2SPacket(pStack, otherStack));
+                // Server stuff here
 
+                Level level = pPlayer.level();
+
+
+
+                CompoundTag enchantmentTag = bookStack.getTag().getCompound("Enchantment");
+                int enchantmentLevel = enchantmentTag.getInt("lvl");
+                String enchantmentRaw = enchantmentTag.getString("id");
+                ResourceLocation resourceLocation = new ResourceLocation(enchantmentRaw);
+                Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(resourceLocation);
+                assert enchantment != null;
+                boolean canEnchantGeneral = enchantment.canEnchant(itemToEnchantStack);
+
+                Map<Enchantment, Integer> otherStackEnchantmentsInfo = EnchantmentHelper.getEnchantments(itemToEnchantStack);
+                Collection<Enchantment> otherStackEnchants = otherStackEnchantmentsInfo.keySet();
+
+
+                // TODO - Rainbow color enchantments
+
+                if (canEnchantGeneral && !itemToEnchantStack.isEnchanted()) {
+                    // No enchantments on the other item so it can be applied
+
+                    otherStackEnchantmentsInfo.put(enchantment, enchantmentLevel);
+                    applyEnchantsSafely(otherStackEnchantmentsInfo, itemToEnchantStack, pPlayer, level, bookStack);
+
+                } else if (canEnchantGeneral) {
+                    // Loop through each of the otherStacks enchant and make sure they are compatible with the incoming enchant
+
+                    if (otherStackEnchants.contains(enchantment)) {
+                        int otherEnchantLevel = otherStackEnchantmentsInfo.get(enchantment);
+                        if (otherEnchantLevel == enchantment.getMaxLevel()) {
+                            sendClientMessage(pPlayer, Component.literal("This item already has this enchantment maxed!").withStyle(ChatFormatting.RED));
+
+                        } else if (enchantmentLevel < otherEnchantLevel) {
+                            sendClientMessage(pPlayer, Component.literal("This item already has this enchantment!").withStyle(ChatFormatting.RED));
+
+                        } else {
+                            if (otherEnchantLevel == enchantmentLevel) {
+                                otherStackEnchantmentsInfo.put(enchantment, otherEnchantLevel + 1 );
+                            } else {
+                                otherStackEnchantmentsInfo.put(enchantment, enchantmentLevel );
+                            }
+                            applyEnchantsSafely(otherStackEnchantmentsInfo, itemToEnchantStack, pPlayer, level, bookStack);
+
+                        }
+                    } else {
+                        for (Enchantment otherEnchantment : otherStackEnchants) {
+                            boolean isCompatible = otherEnchantment.isCompatibleWith(enchantment);
+
+                            if (!isCompatible) {
+                                sendClientMessage(pPlayer, Component.translatable(enchantment.getDescriptionId())
+                                        .append(" is not compatible with ")
+                                        .append(Component.translatable(otherEnchantment.getDescriptionId()))
+                                        .withStyle(ChatFormatting.RED) );
+
+                            }
+                        }
+                        // Enchant good to go, enchant that thing!
+                        otherStackEnchantmentsInfo.put(enchantment, enchantmentLevel);
+                        applyEnchantsSafely(otherStackEnchantmentsInfo, itemToEnchantStack, pPlayer, level, bookStack);
+
+                    }
+                } else {
+                    sendClientMessage(pPlayer, Component.literal("Enchantment cannot be applied to this item").withStyle(ChatFormatting.RED));
+                }
             }
 
             return true;
         } else {
             return false;
         }
+    }
+
+    private void applyEnchantsSafely(Map<Enchantment, Integer> enchants, ItemStack item, Player pPlayer, Level level, ItemStack enchantedBook) {
+        assert enchantedBook.getTag() != null;
+        int slotIndex = pPlayer.getInventory().findSlotMatchingItem(item);
+        int successRate = enchantedBook.getTag().getInt("SuccessRate");
+        if (isSuccessfulEnchant(successRate)) {
+            EnchantmentHelper.setEnchantments(enchants, item);
+            level.playSound(null, pPlayer.getOnPos(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1f, 1f);
+            sendClientMessage(pPlayer, Component.literal("Successfully enchanted.").withStyle(ChatFormatting.GREEN));
+        } else {
+            // Play bad sound
+            level.playSound(null, pPlayer.getOnPos(), ModSounds.ENCHANTED_BOOK_FAIL.get(), SoundSource.PLAYERS, 4f, 1f);
+            sendClientMessage(pPlayer, Component.literal("Enchantment failed to apply to item, lolol.").withStyle(ChatFormatting.RED));
+        }
+        // Break the book regardless of success or not
+        enchantedBook.shrink(1);
+
+    }
+
+    private void sendClientMessage(Player pPlayer, Component textComponent) {
+        pPlayer.sendSystemMessage(textComponent);
+    }
+
+    private boolean isSuccessfulEnchant(int successRate) {
+        Random random = new Random();
+        return random.nextInt(100) < successRate;
     }
 
 
