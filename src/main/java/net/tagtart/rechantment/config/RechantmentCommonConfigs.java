@@ -81,6 +81,7 @@ public class RechantmentCommonConfigs {
         LEGENDARY_ENCHANTMENTS = BUILDER.defineList("enchantments", Arrays.asList(
                 "minecraft:infinity"
         ), s -> s instanceof String);
+
         BUILDER.pop();
 
 

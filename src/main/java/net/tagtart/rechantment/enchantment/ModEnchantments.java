@@ -19,6 +19,10 @@ public class ModEnchantments {
             ENCHANTMENTS.register("thunder_strike", () -> new ThunderStrikeEnchantment(
                     Enchantment.Rarity.COMMON, EnchantmentCategory.WEAPON, EquipmentSlot.MAINHAND));
 
+    public static RegistryObject<Enchantment> BASH =
+            ENCHANTMENTS.register("bash", () -> new BashEnchantment(
+                    Enchantment.Rarity.COMMON, EnchantmentCategory.BREAKABLE, EquipmentSlot.OFFHAND));
+
 
     public static void register(IEventBus eventBus) {
         ENCHANTMENTS.register(eventBus);

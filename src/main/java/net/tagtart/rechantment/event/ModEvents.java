@@ -3,9 +3,20 @@ package net.tagtart.rechantment.event;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageEffects;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.phys.Vec2;
+import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
+import net.minecraftforge.event.entity.living.ShieldBlockEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -16,10 +27,42 @@ import net.tagtart.rechantment.util.UtilFunctions;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 public class ModEvents {
     @Mod.EventBusSubscriber(modid = Rechantment.MOD_ID)
     public static class ForgeEvents {
+
+        @SubscribeEvent
+        public static void onShieldBlock(ShieldBlockEvent event) {
+            LivingEntity player = event.getEntity();
+            DamageSource source = event.getDamageSource();
+            Entity attacker = source.getEntity();
+            ItemStack shield = player.getUseItem();
+
+            if(shield.getItem() instanceof ShieldItem) {
+                ResourceLocation resource = new ResourceLocation("rechantment:bash");
+                Map<Enchantment, Integer> shieldEnchants = EnchantmentHelper.getEnchantments(shield);
+                if (shieldEnchants.containsKey(ForgeRegistries.ENCHANTMENTS.getValue(resource))) {
+                    if (source.getDirectEntity() instanceof Projectile) {
+                        return;
+                    }
+
+                    double d0 = attacker.getX() - player.getX();
+                    double d1 = attacker.getZ() - player.getZ();
+                    Vec2 toAttacker = new Vec2((float)d0, (float)d1);
+                    toAttacker = toAttacker.normalized();
+                    toAttacker = toAttacker.scale(3f);
+
+
+                        if (attacker.isPushable()) {
+                            attacker.push(toAttacker.x, 0.2, toAttacker.y);
+                        }
+
+                    System.out.println(attacker.isPushable());
+                }
+            }
+        }
 
         @SubscribeEvent
         public static void onItemToolTip(ItemTooltipEvent event) {
