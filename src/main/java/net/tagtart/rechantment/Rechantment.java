@@ -16,6 +16,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.tagtart.rechantment.block.ModBlocks;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
+import net.tagtart.rechantment.enchantment.ModEnchantments;
 import net.tagtart.rechantment.item.ModItems;
 import net.tagtart.rechantment.networking.ModPackets;
 import net.tagtart.rechantment.sound.ModSounds;
@@ -38,6 +39,7 @@ public class Rechantment
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
         ModSounds.register(modEventBus);
+        ModEnchantments.register(modEventBus);
         modEventBus.addListener(this::commonSetup);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, RechantmentCommonConfigs.SPEC, "rechantment-config.toml");

@@ -20,6 +20,9 @@
   "enchantment.icon.shovel": "瞕",
   "enchantment.icon.sword": "瞖",
   "enchantment.icon.trident": "瞗",
+
+  "enchantment.rechantment.thunder_strike": "Chance to summon lightning to strike your targets.",
+
   "enchantment.minecraft.protection.description": "Reduces most types of damage by increasing amounts.",
   "enchantment.minecraft.fire_protection.description": "Reduces damage and burn time when lit on fire.",
   "enchantment.minecraft.feather_falling.description": "Reduces the damage dealt from falling.",
