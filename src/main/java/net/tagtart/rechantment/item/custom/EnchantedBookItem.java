@@ -82,8 +82,13 @@ public class EnchantedBookItem extends Item {
         String enchantmentName = enchantmentInfo[1];
         Pair<String, ChatFormatting> enchantRarityInfo = UtilFunctions.getRarityInfo(enchantmentRaw);
 
+        ResourceLocation resourceLocation = new ResourceLocation(enchantmentRaw);
+        Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(resourceLocation);
         int enchantmentLvl = enchantmentTag.getInt("lvl");
-        String romanLevel = Component.translatable("enchantment.level." + enchantmentLvl).getString();
+        String romanLevel ="";
+
+        if (enchantment.getMaxLevel() != 1)
+            romanLevel = Component.translatable("enchantment.level." + enchantmentLvl).getString();
 
         String enchantFormattedName = Component.translatable("enchantment." + enchantmentSource + "." + enchantmentName).getString();
         String rarityIcon = Component.translatable("enchantment.rarity." + enchantRarityInfo.getA()).getString();
@@ -91,6 +96,7 @@ public class EnchantedBookItem extends Item {
         return Component.literal(rarityIcon + " ")
                 .append(Component.literal(enchantFormattedName + " " + romanLevel)
                         .withStyle(enchantRarityInfo.getB()));
+
     }
 
     @Override
@@ -237,7 +243,7 @@ public class EnchantedBookItem extends Item {
             sendClientMessage(pPlayer, Component.literal("Successfully enchanted.").withStyle(ChatFormatting.GREEN));
         } else {
             // Play bad sound
-            level.playSound(null, pPlayer.getOnPos(), ModSounds.ENCHANTED_BOOK_FAIL.get(), SoundSource.PLAYERS, 4f, 1f);
+            level.playSound(null, pPlayer.getOnPos(), ModSounds.ENCHANTED_BOOK_FAIL.get(), SoundSource.PLAYERS, 10f, 1f);
             sendClientMessage(pPlayer, Component.literal("Enchantment failed to apply to item, lolol.").withStyle(ChatFormatting.RED));
         }
         // Break the book regardless of success or not
