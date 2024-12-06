@@ -41,9 +41,12 @@ public class ModEvents {
             ItemStack shield = player.getUseItem();
 
             if(shield.getItem() instanceof ShieldItem) {
-                ResourceLocation resource = new ResourceLocation("rechantment:bash");
+                // TODO: tweak knockback value
+
+                // TODO: add Courage enchantment
+                ResourceLocation bashResource = new ResourceLocation("rechantment:bash");
                 Map<Enchantment, Integer> shieldEnchants = EnchantmentHelper.getEnchantments(shield);
-                if (shieldEnchants.containsKey(ForgeRegistries.ENCHANTMENTS.getValue(resource))) {
+                if (shieldEnchants.containsKey(ForgeRegistries.ENCHANTMENTS.getValue(bashResource))) {
                     if (source.getDirectEntity() instanceof Projectile) {
                         return;
                     }
