@@ -19,8 +19,8 @@ public class ThunderStrikeEnchantment extends Enchantment {
 
   // Maps enchantment level to a success rate of spawning lightning
    private final Map<Integer, Integer> successMapping = Map.of(
-           1, 25,
-           2, 33
+           1, 10,
+           2, 20
    );
 
     @Override

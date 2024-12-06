@@ -21,7 +21,11 @@
   "enchantment.icon.sword": "瞖",
   "enchantment.icon.trident": "瞗",
 
-  "enchantment.rechantment.thunder_strike": "Chance to summon lightning to strike your targets.",
+  "enchantment.rechantment.thunder_strike": "Thunder Strike",
+  "enchantment.rechantment.thunder_strike.description": "Chance to summon lightning to strike your targets.",
+
+  "enchantment.rechantment.bash": "Bash",
+  "enchantment.rechantment.bash.description": "Knocks an attacker back if blocking.",
 
   "enchantment.minecraft.protection.description": "Reduces most types of damage by increasing amounts.",
   "enchantment.minecraft.fire_protection.description": "Reduces damage and burn time when lit on fire.",
