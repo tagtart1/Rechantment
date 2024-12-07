@@ -68,7 +68,6 @@ public class EnchantedBookItem extends Item {
     };
 
     public EnchantedBookItem(Properties pProperties) {
-
         super(pProperties);
     }
 
@@ -143,11 +142,6 @@ public class EnchantedBookItem extends Item {
     @Override
     public int getMaxStackSize(ItemStack stack) {
         return 1;
-    }
-
-    @Override
-    public boolean isFoil(ItemStack pStack) {
-        return true;
     }
 
     @Override
@@ -276,6 +270,4 @@ public class EnchantedBookItem extends Item {
         }
         return text;
     }
-
-
 }

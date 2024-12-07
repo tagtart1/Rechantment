@@ -65,4 +65,17 @@ public class UtilFunctions {
         }
         return new Pair<>("simple", ChatFormatting.GRAY);
     }
+
+    public static Pair<String, ChatFormatting> getRarityInfo(float rarity) {
+
+        int rarityInt = Math.round(rarity);
+        return switch (rarityInt) {
+            case 1 -> new Pair<>("simple", ChatFormatting.GRAY);
+            case 2 -> new Pair<>("unique", ChatFormatting.GREEN);
+            case 3 -> new Pair<>("elite", ChatFormatting.AQUA);
+            case 4 -> new Pair<>("ultimate", ChatFormatting.YELLOW);
+            case 5 -> new Pair<>("legendary", ChatFormatting.GOLD);
+            default -> new Pair<>("simple", ChatFormatting.GRAY);
+        };
+    }
 }

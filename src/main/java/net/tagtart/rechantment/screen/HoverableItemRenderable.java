@@ -1,22 +1,31 @@
 package net.tagtart.rechantment.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.tagtart.rechantment.item.ModItems;
 import net.tagtart.rechantment.util.BookRequirementProperties;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 public class HoverableItemRenderable implements Renderable {
 
     protected final ResourceLocation texture;
-    protected final BookRequirementProperties bookProperties;
 
-    // Item icons are 16x16, so we draw entire texture given
-    // (Have to assume it's 16x16 as well)
+    protected Inventory playerInventory;
+
+    // Item icons are 16x16 by default, but these can be set to any
+    // texture size. Entire image will render by default.
     protected int imageWidth = 16;
     protected int imageHeight = 16;
 
@@ -24,12 +33,22 @@ public class HoverableItemRenderable implements Renderable {
     protected int renderOffsetPosX;
     protected int renderOffsetPosY;
 
-    public HoverableItemRenderable(ResourceLocation textureResource, BookRequirementProperties properties, int posX, int posY)
+    protected ArrayList<Component> customTooltipLines;
+    protected boolean hoveredLastFrame = false;
+    protected boolean hoveredThisFrame = false;
+
+    public HoverableItemRenderable(Inventory pPlayerInventory, ResourceLocation textureResource, int posX, int posY)
     {
+        this(textureResource, posX, posY);
+        playerInventory = pPlayerInventory;
+    }
+
+    public HoverableItemRenderable(ResourceLocation textureResource, int posX, int posY) {
         renderOffsetPosX = posX;
         renderOffsetPosY = posY;
         texture = textureResource;
-        bookProperties = properties;
+
+        customTooltipLines = new ArrayList<>();
     }
 
     @Override
@@ -40,8 +59,44 @@ public class HoverableItemRenderable implements Renderable {
         RenderSystem.setShaderTexture(0, texture);
 
         guiGraphics.blit(texture, renderOffsetPosX, renderOffsetPosY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
-        //guiGraphics.renderFakeItem(itemStack, renderOffsetPosX, renderOffsetPosY);
-        //guiGraphics.fill(parentOriginX, parentOriginY, parentOriginX + renderOffsetPosX, parentOriginY + renderOffsetPosY, 1);
+
+        hoveredThisFrame = isMouseOverlapped(mouseX, mouseY);
+        if (hoveredThisFrame) {
+            if (!hoveredLastFrame) {
+                onHoverStart();
+            }
+            renderCustomTooltip(guiGraphics, mouseX, mouseY);
+        }
+        else {
+            if (hoveredLastFrame) {
+                onHoverEnd();
+            }
+        }
+
+        hoveredLastFrame = hoveredThisFrame;
     }
+
+    protected void onHoverStart() {
+
+    }
+
+    protected void onHoverEnd() {
+
+    }
+
+    private void renderCustomTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        guiGraphics.renderTooltip(Minecraft.getInstance().font, customTooltipLines, Optional.empty(), mouseX, mouseY);
+    }
+
+    // Uses point intersection with 2D AABB to determine if mouse is over the renderable.
+    public boolean isMouseOverlapped(int mouseX, int mouseY) {
+        int minX = renderOffsetPosX;
+        int minY = renderOffsetPosY;
+        int maxX = renderOffsetPosX + imageWidth;
+        int maxY = renderOffsetPosY + imageHeight;
+
+        return minX <= mouseX && maxX >= mouseX && minY <= mouseY && maxY >= mouseY;
+    }
+
 }
 
