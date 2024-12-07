@@ -8,6 +8,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageEffects;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
@@ -15,6 +16,7 @@ import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.phys.Vec2;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 import net.minecraftforge.event.entity.living.ShieldBlockEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -96,5 +98,25 @@ public class ModEvents {
                 }
             }
         }
+
+        @SubscribeEvent
+        public static void onLightningStrike(LivingHurtEvent event) {
+            Entity source = event.getSource().getEntity();
+            System.out.println(source);
+            if (source instanceof LightningBolt lightningBolt) {
+                // If the cause of the lightning bolt is the player
+                System.out.println(event.getEntity());
+                System.out.println(lightningBolt.getCause());
+                if (event.getEntity() == lightningBolt.getCause()) {
+                    System.out.println("CANCEL THIS DAMAGE NOW!!!");
+                    event.setCanceled(true);
+                }
+            }
+        }
+
+
     }
+
+
+
 }

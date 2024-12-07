@@ -2,6 +2,7 @@ package net.tagtart.rechantment.enchantment;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
@@ -31,7 +32,7 @@ public class ThunderStrikeEnchantment extends Enchantment {
             BlockPos targetPosition = pTarget.blockPosition();
 
             if (isSuccess(pLevel)) {
-                EntityType.LIGHTNING_BOLT.spawn(world, (ItemStack) null, null, targetPosition, MobSpawnType.TRIGGERED, true, true);
+                EntityType.LIGHTNING_BOLT.spawn(world, (ItemStack) null, (ServerPlayer) pAttacker, targetPosition, MobSpawnType.TRIGGERED, true, true);
             }
         }
     }

@@ -18,8 +18,6 @@ public class BashEnchantment extends Enchantment {
     }
 
 
-
-
     @Override
     public int getMaxLevel() {
         return 1;
