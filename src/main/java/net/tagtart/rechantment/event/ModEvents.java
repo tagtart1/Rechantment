@@ -30,8 +30,12 @@ import java.util.Map;
 import java.util.Vector;
 
 public class ModEvents {
+
     @Mod.EventBusSubscriber(modid = Rechantment.MOD_ID)
     public static class ForgeEvents {
+
+        public static float SHIELD_BASH_KNOCKBACK = 1.15f;
+        public static float SHIELD_BASH_KNOCKBACK_Y = 0.4f;
 
         @SubscribeEvent
         public static void onShieldBlock(ShieldBlockEvent event) {
@@ -46,6 +50,7 @@ public class ModEvents {
                 // TODO: add Courage enchantment
                 ResourceLocation bashResource = new ResourceLocation("rechantment:bash");
                 Map<Enchantment, Integer> shieldEnchants = EnchantmentHelper.getEnchantments(shield);
+                // Handle bash enchantment
                 if (shieldEnchants.containsKey(ForgeRegistries.ENCHANTMENTS.getValue(bashResource))) {
                     if (source.getDirectEntity() instanceof Projectile) {
                         return;
@@ -55,11 +60,11 @@ public class ModEvents {
                     double d1 = attacker.getZ() - player.getZ();
                     Vec2 toAttacker = new Vec2((float)d0, (float)d1);
                     toAttacker = toAttacker.normalized();
-                    toAttacker = toAttacker.scale(3f);
+                    toAttacker = toAttacker.scale(SHIELD_BASH_KNOCKBACK);
 
 
                         if (attacker.isPushable()) {
-                            attacker.push(toAttacker.x, 0.2, toAttacker.y);
+                            attacker.push(toAttacker.x, SHIELD_BASH_KNOCKBACK_Y, toAttacker.y);
                         }
 
                     System.out.println(attacker.isPushable());
