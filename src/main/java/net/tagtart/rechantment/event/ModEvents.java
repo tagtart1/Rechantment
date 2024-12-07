@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageEffects;
 import net.minecraft.world.damagesource.DamageSource;
@@ -16,6 +17,7 @@ import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.phys.Vec2;
+import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 import net.minecraftforge.event.entity.living.ShieldBlockEvent;
@@ -24,6 +26,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.Rechantment;
+import net.tagtart.rechantment.enchantment.ThunderStrikeEnchantment;
 import net.tagtart.rechantment.util.UtilFunctions;
 
 import java.awt.*;
@@ -100,19 +103,17 @@ public class ModEvents {
         }
 
         @SubscribeEvent
-        public static void onLightningStrike(LivingHurtEvent event) {
-            Entity source = event.getSource().getEntity();
-            System.out.println(source);
-            if (source instanceof LightningBolt lightningBolt) {
-                // If the cause of the lightning bolt is the player
-                System.out.println(event.getEntity());
-                System.out.println(lightningBolt.getCause());
-                if (event.getEntity() == lightningBolt.getCause()) {
-                    System.out.println("CANCEL THIS DAMAGE NOW!!!");
-                    event.setCanceled(true);
-                }
+        public static void onLightningStrike(EntityStruckByLightningEvent event) {
+
+            if (event.getEntity() instanceof ServerPlayer && event.getLightning().getCause() == event.getEntity()) {
+
+                event.setCanceled(true);
+                System.out.println("Player struck by lightning but damage is canceled!");
             }
         }
+
+
+
 
 
     }
