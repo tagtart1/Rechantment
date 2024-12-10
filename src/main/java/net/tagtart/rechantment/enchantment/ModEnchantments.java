@@ -23,6 +23,10 @@ public class ModEnchantments {
             ENCHANTMENTS.register("bash", () -> new BashEnchantment(
                     Enchantment.Rarity.COMMON, EnchantmentCategory.BREAKABLE, EquipmentSlot.OFFHAND));
 
+    public static RegistryObject<Enchantment> COURAGE =
+            ENCHANTMENTS.register("courage", () -> new CourageEnchantment(
+                    Enchantment.Rarity.COMMON, EnchantmentCategory.BREAKABLE, EquipmentSlot.OFFHAND));
+
 
     public static void register(IEventBus eventBus) {
         ENCHANTMENTS.register(eventBus);

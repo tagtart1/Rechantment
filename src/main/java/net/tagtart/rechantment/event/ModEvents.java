@@ -50,7 +50,7 @@ public class ModEvents {
             ItemStack shield = player.getUseItem();
 
             if(shield.getItem() instanceof ShieldItem) {
-                // TODO: tweak knockback value
+
 
                 // TODO: add Courage enchantment
                 ResourceLocation bashResource = new ResourceLocation("rechantment:bash");
@@ -102,15 +102,7 @@ public class ModEvents {
             }
         }
 
-        @SubscribeEvent
-        public static void onLightningStrike(EntityStruckByLightningEvent event) {
 
-            if (event.getEntity() instanceof ServerPlayer && event.getLightning().getCause() == event.getEntity()) {
-
-                event.setCanceled(true);
-                System.out.println("Player struck by lightning but damage is canceled!");
-            }
-        }
 
 
 
