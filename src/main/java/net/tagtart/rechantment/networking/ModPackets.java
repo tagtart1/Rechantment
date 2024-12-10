@@ -8,6 +8,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.networking.packet.EnchantItemC2SPacket;
+import net.tagtart.rechantment.networking.packet.PurchaseEnchantedBookC2SPacket;
 import net.tagtart.rechantment.networking.packet.SyncEnchantItemS2CPacket;
 
 // EVERYTHING IN HERE IS NOT USED CURRENTLY, JUST BOILERPLATE
@@ -42,10 +43,10 @@ public class ModPackets {
                 .consumerMainThread(SyncEnchantItemS2CPacket::handle)
                 .add();
 
-        net.messageBuilder(SyncEnchantItemS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(SyncEnchantItemS2CPacket::new)
-                .encoder(SyncEnchantItemS2CPacket::toBytes)
-                .consumerMainThread(SyncEnchantItemS2CPacket::handle)
+        net.messageBuilder(PurchaseEnchantedBookC2SPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(PurchaseEnchantedBookC2SPacket::new)
+                .encoder(PurchaseEnchantedBookC2SPacket::toBytes)
+                .consumerMainThread(PurchaseEnchantedBookC2SPacket::handle)
                 .add();
     }
 
