@@ -58,5 +58,7 @@ public class AllBookProperties {
                 0.08f,
                 Blocks.ANCIENT_DEBRIS
         );
+
+        return ALL_BOOK_PROPERTIES;
     }
 }
