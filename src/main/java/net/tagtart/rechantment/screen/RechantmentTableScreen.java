@@ -6,24 +6,32 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.util.AllBookProperties;
 import net.tagtart.rechantment.util.BookRequirementProperties;
 import net.tagtart.rechantment.util.UtilFunctions;
-import org.jetbrains.annotations.NotNull;
 import oshi.util.tuples.Pair;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentTableMenu> {
 
-    public static final ResourceLocation simpleLocation = new ResourceLocation(Rechantment.MOD_ID, "textures/item/simple.png");
-    public static final ResourceLocation uniqueLocation = new ResourceLocation(Rechantment.MOD_ID, "textures/item/unique.png");
-    public static final ResourceLocation eliteLocation = new ResourceLocation(Rechantment.MOD_ID, "textures/item/elite.png");
-    public static final ResourceLocation ultimateLocation = new ResourceLocation(Rechantment.MOD_ID, "textures/item/ultimate.png");
-    public static final ResourceLocation legendaryLocation = new ResourceLocation(Rechantment.MOD_ID, "textures/item/legendary.png");
+    public static final Style PINK_COLOR_STYLE = Style.EMPTY.withColor(0xFCB4B4);
+    public static final Style MID_GRAY_COLOR_STYLE = Style.EMPTY.withColor(0xA8A8A8);
+
+    public static final ResourceLocation SIMPLE_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/item/simple.png");
+    public static final ResourceLocation UNIQUE_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/item/unique.png");
+    public static final ResourceLocation ELITE_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/item/elite.png");
+    public static final ResourceLocation ULTIMATE_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/item/ultimate.png");
+    public static final ResourceLocation LEGENDARY_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/item/legendary.png");
+
+    private static final Component grayHyphen = Component.literal("- ").withStyle(MID_GRAY_COLOR_STYLE);
+    private static final Component whiteArrow = Component.literal("→ ").withStyle(ChatFormatting.WHITE);
+    private static final Component redX = Component.literal("✘ ").withStyle(ChatFormatting.DARK_RED);
 
     private static final ResourceLocation TEXTURE =
             new ResourceLocation(Rechantment.MOD_ID, "textures/gui/enchantment_table.png");
@@ -53,11 +61,11 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         this.topPos = (height - imageHeight) / 2;
 
         hoverables = new ArrayList<>();
-        hoverables.add(new HoverableEnchantedBookItemRenderable(this, AllBookProperties.SIMPLE_PROPERTIES, simpleLocation, leftPos + 10, topPos + 44));
-        hoverables.add(new HoverableEnchantedBookItemRenderable(this, AllBookProperties.UNIQUE_PROPERTIES, uniqueLocation,  leftPos + 150, topPos + 44));
-        hoverables.add(new HoverableEnchantedBookItemRenderable(this,  AllBookProperties.ELITE_PROPERTIES, eliteLocation,leftPos + 41,  topPos + 41));
-        hoverables.add(new HoverableEnchantedBookItemRenderable(this, AllBookProperties.ULTIMATE_PROPERTIES, ultimateLocation, leftPos + 116, topPos + 41));
-        hoverables.add(new HoverableEnchantedBookItemRenderable(this, AllBookProperties.LEGENDARY_PROPERTIES,legendaryLocation, leftPos + 77, topPos + 37));
+        hoverables.add(new HoverableEnchantedBookItemRenderable(this, AllBookProperties.SIMPLE_PROPERTIES, SIMPLE_LOCATION, leftPos + 10, topPos + 44));
+        hoverables.add(new HoverableEnchantedBookItemRenderable(this, AllBookProperties.UNIQUE_PROPERTIES, UNIQUE_LOCATION,  leftPos + 150, topPos + 44));
+        hoverables.add(new HoverableEnchantedBookItemRenderable(this,  AllBookProperties.ELITE_PROPERTIES, ELITE_LOCATION,leftPos + 41,  topPos + 41));
+        hoverables.add(new HoverableEnchantedBookItemRenderable(this, AllBookProperties.ULTIMATE_PROPERTIES, ULTIMATE_LOCATION, leftPos + 116, topPos + 41));
+        hoverables.add(new HoverableEnchantedBookItemRenderable(this, AllBookProperties.LEGENDARY_PROPERTIES, LEGENDARY_LOCATION, leftPos + 77, topPos + 37));
     }
 
     @Override
@@ -109,23 +117,77 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
 
     public ArrayList<Component> getEnchantTableTooltipLines(BookRequirementProperties properties) {
 
-        ArrayList<Component> tooltipLines = new ArrayList<Component>();
+        ArrayList<Component> tooltipLines = new ArrayList<>();
 
         Pair<String, ChatFormatting> enchantRarityInfo = UtilFunctions.getRarityInfo(properties.rarity);
 
         // Tooltip "title", with rarity icon and generic book name.
-        String rarityIcon = Component.translatable("enchantment.rarity." + enchantRarityInfo.getA()).getString();
-        String bookTitle = Component.translatable("item.rechantment.enchantment_table.enchanted_book").withStyle(enchantRarityInfo.getB()).getString();
-        tooltipLines.add(Component.literal(rarityIcon + " " + bookTitle).withStyle(enchantRarityInfo.getB()));
+        Component rarityIcon = Component.translatable("enchantment.rarity." + enchantRarityInfo.getA());
+        Component bookTitle = Component.translatable("item.rechantment.enchanted_book").withStyle(enchantRarityInfo.getB());
+        tooltipLines.add(Component.literal(rarityIcon.getString()).append(" ").append(bookTitle));
         tooltipLines.add(Component.literal(" "));
 
-        tooltipLines.add(Component.translatable("item.rechantment.enchantment_table.enchanted_book_desc"));
+        String description = Component.translatable("tooltip.rechantment.enchantment_table.enchanted_book_desc").getString();
+        List<String> splitText = UtilFunctions.wrapText(description, 165);
+        for (String line : splitText) {
+            tooltipLines.add(Component.literal(line.trim()));
+        }
         tooltipLines.add(Component.literal(" "));
 
-        String experienceTitle = Component.translatable("tooltip.rechantment.enchantment_table.experience").getString();
+        // Experience requirement
+        Component experienceTitle = Component.translatable("tooltip.rechantment.enchantment_table.experience").withStyle(MID_GRAY_COLOR_STYLE);
+        Component experienceFrac = Component.literal(playerInventory.player.totalExperience + "/" + properties.requiredExp + " EXP").withStyle(ChatFormatting.WHITE);
+        tooltipLines.add(experienceTitle.copy().append(": ").append(experienceFrac));
+        tooltipLines.add(Component.literal(" "));
 
+        // Other requirements:
+        Component requirementsTitle = Component.translatable("tooltip.rechantment.enchantment_table.requirements").append(": ").withStyle(MID_GRAY_COLOR_STYLE);
+        tooltipLines.add(requirementsTitle);
 
+        // Bookshelf count requirement. Green color if requirement met.
+        String bookshelfCount = String.valueOf(properties.requiredBookShelves);
+        String bookshelvesName = Component.translatable("tooltip.rechantment.enchantment_table.bookshelves").getString();
+        ChatFormatting bookReqMetColor = playerMeetsBookshelfRequirement(properties) ? ChatFormatting.GREEN : ChatFormatting.RED;
+        Component fullBookRequirementColored = Component.literal(bookshelfCount + " " + bookshelvesName).withStyle(bookReqMetColor);
+        tooltipLines.add(grayHyphen.copy().append(fullBookRequirementColored));
 
+        // Floor block requirement. Green color if requirement met.
+        String floorBlockName = properties.floorBlock.getName().getString();
+        String floorTranslated = Component.translatable("tooltip.rechantment.enchantment_table.floor").getString();
+        ChatFormatting floorReqMetColor = playerMeetsFloorRequirement(properties) ? ChatFormatting.GREEN : ChatFormatting.RED;
+        Component fullFloorRequirementColored = Component.literal(floorBlockName + " " + floorTranslated).withStyle(floorReqMetColor);
+        tooltipLines.add(grayHyphen.copy().append(fullFloorRequirementColored));
+        tooltipLines.add(Component.literal(" "));
+
+        // Break chances:
+        String chancePerBlock = Component.translatable("tooltip.rechantment.enchantment_table.chance_per").getString();
+        Component breakChanceTitle = Component.translatable("tooltip.rechantment.enchantment_table.break_chance").append(":").withStyle(MID_GRAY_COLOR_STYLE);
+        tooltipLines.add(breakChanceTitle);
+
+        // Bookshelves break chance
+        String bookBreakChance = String.format("%.1f%%", properties.bookBreakChance * 100f);
+        tooltipLines.add(Component.literal("- " + bookshelvesName + ":"));
+        tooltipLines.add(Component.literal("    - " + bookBreakChance + " " + chancePerBlock).withStyle(PINK_COLOR_STYLE));
+
+        // Floor break chance
+        String floorBreakChance = String.format("%.1f%%", properties.floorBreakChance * 100f);
+        tooltipLines.add(Component.literal("- " + floorTranslated + ":"));
+        tooltipLines.add(Component.literal("    - " + floorBreakChance + " " + chancePerBlock).withStyle(PINK_COLOR_STYLE));
+        tooltipLines.add(Component.literal(" "));
+
+        // Shows left-click prompt if met, otherwise shows warning that requirements not met.
+        if (playerMeetsAllEnchantRequirements(properties)) {
+            Component leftClickPrompt = Component.translatable("tooltip.rechantment.enchantment_table.left_click").withStyle(enchantRarityInfo.getB());
+            tooltipLines.add(whiteArrow.copy().append(leftClickPrompt));
+        }
+        else {
+            Component reqNotMet = Component.translatable("tooltip.rechantment.enchantment_table.requirements_not_met").withStyle(ChatFormatting.RED);
+            tooltipLines.add(redX.copy().append(reqNotMet));
+        }
+
+        // Final line, show right click prompt.
+        Component rightClickPrompt = Component.translatable("tooltip.rechantment.enchantment_table.right_click").withStyle(enchantRarityInfo.getB());
+        tooltipLines.add(whiteArrow.copy().append(rightClickPrompt));
 
         return tooltipLines;
     }
@@ -135,10 +197,16 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
     }
 
     public boolean playerMeetsBookshelfRequirement(BookRequirementProperties bookProperties) {
-        return false;
+        return true;
     }
 
     public boolean playerMeetsFloorRequirement(BookRequirementProperties bookProperties) {
         return false;
+    }
+
+    public boolean playerMeetsAllEnchantRequirements(BookRequirementProperties bookProperties) {
+        return  playerMeetsBookshelfRequirement(bookProperties) &&
+                playerMeetsExpRequirement(bookProperties) &&
+                playerMeetsFloorRequirement(bookProperties);
     }
 }
