@@ -8,9 +8,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageEffects;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
@@ -42,6 +47,9 @@ public class ModEvents {
         public static float SHIELD_BASH_KNOCKBACK = 1.15f;
         public static float SHIELD_BASH_KNOCKBACK_Y = 0.4f;
 
+        public static int SHIELD_COURAGE_SPEED_DURATION = 40; // Speed in ticks
+
+
         @SubscribeEvent
         public static void onShieldBlock(ShieldBlockEvent event) {
             LivingEntity player = event.getEntity();
@@ -54,6 +62,7 @@ public class ModEvents {
 
                 // TODO: add Courage enchantment
                 ResourceLocation bashResource = new ResourceLocation("rechantment:bash");
+                ResourceLocation courageResource = new ResourceLocation("rechantment:courage");
                 Map<Enchantment, Integer> shieldEnchants = EnchantmentHelper.getEnchantments(shield);
                 // Handle bash enchantment
                 if (shieldEnchants.containsKey(ForgeRegistries.ENCHANTMENTS.getValue(bashResource))) {
@@ -72,9 +81,22 @@ public class ModEvents {
                             attacker.push(toAttacker.x, SHIELD_BASH_KNOCKBACK_Y, toAttacker.y);
                         }
 
-                    System.out.println(attacker.isPushable());
+                }
+
+                // Check for Courage enchantment
+                if (shieldEnchants.containsKey(ForgeRegistries.ENCHANTMENTS.getValue(courageResource))) {
+                   int enchantmentLevel = shieldEnchants.get(ForgeRegistries.ENCHANTMENTS.getValue(courageResource));
+                   MobEffectInstance speedEffect = new MobEffectInstance(
+                           MobEffects.MOVEMENT_SPEED,
+                           SHIELD_COURAGE_SPEED_DURATION,
+                           enchantmentLevel - 1
+                   );
+
+                    player.addEffect(speedEffect);
                 }
             }
+
+
         }
 
         @SubscribeEvent
