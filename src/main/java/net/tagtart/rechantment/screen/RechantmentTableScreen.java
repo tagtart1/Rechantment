@@ -5,12 +5,14 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.tagtart.rechantment.Rechantment;
-import net.tagtart.rechantment.util.AllBookProperties;
 import net.tagtart.rechantment.util.BookRequirementProperties;
 import net.tagtart.rechantment.util.UtilFunctions;
 import oshi.util.tuples.Pair;
@@ -40,6 +42,8 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
 
     public Inventory playerInventory;
 
+    private BlockState[] cachedBookshelvesInRange;
+    private BlockState[] cachedFloorBlocksInRange;
 
     public RechantmentTableScreen(RechantmentTableMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
@@ -61,11 +65,11 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         this.topPos = (height - imageHeight) / 2;
 
         hoverables = new ArrayList<>();
-        hoverables.add(new HoverableEnchantedBookItemRenderable(this, AllBookProperties.SIMPLE_PROPERTIES, SIMPLE_LOCATION, leftPos + 10, topPos + 44));
-        hoverables.add(new HoverableEnchantedBookItemRenderable(this, AllBookProperties.UNIQUE_PROPERTIES, UNIQUE_LOCATION,  leftPos + 150, topPos + 44));
-        hoverables.add(new HoverableEnchantedBookItemRenderable(this,  AllBookProperties.ELITE_PROPERTIES, ELITE_LOCATION,leftPos + 41,  topPos + 41));
-        hoverables.add(new HoverableEnchantedBookItemRenderable(this, AllBookProperties.ULTIMATE_PROPERTIES, ULTIMATE_LOCATION, leftPos + 116, topPos + 41));
-        hoverables.add(new HoverableEnchantedBookItemRenderable(this, AllBookProperties.LEGENDARY_PROPERTIES, LEGENDARY_LOCATION, leftPos + 77, topPos + 37));
+        hoverables.add(new HoverableEnchantedBookItemRenderable(this, 0, SIMPLE_LOCATION, leftPos + 10, topPos + 44));
+        hoverables.add(new HoverableEnchantedBookItemRenderable(this, 1, UNIQUE_LOCATION,  leftPos + 150, topPos + 44));
+        hoverables.add(new HoverableEnchantedBookItemRenderable(this,  2, ELITE_LOCATION,leftPos + 41,  topPos + 41));
+        hoverables.add(new HoverableEnchantedBookItemRenderable(this, 3, ULTIMATE_LOCATION, leftPos + 116, topPos + 41));
+        hoverables.add(new HoverableEnchantedBookItemRenderable(this, 4, LEGENDARY_LOCATION, leftPos + 77, topPos + 37));
     }
 
     @Override
@@ -98,9 +102,20 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         if (pButton == 0) {
             for (HoverableEnchantedBookItemRenderable hoverable : hoverables) {
                 if (hoverable.isMouseOverlapped((int) Math.round(pMouseX), (int) Math.round(pMouseY))) {
-                    // Reward book based on properties.
-                    // hoverable.bookProperties
+                    BookRequirementProperties properties = hoverable.bookProperties;
 
+                    if (!expRequirementMet(properties)) {
+                        // Send warning message to player, and close screen.
+                        playerInventory.player.closeContainer();
+                        break;
+                    }
+
+                    if (!floorRequirementsMet(properties) && !bookshelfRequirementsMet(properties)) {
+                        // Just play sound, don't close
+                        break;
+                    }
+
+                    // At this point, they meet the requirements.
                 }
             }
         }
@@ -116,6 +131,10 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
     }
 
     public ArrayList<Component> getEnchantTableTooltipLines(BookRequirementProperties properties) {
+
+        // VERY IMPORTANT to note. On client side, we only recompute if requirements are valid when tooltip is refreshed,
+        // which only happens when a new item is initially hovered in this case. Server-side checks are in PurchaseEnchantedBookC2SPacket.
+        refreshCachedBlockStates(properties);
 
         ArrayList<Component> tooltipLines = new ArrayList<>();
 
@@ -147,14 +166,14 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         // Bookshelf count requirement. Green color if requirement met.
         String bookshelfCount = String.valueOf(properties.requiredBookShelves);
         String bookshelvesName = Component.translatable("tooltip.rechantment.enchantment_table.bookshelves").getString();
-        ChatFormatting bookReqMetColor = playerMeetsBookshelfRequirement(properties) ? ChatFormatting.GREEN : ChatFormatting.RED;
+        ChatFormatting bookReqMetColor = bookshelfRequirementsMet(properties) ? ChatFormatting.GREEN : ChatFormatting.RED;
         Component fullBookRequirementColored = Component.literal(bookshelfCount + " " + bookshelvesName).withStyle(bookReqMetColor);
         tooltipLines.add(grayHyphen.copy().append(fullBookRequirementColored));
 
         // Floor block requirement. Green color if requirement met.
         String floorBlockName = properties.floorBlock.getName().getString();
         String floorTranslated = Component.translatable("tooltip.rechantment.enchantment_table.floor").getString();
-        ChatFormatting floorReqMetColor = playerMeetsFloorRequirement(properties) ? ChatFormatting.GREEN : ChatFormatting.RED;
+        ChatFormatting floorReqMetColor = floorRequirementsMet(properties) ? ChatFormatting.GREEN : ChatFormatting.RED;
         Component fullFloorRequirementColored = Component.literal(floorBlockName + " " + floorTranslated).withStyle(floorReqMetColor);
         tooltipLines.add(grayHyphen.copy().append(fullFloorRequirementColored));
         tooltipLines.add(Component.literal(" "));
@@ -192,21 +211,30 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         return tooltipLines;
     }
 
-    public boolean playerMeetsExpRequirement(BookRequirementProperties bookProperties) {
-        return playerInventory.player.totalExperience >= bookProperties.requiredExp;
+    public void refreshCachedBlockStates(BookRequirementProperties bookProperties) {
+
+        Level level = playerInventory.player.level();
+        BlockPos enchantTablePos = menu.blockEntity.getBlockPos();
+
+        cachedBookshelvesInRange = UtilFunctions.scanAroundBlockForBookshelves(level, enchantTablePos);
+        cachedFloorBlocksInRange = UtilFunctions.scanAroundBlockForValidFloors(bookProperties.floorBlock, level, enchantTablePos);
     }
 
-    public boolean playerMeetsBookshelfRequirement(BookRequirementProperties bookProperties) {
-        return true;
+    public boolean expRequirementMet(BookRequirementProperties bookProperties) {
+        return UtilFunctions.playerMeetsExpRequirement(bookProperties, playerInventory.player);
     }
 
-    public boolean playerMeetsFloorRequirement(BookRequirementProperties bookProperties) {
-        return false;
+    public boolean bookshelfRequirementsMet (BookRequirementProperties bookProperties) {
+        return UtilFunctions.playerMeetsBookshelfRequirement(bookProperties, cachedBookshelvesInRange);
+    }
+
+    public boolean floorRequirementsMet(BookRequirementProperties bookProperties) {
+        return UtilFunctions.playerMeetsFloorRequirement(bookProperties, cachedFloorBlocksInRange);
     }
 
     public boolean playerMeetsAllEnchantRequirements(BookRequirementProperties bookProperties) {
-        return  playerMeetsBookshelfRequirement(bookProperties) &&
-                playerMeetsExpRequirement(bookProperties) &&
-                playerMeetsFloorRequirement(bookProperties);
+        return  bookshelfRequirementsMet(bookProperties) &&
+                expRequirementMet(bookProperties) &&
+                floorRequirementsMet(bookProperties);
     }
 }

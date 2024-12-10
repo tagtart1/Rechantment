@@ -41,6 +41,12 @@ public class ModPackets {
                 .encoder(SyncEnchantItemS2CPacket::toBytes)
                 .consumerMainThread(SyncEnchantItemS2CPacket::handle)
                 .add();
+
+        net.messageBuilder(SyncEnchantItemS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SyncEnchantItemS2CPacket::new)
+                .encoder(SyncEnchantItemS2CPacket::toBytes)
+                .consumerMainThread(SyncEnchantItemS2CPacket::handle)
+                .add();
     }
 
     public static <PACKET> void sentToServer(PACKET packet) {
