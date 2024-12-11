@@ -1,8 +1,10 @@
 package net.tagtart.rechantment.enchantment;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.*;
@@ -12,7 +14,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.BiomeSources;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.world.BiomeModifier;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Map;
 import java.util.Random;
@@ -35,6 +40,9 @@ public class ThunderStrikeEnchantment extends Enchantment {
     @Override
     public void doPostAttack(LivingEntity pAttacker, Entity pTarget, int pLevel) {
 
+        System.out.println(ForgeRegistries.ENTITY_TYPES.getKey(pTarget.getType()).toString());
+
+        
         if (!pAttacker.level().isClientSide()) {
             ServerLevel world = ((ServerLevel) pAttacker.level());
             BlockPos targetPosition = pTarget.blockPosition();
