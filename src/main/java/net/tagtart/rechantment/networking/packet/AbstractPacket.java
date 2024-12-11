@@ -19,6 +19,4 @@ public abstract class AbstractPacket {
     public abstract void toBytes(FriendlyByteBuf buf);
 
     public abstract boolean handle(Supplier<NetworkEvent.Context> supplier);
-
-    public abstract NetworkDirection getNetworkDirection();
 }

@@ -94,20 +94,30 @@ public class UtilFunctions {
 
     // Forms a bounding box around the provided position by offsetting the corners by the provided offset values,
     // then returns an array of all block states in the level inside that bounding box. If a filter is provided,
-    // only blocks matching the type provided will be returned. Keep in mind the offsets are absolutes, as in,
-    // lowerLeft will be subtracted from given position, and upperRight will be added!
-    public static BlockState[] getAllBlockStatesAroundBlock(Level level, BlockPos centerPos, Vec3 lowerLeftOffset, Vec3 upperRightOffset, @Nullable Block blockFilter) {
+    // only blocks matching the type provided will be returned (otherwise, all are returned). Keep in mind the offsets are absolutes,
+    // as in, lowerLeft will be subtracted from given position, and upperRight will be added!
+    public static Pair<BlockState[], BlockPos[]> getAllBlockInfoAroundBlock(Level level, BlockPos centerPos, Vec3i lowerLeftOffset, Vec3i upperRightOffset, @Nullable Block blockFilter) {
 
-        Vec3 lowerLeft = centerPos.getCenter().subtract(lowerLeftOffset);
-        Vec3 upperRight = centerPos.getCenter().add(upperRightOffset);
-        AABB blockAABB = new AABB(lowerLeft, upperRight);
+        Vec3i lowerLeft = centerPos.subtract(lowerLeftOffset);
+        Vec3i upperRight = centerPos.offset(upperRightOffset);
 
-        Stream<BlockState> allStates = level.getBlockStates(blockAABB);
+        ArrayList<BlockPos> positions = new ArrayList<>();
+        ArrayList<BlockState> states = new ArrayList<>();
+        for (int x = lowerLeft.getX(); x <= upperRight.getX(); ++x) {
+            for (int y = lowerLeft.getY(); y <= upperRight.getY(); ++y) {
+                for (int z = lowerLeft.getZ(); z <= upperRight.getZ(); ++z) {
+                    BlockPos pos = new BlockPos(x, y, z);
+                    BlockState state = level.getBlockState(pos);
 
-        if (blockFilter != null)
-            return allStates.filter(state -> state.is(blockFilter)).toArray(BlockState[]::new);
+                    if (blockFilter == null || state.is(blockFilter)) {
+                        positions.add(pos);
+                        states.add(state);
+                    }
+                }
+            }
+        }
 
-        return allStates.toArray(BlockState[]::new);
+        return new Pair<>(states.toArray(BlockState[]::new), positions.toArray(BlockPos[]::new));
     }
 
     public static boolean playerMeetsExpRequirement(BookRequirementProperties bookProperties, Player player) {
@@ -128,14 +138,14 @@ public class UtilFunctions {
         return blocksPresent >= 9;
     }
 
-    public static BlockState[] scanAroundBlockForBookshelves(Level level, BlockPos blockPos){
+    public static Pair<BlockState[], BlockPos[]> scanAroundBlockForBookshelves(Level level, BlockPos blockPos){
 
         // Might read these from config instead but probably not for now?
         // Compute AABB corners for scanning level:
-        Vec3 bookshelfCheckLowerLeftOffset = new Vec3(3, 0, 3);
-        Vec3 bookshelfCheckUpperRightOffset = new Vec3(3, 2, 3);
+        Vec3i bookshelfCheckLowerLeftOffset = new Vec3i(3, 0, 3);
+        Vec3i bookshelfCheckUpperRightOffset = new Vec3i(3, 2, 3);
 
-        BlockState[] bookshelves = UtilFunctions.getAllBlockStatesAroundBlock(
+        var bookBlockInfo = UtilFunctions.getAllBlockInfoAroundBlock(
                 level,
                 blockPos,
                 bookshelfCheckLowerLeftOffset,
@@ -143,15 +153,15 @@ public class UtilFunctions {
                 Blocks.BOOKSHELF
         );
 
-        return bookshelves;
+        return bookBlockInfo;
     }
 
-    public static BlockState[] scanAroundBlockForValidFloors(Block validBlock, Level level, BlockPos blockPos){
+    public static Pair<BlockState[], BlockPos[]> scanAroundBlockForValidFloors(Block validBlock, Level level, BlockPos blockPos){
 
-        Vec3 floorCheckLowerLeftOffset = new Vec3(1, 0, 1);
-        Vec3 floorCheckUpperRightOffset = new Vec3(1, 0, 1);
+        Vec3i floorCheckLowerLeftOffset = new Vec3i(1, 0, 1);
+        Vec3i floorCheckUpperRightOffset = new Vec3i(1, 0, 1);
 
-        BlockState[] floorBlocks = UtilFunctions.getAllBlockStatesAroundBlock(
+         var floorBlockInfo = UtilFunctions.getAllBlockInfoAroundBlock(
                 level,
                 blockPos.subtract(new Vec3i(0, 1, 0)), // Checking one block under enchant table.
                 floorCheckLowerLeftOffset,
@@ -159,7 +169,7 @@ public class UtilFunctions {
                 validBlock
         );
 
-        return floorBlocks;
+        return floorBlockInfo;
     }
 
     public static boolean playerMeetsAllEnchantRequirements(BookRequirementProperties bookProperties, Player player, BlockState[] bookshelves, BlockState[] floorBlocks) {
@@ -170,4 +180,6 @@ public class UtilFunctions {
 
         return expReqMet && shelvesReqMet && floorReqMet;
     }
+
+
 }

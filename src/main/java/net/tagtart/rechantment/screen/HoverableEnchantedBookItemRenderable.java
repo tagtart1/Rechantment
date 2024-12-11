@@ -9,13 +9,15 @@ import net.tagtart.rechantment.util.BookRequirementProperties;
 public class HoverableEnchantedBookItemRenderable extends HoverableItemRenderable {
 
     public BookRequirementProperties bookProperties;
+    public int propertiesIndex;
 
     protected RechantmentTableScreen screen;
 
     protected EnchantmentTableBlockEntity enchantmentTable;
 
-    public HoverableEnchantedBookItemRenderable(RechantmentTableScreen pScreen, int propertiesIndex, ResourceLocation textureResource, int posX, int posY) {
+    public HoverableEnchantedBookItemRenderable(RechantmentTableScreen pScreen, int pPropertiesIndex, ResourceLocation textureResource, int posX, int posY) {
         super(pScreen.playerInventory, textureResource, posX, posY);
+        propertiesIndex = pPropertiesIndex;
         bookProperties = AllBookProperties.getAllProperties()[propertiesIndex];
         screen = pScreen;
     }

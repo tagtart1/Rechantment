@@ -3,7 +3,9 @@ package net.tagtart.rechantment.item.custom;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.context.UseOnContext;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.networking.ModPackets;
 import net.tagtart.rechantment.networking.packet.EnchantItemC2SPacket;
@@ -226,6 +228,12 @@ public class EnchantedBookItem extends Item {
             return false;
         }
     }
+
+    @Override
+    public boolean isFoil(ItemStack pStack) {
+        return true;
+    }
+
 
     private void applyEnchantsSafely(Map<Enchantment, Integer> enchants, ItemStack item, Player pPlayer, Level level, ItemStack enchantedBook) {
         assert enchantedBook.getTag() != null;

@@ -9,10 +9,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.tagtart.rechantment.Rechantment;
+import net.tagtart.rechantment.networking.ModPackets;
+import net.tagtart.rechantment.networking.packet.PurchaseEnchantedBookC2SPacket;
+import net.tagtart.rechantment.sound.ModSounds;
 import net.tagtart.rechantment.util.BookRequirementProperties;
 import net.tagtart.rechantment.util.UtilFunctions;
 import oshi.util.tuples.Pair;
@@ -67,9 +72,9 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         hoverables = new ArrayList<>();
         hoverables.add(new HoverableEnchantedBookItemRenderable(this, 0, SIMPLE_LOCATION, leftPos + 10, topPos + 44));
         hoverables.add(new HoverableEnchantedBookItemRenderable(this, 1, UNIQUE_LOCATION,  leftPos + 150, topPos + 44));
-        hoverables.add(new HoverableEnchantedBookItemRenderable(this,  2, ELITE_LOCATION,leftPos + 41,  topPos + 41));
+        hoverables.add(new HoverableEnchantedBookItemRenderable(this,  2, ELITE_LOCATION,leftPos + 43,  topPos + 40));
         hoverables.add(new HoverableEnchantedBookItemRenderable(this, 3, ULTIMATE_LOCATION, leftPos + 116, topPos + 41));
-        hoverables.add(new HoverableEnchantedBookItemRenderable(this, 4, LEGENDARY_LOCATION, leftPos + 77, topPos + 37));
+        hoverables.add(new HoverableEnchantedBookItemRenderable(this, 4, LEGENDARY_LOCATION, leftPos + 78, topPos + 38));
     }
 
     @Override
@@ -100,22 +105,46 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
 
         // If mouse overlaps a custom Hoverable and was left-clicked:
         if (pButton == 0) {
+            System.out.println("click occurred!");
+            Player player = playerInventory.player;
+            Level level = player.level();
+
             for (HoverableEnchantedBookItemRenderable hoverable : hoverables) {
                 if (hoverable.isMouseOverlapped((int) Math.round(pMouseX), (int) Math.round(pMouseY))) {
+                    System.out.println(String.format("clicked a hoverable, %d books, %d floors!", cachedBookshelvesInRange.length, cachedFloorBlocksInRange.length));
                     BookRequirementProperties properties = hoverable.bookProperties;
 
-                    if (!expRequirementMet(properties)) {
-                        // Send warning message to player, and close screen.
-                        playerInventory.player.closeContainer();
-                        break;
-                    }
-
                     if (!floorRequirementsMet(properties) && !bookshelfRequirementsMet(properties)) {
-                        // Just play sound, don't close
+                        // Just play sound, don't close TODO: ADD PROPER SOUND LIKE MOD HAS.
+                        level.playSound(null, player.getOnPos(), ModSounds.ENCHANTED_BOOK_FAIL.get(), SoundSource.PLAYERS, 10f, 1f);
                         break;
                     }
 
-                    // At this point, they meet the requirements.
+                    if (playerInventory.getFreeSlot() == -1) {
+                        // Send warning message to player, and close screen.
+                        player.closeContainer();
+                        level.playSound(null, player.getOnPos(), ModSounds.ENCHANTED_BOOK_FAIL.get(), SoundSource.PLAYERS, 10f, 1f);
+
+                        Component translatedMsg = Component.translatable("message.rechantment.inventory_full").withStyle(ChatFormatting.RED);
+                        player.sendSystemMessage(translatedMsg);
+                        break;
+                    }
+
+                    if (!expRequirementMet(properties)) {
+                        // Also send warning message to player, and close screen.
+                        player.closeContainer();
+                        level.playSound(null, player.getOnPos(), ModSounds.ENCHANTED_BOOK_FAIL.get(), SoundSource.PLAYERS, 10f, 1f);
+
+                        String translatedMsg = Component.translatable("message.rechantment.insufficient_exp").getString();
+                        String argsAdded = String.format(translatedMsg, player.totalExperience, properties.requiredExp);
+                        player.sendSystemMessage(Component.literal(argsAdded).withStyle(ChatFormatting.RED));
+
+                        break;
+                    }
+
+                    // At this point, they meet the requirements. Can try to send a packet to server!
+                    ModPackets.sentToServer(new PurchaseEnchantedBookC2SPacket(hoverable.propertiesIndex, menu.blockEntity.getBlockPos()));
+                    return true;
                 }
             }
         }
@@ -216,8 +245,8 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         Level level = playerInventory.player.level();
         BlockPos enchantTablePos = menu.blockEntity.getBlockPos();
 
-        cachedBookshelvesInRange = UtilFunctions.scanAroundBlockForBookshelves(level, enchantTablePos);
-        cachedFloorBlocksInRange = UtilFunctions.scanAroundBlockForValidFloors(bookProperties.floorBlock, level, enchantTablePos);
+        cachedBookshelvesInRange = UtilFunctions.scanAroundBlockForBookshelves(level, enchantTablePos).getA();
+        cachedFloorBlocksInRange = UtilFunctions.scanAroundBlockForValidFloors(bookProperties.floorBlock, level, enchantTablePos).getA();
     }
 
     public boolean expRequirementMet(BookRequirementProperties bookProperties) {

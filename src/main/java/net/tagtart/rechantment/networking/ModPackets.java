@@ -8,6 +8,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.networking.packet.EnchantItemC2SPacket;
+import net.tagtart.rechantment.networking.packet.EnchantPurchaseResultS2CPacket;
 import net.tagtart.rechantment.networking.packet.PurchaseEnchantedBookC2SPacket;
 import net.tagtart.rechantment.networking.packet.SyncEnchantItemS2CPacket;
 
@@ -43,11 +44,17 @@ public class ModPackets {
                 .consumerMainThread(SyncEnchantItemS2CPacket::handle)
                 .add();
 
-        net.messageBuilder(PurchaseEnchantedBookC2SPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+        net.messageBuilder(PurchaseEnchantedBookC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .decoder(PurchaseEnchantedBookC2SPacket::new)
                 .encoder(PurchaseEnchantedBookC2SPacket::toBytes)
                 .consumerMainThread(PurchaseEnchantedBookC2SPacket::handle)
                 .add();
+
+//        net.messageBuilder(EnchantPurchaseResultS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+//                .decoder(EnchantPurchaseResultS2CPacket::new)
+//                .encoder(EnchantPurchaseResultS2CPacket::toBytes)
+//                .consumerMainThread(EnchantPurchaseResultS2CPacket::handle)
+//                .add();
     }
 
     public static <PACKET> void sentToServer(PACKET packet) {
