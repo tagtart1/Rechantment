@@ -40,9 +40,6 @@ public class ThunderStrikeEnchantment extends Enchantment {
     @Override
     public void doPostAttack(LivingEntity pAttacker, Entity pTarget, int pLevel) {
 
-        System.out.println(ForgeRegistries.ENTITY_TYPES.getKey(pTarget.getType()).toString());
-
-        
         if (!pAttacker.level().isClientSide()) {
             ServerLevel world = ((ServerLevel) pAttacker.level());
             BlockPos targetPosition = pTarget.blockPosition();

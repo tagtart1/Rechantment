@@ -59,7 +59,8 @@ public class RechantmentCommonConfigs {
                 "minecraft:fire_aspect",
                 "minecraft:flame",
                 "minecraft:frost_walker",
-                "minecraft:soul_speed"
+                "minecraft:soul_speed",
+                "rechantment:voids_bane"
         ), s -> s instanceof String);
         BUILDER.pop();
 
