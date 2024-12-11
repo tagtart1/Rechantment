@@ -31,12 +31,15 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.Rechantment;
+import net.tagtart.rechantment.enchantment.ModEnchantments;
 import net.tagtart.rechantment.enchantment.ThunderStrikeEnchantment;
+import net.tagtart.rechantment.enchantment.VoidsBaneEnchantment;
 import net.tagtart.rechantment.util.UtilFunctions;
 
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 public class ModEvents {
@@ -120,6 +123,36 @@ public class ModEvents {
                             tooltip.set(i, modifiedText);
                         }
                     }
+                }
+            }
+        }
+
+        @SubscribeEvent
+        public static void onLivingHurt(LivingHurtEvent event) {
+            // Check if attacker is player
+            if (event.getSource().getEntity() instanceof LivingEntity player) {
+                ItemStack weapon = player.getMainHandItem();
+                ResourceLocation voidsBaneResource = new ResourceLocation("rechantment:voids_bane");
+                Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(weapon);
+                Enchantment voidsBaneBase = ForgeRegistries.ENCHANTMENTS.getValue(voidsBaneResource);
+
+                // Check if the weapon has voids bane
+                if (enchantments.containsKey(voidsBaneBase)) {
+                   VoidsBaneEnchantment voidsBane = (VoidsBaneEnchantment) voidsBaneBase;
+                   ResourceLocation targetId = ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType());
+                   if (targetId != null && voidsBane != null) {
+                       String targetIdString = targetId.toString();
+
+                       // Check if the target can be effected by voids bane
+                       if (voidsBane.validTargets.contains(targetIdString)) {
+                           // Apply bonus damage
+                           int enchantmentOnWeaponLevel = enchantments.get(voidsBaneBase);
+                           float bonusDamage = voidsBane.getDamageBonus(enchantmentOnWeaponLevel);
+                           event.setAmount(event.getAmount() + bonusDamage);
+                       }
+                   }
+
+
                 }
             }
         }

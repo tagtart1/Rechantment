@@ -22,7 +22,7 @@ public class VoidsBaneEnchantment extends Enchantment {
         super(pRarity, pCategory, pSlots);
     }
 
-    List<String> affectedMobs = Arrays.asList(
+    public final List<String> validTargets = Arrays.asList(
             "endermanoverhaul:end_enderman",
             "endermanoverhaul:end_islands_enderman",
             "betterend:end_slime",
@@ -35,7 +35,7 @@ public class VoidsBaneEnchantment extends Enchantment {
             "minecraft:shulker",
             "minecraft:ender_dragon");
 
-    List<Float> damageBonusLevels = Arrays.asList(
+    private final List<Float> damageBonusLevels = Arrays.asList(
             2f, // Level 1
             3f, // Level 2
             4f, // Level 3
@@ -44,23 +44,9 @@ public class VoidsBaneEnchantment extends Enchantment {
 
 
 
-    @Override
-    public void doPostAttack(LivingEntity pAttacker, Entity pTarget, int pLevel) {
-        if (pAttacker.level().isClientSide()) return;
-        ResourceLocation entityId = ForgeRegistries.ENTITY_TYPES.getKey(pTarget.getType());
-        if (entityId == null || !affectedMobs.contains((entityId.toString()))) { return; }
-
-        float damageBonus = damageBonusLevels.get(pLevel - 1);
-
-        if (pAttacker instanceof Player player && pTarget instanceof LivingEntity livingTarget) {
-           // MOVE THIS TO AN EVENT TO MAKE THE  DAMAGE ADDITIVE
-        }
-        super.doPostAttack(pAttacker, pTarget, pLevel);
-    }
 
     public float getDamageBonus(int pLevel) {
-        // calucalte additive damage here
-        return 1f;
+        return damageBonusLevels.get(pLevel - 1);
     }
 
 
