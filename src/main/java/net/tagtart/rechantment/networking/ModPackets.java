@@ -48,6 +48,7 @@ public class ModPackets {
                 .encoder(PurchaseEnchantedBookC2SPacket::toBytes)
                 .consumerMainThread(PurchaseEnchantedBookC2SPacket::handle)
                 .add();
+    }
 
     public static <PACKET> void sentToServer(PACKET packet) {
         INSTANCE.sendToServer(packet);
