@@ -15,8 +15,12 @@ import net.tagtart.rechantment.networking.PurchaseBookResultCase;
 import net.tagtart.rechantment.util.AllBookProperties;
 import net.tagtart.rechantment.util.BookRequirementProperties;
 import net.tagtart.rechantment.util.UtilFunctions;
+import org.checkerframework.checker.units.qual.A;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Supplier;
 
 // This should only be created if the CLIENT side has also properly detected that
@@ -87,18 +91,43 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
                         level.destroyBlock(position, false);
                 }
 
-                // Do same for floor blocks.
-                for (int i = 0; i < floorBlocks.getB().length; ++i) {
-                    BlockPos position = floorBlocks.getB()[i];
-                    if (random.nextFloat() < bookProperties.floorBreakChance)
-                        level.destroyBlock(position, false);
+                // Do same for floor blocks, with extra logic prevent the block under
+                // the table from breaking if possible.
+                HashSet<Integer> remainingBlocks = new HashSet<>();
+                BlockPos[] floorPositions = floorBlocks.getB();
+                for (int i = 0; i < floorPositions.length; ++i)
+                    remainingBlocks.add(i);
+
+                int underTableIndex = -1; // If still -1, don't offset the block under table's destruction to another block!
+                for (int i = 0; i < floorPositions.length; ++i) {
+                    BlockPos position = floorPositions[i];
+                    if (random.nextFloat() < bookProperties.floorBreakChance) {
+
+                        if (position.getX() == enchantTablePos.getX() && position.getZ() == enchantTablePos.getZ()) {
+                            underTableIndex = i;
+                        }
+                        else {
+                            level.destroyBlock(position, false);
+                        }
+                        remainingBlocks.remove(i);
+                    }
+                }
+
+                // This will be true if the center block (under the enchant table) was rolled to be destroyed.
+                // This should hopefully pick a random block that hasn't been destroyed. If all others were destroyed,
+                // then the center block itself DOES get destroyed since no other blocks remain.
+                if (underTableIndex != -1) {
+                    ArrayList<Integer> remainingBlocksIterable = new ArrayList<>(remainingBlocks);
+                    int randomBlock = underTableIndex;
+                    if (!remainingBlocksIterable.isEmpty())
+                        randomBlock = random.nextInt(remainingBlocksIterable.size());
+
+                    BlockPos position = floorPositions[randomBlock];
+                    level.destroyBlock(position, false);
                 }
 
                 ItemStack toGive = new ItemStack(ModItems.ENCHANTED_BOOK.get());
 
-                // Our custom Enchantment tag is different from the "Enchantments" list that items
-                // will normally get when calling itemStack.enchant(), so we must add the tag manually,
-                // as well as the success rate.
                 CompoundTag rootTag = toGive.getOrCreateTag();
 
                 CompoundTag enchantmentTag = new CompoundTag();
@@ -109,7 +138,6 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
                 rootTag.put("Enchantment", enchantmentTag);
                 rootTag.put("SuccessRate", successTag);
 
-                //toGive.enchant(Enchantments.BLOCK_FORTUNE, 2); // Just to test.
                 player.addItem(toGive);
             }
 

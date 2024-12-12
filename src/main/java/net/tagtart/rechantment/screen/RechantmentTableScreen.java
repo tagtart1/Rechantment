@@ -213,15 +213,19 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         tooltipLines.add(breakChanceTitle);
 
         // Bookshelves break chance
-        String bookBreakChance = String.format("%.1f%%", properties.bookBreakChance * 100f);
-        tooltipLines.add(Component.literal("- " + bookshelvesName + ":"));
-        tooltipLines.add(Component.literal("    - " + bookBreakChance + " " + chancePerBlock).withStyle(PINK_COLOR_STYLE));
+        if (properties.bookBreakChance > 0.0001f) {
+            String bookBreakChance = String.format("%.1f%%", properties.bookBreakChance * 100f);
+            tooltipLines.add(Component.literal("- " + bookshelvesName + ":"));
+            tooltipLines.add(Component.literal("    - " + bookBreakChance + " " + chancePerBlock).withStyle(PINK_COLOR_STYLE));
+        }
 
         // Floor break chance
-        String floorBreakChance = String.format("%.1f%%", properties.floorBreakChance * 100f);
-        tooltipLines.add(Component.literal("- " + floorTranslated + ":"));
-        tooltipLines.add(Component.literal("    - " + floorBreakChance + " " + chancePerBlock).withStyle(PINK_COLOR_STYLE));
-        tooltipLines.add(Component.literal(" "));
+        if (properties.floorBreakChance > 0.0001f) {
+            String floorBreakChance = String.format("%.1f%%", properties.floorBreakChance * 100f);
+            tooltipLines.add(Component.literal("- " + floorTranslated + ":"));
+            tooltipLines.add(Component.literal("    - " + floorBreakChance + " " + chancePerBlock).withStyle(PINK_COLOR_STYLE));
+            tooltipLines.add(Component.literal(" "));
+        }
 
         // Shows left-click prompt if met, otherwise shows warning that requirements not met.
         if (playerMeetsAllEnchantRequirements(properties)) {
