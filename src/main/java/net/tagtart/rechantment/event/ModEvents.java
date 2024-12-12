@@ -31,6 +31,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.Rechantment;
+import net.tagtart.rechantment.enchantment.HellsFuryEnchantment;
 import net.tagtart.rechantment.enchantment.ModEnchantments;
 import net.tagtart.rechantment.enchantment.ThunderStrikeEnchantment;
 import net.tagtart.rechantment.enchantment.VoidsBaneEnchantment;
@@ -132,9 +133,13 @@ public class ModEvents {
             // Check if attacker is player
             if (event.getSource().getEntity() instanceof LivingEntity player) {
                 ItemStack weapon = player.getMainHandItem();
+
                 ResourceLocation voidsBaneResource = new ResourceLocation("rechantment:voids_bane");
+                ResourceLocation hellsFuryResource = new ResourceLocation("rechantment:hells_fury");
+
                 Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(weapon);
                 Enchantment voidsBaneBase = ForgeRegistries.ENCHANTMENTS.getValue(voidsBaneResource);
+                Enchantment hellsFuryBase = ForgeRegistries.ENCHANTMENTS.getValue(hellsFuryResource);
 
                 // Check if the weapon has voids bane
                 if (enchantments.containsKey(voidsBaneBase)) {
@@ -149,20 +154,25 @@ public class ModEvents {
                            int enchantmentOnWeaponLevel = enchantments.get(voidsBaneBase);
                            float bonusDamage = voidsBane.getDamageBonus(enchantmentOnWeaponLevel);
                            event.setAmount(event.getAmount() + bonusDamage);
+
                        }
                    }
+                } else if (enchantments.containsKey(hellsFuryBase)) {
+                    HellsFuryEnchantment hellsFury = (HellsFuryEnchantment) hellsFuryBase;
+                    ResourceLocation targetId = ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType());
+
+                    if (targetId != null && hellsFury != null) {
+                        String targetIdString = targetId.toString();
+
+                        if (hellsFury.validTargets.contains(targetIdString)) {
+                            int enchantmentOnWeaponLevel = enchantments.get(hellsFuryBase);
+                            float bonusDamage = hellsFury.getDamageBonus(enchantmentOnWeaponLevel);
+                            event.setAmount(event.getAmount() + bonusDamage);
+
+                        }
+                    }
                 }
             }
         }
-
-
-
-
-
-
-
     }
-
-
-
 }
