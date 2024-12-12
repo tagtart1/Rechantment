@@ -39,7 +39,8 @@ public class VoidsBaneEnchantment extends Enchantment {
             2f, // Level 1
             3f, // Level 2
             4f, // Level 3
-            5f  // Level 4
+            5f, // Level 4
+            6f  // Level 5
     );
 
 
@@ -63,6 +64,6 @@ public class VoidsBaneEnchantment extends Enchantment {
 
     @Override
     public int getMaxLevel() {
-        return 4;
+        return 5;
     }
 }

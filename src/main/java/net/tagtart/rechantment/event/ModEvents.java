@@ -140,7 +140,7 @@ public class ModEvents {
                 Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(weapon);
                 Enchantment voidsBaneBase = ForgeRegistries.ENCHANTMENTS.getValue(voidsBaneResource);
                 Enchantment hellsFuryBase = ForgeRegistries.ENCHANTMENTS.getValue(hellsFuryResource);
-
+                // Make this better later yknow
                 // Check if the weapon has voids bane
                 if (enchantments.containsKey(voidsBaneBase)) {
                    VoidsBaneEnchantment voidsBane = (VoidsBaneEnchantment) voidsBaneBase;
@@ -168,7 +168,6 @@ public class ModEvents {
                             int enchantmentOnWeaponLevel = enchantments.get(hellsFuryBase);
                             float bonusDamage = hellsFury.getDamageBonus(enchantmentOnWeaponLevel);
                             event.setAmount(event.getAmount() + bonusDamage);
-
                         }
                     }
                 }

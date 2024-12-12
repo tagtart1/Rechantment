@@ -36,6 +36,9 @@
   "enchantment.rechantment.hells_fury": "Hell's Fury",
   "enchantment.rechantment.hells_fury.description": "Increases damage to nether mobs.",
 
+  "enchantment.rechantment.ice_aspect": "Ice Aspect",
+  "enchantment.rechantment.ice_aspect.description": "Targets will be frozen for a short period when attacked.",
+
   "enchantment.minecraft.protection.description": "Reduces most types of damage by increasing amounts.",
   "enchantment.minecraft.fire_protection.description": "Reduces damage and burn time when lit on fire.",
   "enchantment.minecraft.feather_falling.description": "Reduces the damage dealt from falling.",

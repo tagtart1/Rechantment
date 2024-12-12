@@ -37,6 +37,11 @@ public class ModEnchantments {
                Enchantment.Rarity.COMMON, EnchantmentCategory.WEAPON, EquipmentSlot.MAINHAND
             ));
 
+    public static RegistryObject<Enchantment> ICE_ASPECT =
+            ENCHANTMENTS.register("ice_aspect", () -> new IceAspectEnchantment(
+                    Enchantment.Rarity.COMMON, EnchantmentCategory.WEAPON, EquipmentSlot.MAINHAND
+            ));
+
     public static void register(IEventBus eventBus) {
         ENCHANTMENTS.register(eventBus);
     }
