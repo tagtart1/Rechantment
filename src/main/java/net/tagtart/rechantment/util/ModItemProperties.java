@@ -20,7 +20,7 @@ public class ModItemProperties {
 
                     // TODO: MAKE THE OTHER CONFIG FOR OTHER RARITES AND CODE THAT SHIT IN
 
-                    if (RechantmentCommonConfigs.SIMPLE_ENCHANTMENTS.get().contains(enchantment)) {
+                    if (RechantmentCommonConfigs.RARITY_0_ENCHANTMENTS.get().contains(enchantment)) {
                         rarity = 1f;
                     } else if (RechantmentCommonConfigs.UNIQUE_ENCHANTMENTS.get().contains(enchantment)) {
                         rarity = 2f;

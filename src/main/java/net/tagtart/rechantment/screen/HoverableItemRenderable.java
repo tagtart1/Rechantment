@@ -8,14 +8,8 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.tooltip.TooltipComponent;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantments;
-import net.tagtart.rechantment.item.ModItems;
-import net.tagtart.rechantment.util.BookRequirementProperties;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public class HoverableItemRenderable implements Renderable {

@@ -6,7 +6,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -14,8 +13,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import oshi.util.tuples.Pair;
@@ -24,7 +21,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class UtilFunctions {
     // TO-DO MOVE THIS TO A UTIL
@@ -65,7 +61,7 @@ public class UtilFunctions {
     }
 
     public static Pair<String, ChatFormatting> getRarityInfo(String enchantmentRaw) {
-        if (RechantmentCommonConfigs.SIMPLE_ENCHANTMENTS.get().contains(enchantmentRaw)) {
+        if (RechantmentCommonConfigs.RARITY_0_ENCHANTMENTS.get().contains(enchantmentRaw)) {
             return new Pair<>("simple", ChatFormatting.GRAY);
         } else if (RechantmentCommonConfigs.ELITE_ENCHANTMENTS.get().contains(enchantmentRaw)) {
             return new Pair<>("elite", ChatFormatting.AQUA);
@@ -120,20 +116,20 @@ public class UtilFunctions {
         return new Pair<>(states.toArray(BlockState[]::new), positions.toArray(BlockPos[]::new));
     }
 
-    public static boolean playerMeetsExpRequirement(BookRequirementProperties bookProperties, Player player) {
+    public static boolean playerMeetsExpRequirement(BookRarityProperties bookProperties, Player player) {
         return player.totalExperience >= bookProperties.requiredExp;
     }
 
     // Note that is checks if the blocks match the required type for safety.
     // Recommended to pass in smaller (possibly already filtered) arrays for performance.
-    public static boolean playerMeetsBookshelfRequirement(BookRequirementProperties bookProperties, BlockState[] states) {
+    public static boolean playerMeetsBookshelfRequirement(BookRarityProperties bookProperties, BlockState[] states) {
         int shelvesPresent = Arrays.stream(states).filter(blockState -> blockState.is(Blocks.BOOKSHELF)).toArray().length;
         return shelvesPresent >= bookProperties.requiredBookShelves;
     }
 
     // Note that is checks if the blocks match the required type for safety.
     // Recommended to pass in smaller (possibly already filtered) arrays for performance.
-    public static boolean playerMeetsFloorRequirement(BookRequirementProperties bookProperties, BlockState[] states) {
+    public static boolean playerMeetsFloorRequirement(BookRarityProperties bookProperties, BlockState[] states) {
         int blocksPresent = Arrays.stream(states).filter(blockState -> blockState.is(bookProperties.floorBlock)).toArray().length;
         return blocksPresent >= 9;
     }
@@ -172,7 +168,7 @@ public class UtilFunctions {
         return floorBlockInfo;
     }
 
-    public static boolean playerMeetsAllEnchantRequirements(BookRequirementProperties bookProperties, Player player, BlockState[] bookshelves, BlockState[] floorBlocks) {
+    public static boolean playerMeetsAllEnchantRequirements(BookRarityProperties bookProperties, Player player, BlockState[] bookshelves, BlockState[] floorBlocks) {
 
         boolean expReqMet      = playerMeetsExpRequirement(bookProperties, player);
         boolean shelvesReqMet  = playerMeetsBookshelfRequirement(bookProperties, bookshelves);
