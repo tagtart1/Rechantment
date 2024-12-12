@@ -188,7 +188,9 @@ public class ModEvents {
         @SubscribeEvent
         public static void onExpDropFromHostile(LivingExperienceDropEvent event) {
             System.out.println("Original exp drop: " + event.getDroppedExperience());
-
+            int newExpToDrop = event.getDroppedExperience() * 10;
+            event.setDroppedExperience(newExpToDrop);
+            System.out.println("New exp dropped: " + event.getDroppedExperience());
         }
     }
 }
