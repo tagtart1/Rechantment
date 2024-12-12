@@ -23,6 +23,24 @@ public class ModEnchantments {
             ENCHANTMENTS.register("bash", () -> new BashEnchantment(
                     Enchantment.Rarity.COMMON, EnchantmentCategory.BREAKABLE, EquipmentSlot.OFFHAND));
 
+    public static RegistryObject<Enchantment> COURAGE =
+            ENCHANTMENTS.register("courage", () -> new CourageEnchantment(
+                    Enchantment.Rarity.COMMON, EnchantmentCategory.BREAKABLE, EquipmentSlot.OFFHAND));
+
+    public static RegistryObject<Enchantment> VOIDS_BANE =
+            ENCHANTMENTS.register("voids_bane", () -> new VoidsBaneEnchantment(
+                    Enchantment.Rarity.COMMON, EnchantmentCategory.WEAPON, EquipmentSlot.MAINHAND
+            ));
+
+    public static RegistryObject<Enchantment> HELLS_FURY =
+            ENCHANTMENTS.register("hells_fury", () -> new HellsFuryEnchantment(
+               Enchantment.Rarity.COMMON, EnchantmentCategory.WEAPON, EquipmentSlot.MAINHAND
+            ));
+
+    public static RegistryObject<Enchantment> ICE_ASPECT =
+            ENCHANTMENTS.register("ice_aspect", () -> new IceAspectEnchantment(
+                    Enchantment.Rarity.COMMON, EnchantmentCategory.WEAPON, EquipmentSlot.MAINHAND
+            ));
 
     public static void register(IEventBus eventBus) {
         ENCHANTMENTS.register(eventBus);
