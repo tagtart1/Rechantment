@@ -23,10 +23,12 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.phys.Vec2;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
+import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 import net.minecraftforge.event.entity.living.ShieldBlockEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -172,6 +174,21 @@ public class ModEvents {
                     }
                 }
             }
+        }
+        @SubscribeEvent
+        public static void onBlockBreak(BlockEvent.BreakEvent event) {
+            // Do the Wisdom stuff here
+            int newExpToDrop = event.getExpToDrop() * 10;
+
+            event.setExpToDrop(newExpToDrop);
+            System.out.println(event.getExpToDrop());
+        }
+
+
+        @SubscribeEvent
+        public static void onExpDropFromHostile(LivingExperienceDropEvent event) {
+            System.out.println("Original exp drop: " + event.getDroppedExperience());
+
         }
     }
 }
