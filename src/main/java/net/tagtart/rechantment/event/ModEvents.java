@@ -151,8 +151,6 @@ public class ModEvents {
                            event.setAmount(event.getAmount() + bonusDamage);
                        }
                    }
-
-
                 }
             }
         }

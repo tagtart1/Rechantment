@@ -33,6 +33,9 @@
   "enchantment.rechantment.voids_bane": "Voids Bane",
   "enchantment.rechantment.voids_bane.description": "Increases damage to end mobs.",
 
+  "enchantment.rechantment.hells_fury": "Hells Fury",
+  "enchantment.rechantment.hells_fury.description": "Increases damage to nether mobs.",
+
   "enchantment.minecraft.protection.description": "Reduces most types of damage by increasing amounts.",
   "enchantment.minecraft.fire_protection.description": "Reduces damage and burn time when lit on fire.",
   "enchantment.minecraft.feather_falling.description": "Reduces the damage dealt from falling.",
