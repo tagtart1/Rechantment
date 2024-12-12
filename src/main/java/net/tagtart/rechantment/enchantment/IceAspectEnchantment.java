@@ -42,7 +42,8 @@ public class IceAspectEnchantment extends Enchantment {
                 IceAspectDurationTicks.get(pLevel - 1),
                 2);
         livingTarget.extinguishFire();
-        pAttacker.addEffect(slownessEffect);
         livingTarget.addEffect(slownessEffect);
     }
+
+
 }
