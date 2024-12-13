@@ -1,14 +1,13 @@
 package net.tagtart.rechantment.screen;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.entity.EnchantmentTableBlockEntity;
 import net.tagtart.rechantment.util.AllBookProperties;
-import net.tagtart.rechantment.util.BookRequirementProperties;
+import net.tagtart.rechantment.util.BookRarityProperties;
 
 public class HoverableEnchantedBookItemRenderable extends HoverableItemRenderable {
 
-    public BookRequirementProperties bookProperties;
+    public BookRarityProperties bookProperties;
     public int propertiesIndex;
 
     protected RechantmentTableScreen screen;

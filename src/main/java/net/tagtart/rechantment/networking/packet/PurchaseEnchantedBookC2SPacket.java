@@ -13,14 +13,12 @@ import net.minecraftforge.network.NetworkEvent;
 import net.tagtart.rechantment.item.ModItems;
 import net.tagtart.rechantment.networking.PurchaseBookResultCase;
 import net.tagtart.rechantment.util.AllBookProperties;
-import net.tagtart.rechantment.util.BookRequirementProperties;
+import net.tagtart.rechantment.util.BookRarityProperties;
 import net.tagtart.rechantment.util.UtilFunctions;
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 import java.util.function.Supplier;
 
 // This should only be created if the CLIENT side has also properly detected that
@@ -59,7 +57,7 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
             ServerLevel level = player.serverLevel();
 
             Inventory playerInventory = player.getInventory();
-            BookRequirementProperties bookProperties = AllBookProperties.getAllProperties()[bookPropertiesIndex];
+            BookRarityProperties bookProperties = AllBookProperties.getAllProperties()[bookPropertiesIndex];
 
             var bookshelves = UtilFunctions.scanAroundBlockForBookshelves(level, enchantTablePos);
             var floorBlocks = UtilFunctions.scanAroundBlockForValidFloors(bookProperties.floorBlock, level, enchantTablePos);

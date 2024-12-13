@@ -18,7 +18,7 @@ import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.networking.ModPackets;
 import net.tagtart.rechantment.networking.packet.PurchaseEnchantedBookC2SPacket;
 import net.tagtart.rechantment.sound.ModSounds;
-import net.tagtart.rechantment.util.BookRequirementProperties;
+import net.tagtart.rechantment.util.BookRarityProperties;
 import net.tagtart.rechantment.util.UtilFunctions;
 import oshi.util.tuples.Pair;
 
@@ -112,7 +112,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
             for (HoverableEnchantedBookItemRenderable hoverable : hoverables) {
                 if (hoverable.isMouseOverlapped((int) Math.round(pMouseX), (int) Math.round(pMouseY))) {
                     System.out.println(String.format("clicked a hoverable, %d books, %d floors!", cachedBookshelvesInRange.length, cachedFloorBlocksInRange.length));
-                    BookRequirementProperties properties = hoverable.bookProperties;
+                    BookRarityProperties properties = hoverable.bookProperties;
 
                     if (!floorRequirementsMet(properties) && !bookshelfRequirementsMet(properties)) {
                         // Just play sound, don't close TODO: ADD PROPER SOUND LIKE MOD HAS.
@@ -159,7 +159,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         return false;
     }
 
-    public ArrayList<Component> getEnchantTableTooltipLines(BookRequirementProperties properties) {
+    public ArrayList<Component> getEnchantTableTooltipLines(BookRarityProperties properties) {
 
         // VERY IMPORTANT to note. On client side, we only recompute if requirements are valid when tooltip is refreshed,
         // which only happens when a new item is initially hovered in this case. Server-side checks are in PurchaseEnchantedBookC2SPacket.
@@ -244,7 +244,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         return tooltipLines;
     }
 
-    public void refreshCachedBlockStates(BookRequirementProperties bookProperties) {
+    public void refreshCachedBlockStates(BookRarityProperties bookProperties) {
 
         Level level = playerInventory.player.level();
         BlockPos enchantTablePos = menu.blockEntity.getBlockPos();
@@ -253,19 +253,19 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         cachedFloorBlocksInRange = UtilFunctions.scanAroundBlockForValidFloors(bookProperties.floorBlock, level, enchantTablePos).getA();
     }
 
-    public boolean expRequirementMet(BookRequirementProperties bookProperties) {
+    public boolean expRequirementMet(BookRarityProperties bookProperties) {
         return UtilFunctions.playerMeetsExpRequirement(bookProperties, playerInventory.player);
     }
 
-    public boolean bookshelfRequirementsMet (BookRequirementProperties bookProperties) {
+    public boolean bookshelfRequirementsMet (BookRarityProperties bookProperties) {
         return UtilFunctions.playerMeetsBookshelfRequirement(bookProperties, cachedBookshelvesInRange);
     }
 
-    public boolean floorRequirementsMet(BookRequirementProperties bookProperties) {
+    public boolean floorRequirementsMet(BookRarityProperties bookProperties) {
         return UtilFunctions.playerMeetsFloorRequirement(bookProperties, cachedFloorBlocksInRange);
     }
 
-    public boolean playerMeetsAllEnchantRequirements(BookRequirementProperties bookProperties) {
+    public boolean playerMeetsAllEnchantRequirements(BookRarityProperties bookProperties) {
         return  bookshelfRequirementsMet(bookProperties) &&
                 expRequirementMet(bookProperties) &&
                 floorRequirementsMet(bookProperties);
