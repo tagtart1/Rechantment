@@ -12,10 +12,7 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LightningBolt;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
@@ -187,10 +184,15 @@ public class ModEvents {
 
         @SubscribeEvent
         public static void onExpDropFromHostile(LivingExperienceDropEvent event) {
-            System.out.println("Original exp drop: " + event.getDroppedExperience());
-            int newExpToDrop = event.getDroppedExperience() * 10;
-            event.setDroppedExperience(newExpToDrop);
-            System.out.println("New exp dropped: " + event.getDroppedExperience());
+
+            MobCategory mobCategory = event.getEntity().getType().getCategory();
+            if (mobCategory == MobCategory.MONSTER) {
+                System.out.println("Original exp drop: " + event.getDroppedExperience());
+                int newExpToDrop = (int)((float) event.getDroppedExperience() * 10.5);
+                event.setDroppedExperience(newExpToDrop);
+                System.out.println("New exp dropped: " + event.getDroppedExperience());
+            }
+
         }
     }
 }

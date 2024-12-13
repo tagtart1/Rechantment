@@ -42,6 +42,11 @@ public class ModEnchantments {
                     Enchantment.Rarity.COMMON, EnchantmentCategory.WEAPON, EquipmentSlot.MAINHAND
             ));
 
+    public static RegistryObject<Enchantment> WISDOM =
+            ENCHANTMENTS.register("wisdom", () -> new WisdomEnchantment(
+                    Enchantment.Rarity.COMMON, EnchantmentCategory.DIGGER, EquipmentSlot.MAINHAND
+            ));
+
     public static void register(IEventBus eventBus) {
         ENCHANTMENTS.register(eventBus);
     }
