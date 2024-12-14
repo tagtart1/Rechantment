@@ -12,10 +12,7 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LightningBolt;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
@@ -33,10 +30,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.Rechantment;
-import net.tagtart.rechantment.enchantment.HellsFuryEnchantment;
-import net.tagtart.rechantment.enchantment.ModEnchantments;
-import net.tagtart.rechantment.enchantment.ThunderStrikeEnchantment;
-import net.tagtart.rechantment.enchantment.VoidsBaneEnchantment;
+import net.tagtart.rechantment.enchantment.*;
 import net.tagtart.rechantment.util.UtilFunctions;
 
 import java.awt.*;
@@ -178,19 +172,37 @@ public class ModEvents {
         @SubscribeEvent
         public static void onBlockBreak(BlockEvent.BreakEvent event) {
             // Do the Wisdom stuff here
-            int newExpToDrop = event.getExpToDrop() * 10;
-
-            event.setExpToDrop(newExpToDrop);
-            System.out.println(event.getExpToDrop());
+            // to-do make a helper function that does the checks and returns the enchantment instance
+            ItemStack pickaxe = event.getPlayer().getMainHandItem();
+            ResourceLocation wisdomResource = new ResourceLocation("rechantment:wisdom");
+            Map<Enchantment, Integer> pickaxeEnchantments = EnchantmentHelper.getEnchantments(pickaxe);
+            Enchantment wisdomBase = ForgeRegistries.ENCHANTMENTS.getValue(wisdomResource);
+            if (pickaxeEnchantments.containsKey(wisdomBase)) {
+                WisdomEnchantment wisdom = (WisdomEnchantment) wisdomBase;
+                int enchantLevel = pickaxeEnchantments.get(wisdomBase);
+                if (wisdom != null) {
+                    // Multiply the exp orbs droppped
+                    float expMultiplier = wisdom.getExpMultiplier(enchantLevel);
+                    int newExpToDrop = (int)((float)event.getExpToDrop() * expMultiplier);
+                    System.out.println("old exp before mult: " + event.getExpToDrop());
+                    event.setExpToDrop(newExpToDrop);
+                    System.out.println(event.getExpToDrop());
+                }
+            }
         }
 
 
         @SubscribeEvent
         public static void onExpDropFromHostile(LivingExperienceDropEvent event) {
-            System.out.println("Original exp drop: " + event.getDroppedExperience());
-            int newExpToDrop = event.getDroppedExperience() * 10;
-            event.setDroppedExperience(newExpToDrop);
-            System.out.println("New exp dropped: " + event.getDroppedExperience());
+
+            MobCategory mobCategory = event.getEntity().getType().getCategory();
+            if (mobCategory == MobCategory.MONSTER) {
+                System.out.println("Original exp drop: " + event.getDroppedExperience());
+                int newExpToDrop = (int)((float) event.getDroppedExperience() * 10.5);
+                event.setDroppedExperience(newExpToDrop);
+                System.out.println("New exp dropped: " + event.getDroppedExperience());
+            }
+
         }
     }
 }
