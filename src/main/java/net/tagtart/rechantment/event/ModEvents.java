@@ -30,10 +30,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.Rechantment;
-import net.tagtart.rechantment.enchantment.HellsFuryEnchantment;
-import net.tagtart.rechantment.enchantment.ModEnchantments;
-import net.tagtart.rechantment.enchantment.ThunderStrikeEnchantment;
-import net.tagtart.rechantment.enchantment.VoidsBaneEnchantment;
+import net.tagtart.rechantment.enchantment.*;
 import net.tagtart.rechantment.util.UtilFunctions;
 
 import java.awt.*;
@@ -175,10 +172,23 @@ public class ModEvents {
         @SubscribeEvent
         public static void onBlockBreak(BlockEvent.BreakEvent event) {
             // Do the Wisdom stuff here
-            int newExpToDrop = event.getExpToDrop() * 10;
-
-            event.setExpToDrop(newExpToDrop);
-            System.out.println(event.getExpToDrop());
+            // to-do make a helper function that does the checks and returns the enchantment instance
+            ItemStack pickaxe = event.getPlayer().getMainHandItem();
+            ResourceLocation wisdomResource = new ResourceLocation("rechantment:wisdom");
+            Map<Enchantment, Integer> pickaxeEnchantments = EnchantmentHelper.getEnchantments(pickaxe);
+            Enchantment wisdomBase = ForgeRegistries.ENCHANTMENTS.getValue(wisdomResource);
+            if (pickaxeEnchantments.containsKey(wisdomBase)) {
+                WisdomEnchantment wisdom = (WisdomEnchantment) wisdomBase;
+                int enchantLevel = pickaxeEnchantments.get(wisdomBase);
+                if (wisdom != null) {
+                    // Multiply the exp orbs droppped
+                    float expMultiplier = wisdom.getExpMultiplier(enchantLevel);
+                    int newExpToDrop = (int)((float)event.getExpToDrop() * expMultiplier);
+                    System.out.println("old exp before mult: " + event.getExpToDrop());
+                    event.setExpToDrop(newExpToDrop);
+                    System.out.println(event.getExpToDrop());
+                }
+            }
         }
 
 
