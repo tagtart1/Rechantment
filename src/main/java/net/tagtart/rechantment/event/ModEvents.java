@@ -186,7 +186,7 @@ public class ModEvents {
                     int newExpToDrop = (int)((float)event.getExpToDrop() * expMultiplier);
                     System.out.println("old exp before mult: " + event.getExpToDrop());
                     event.setExpToDrop(newExpToDrop);
-                    System.out.println(event.getExpToDrop());
+                    System.out.println("new exp: " + event.getExpToDrop());
                 }
             }
         }

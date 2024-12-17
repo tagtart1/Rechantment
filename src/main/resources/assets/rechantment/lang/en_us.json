@@ -60,6 +60,9 @@
   "enchantment.rechantment.wisdom": "Wisdom",
   "enchantment.rechantment.wisdom.description": "Increased EXP drops from mined ores.",
 
+  "enchantment.rechantment.inquisitive": "Inquisitive",
+  "enchantment.rechantment.inquisitive.description": "Increased EXP drops from killed mobs.",
+
   "enchantment.minecraft.protection.description": "Reduces most types of damage by increasing amounts.",
   "enchantment.minecraft.fire_protection.description": "Reduces damage and burn time when lit on fire.",
   "enchantment.minecraft.feather_falling.description": "Reduces the damage dealt from falling.",
