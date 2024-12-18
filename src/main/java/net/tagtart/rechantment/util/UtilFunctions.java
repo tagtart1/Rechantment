@@ -9,6 +9,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -21,6 +23,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class UtilFunctions {
     // TO-DO MOVE THIS TO A UTIL
@@ -177,5 +180,18 @@ public class UtilFunctions {
         return expReqMet && shelvesReqMet && floorReqMet;
     }
 
+
+    public static<T extends Enchantment> Pair<T, Integer> getEnchantmentFromItem (String enchantmentToGet, ItemStack enchantedItem, Class<T> enchantmentClass) {
+
+        Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(enchantedItem);
+
+        ResourceLocation enchantResource = new ResourceLocation(enchantmentToGet);
+        Enchantment enchantmentBase = ForgeRegistries.ENCHANTMENTS.getValue(enchantResource);
+
+        if (enchantments.containsKey(enchantmentBase)) {
+            return new Pair<>(enchantmentClass.cast(enchantmentBase), enchantments.get(enchantmentBase));
+        }
+        return null;
+    }
 
 }

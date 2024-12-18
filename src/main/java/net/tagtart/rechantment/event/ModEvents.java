@@ -32,6 +32,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.enchantment.*;
 import net.tagtart.rechantment.util.UtilFunctions;
+import oshi.util.tuples.Pair;
 
 import java.awt.*;
 import java.util.List;
@@ -130,65 +131,32 @@ public class ModEvents {
             if (event.getSource().getEntity() instanceof LivingEntity player) {
                 ItemStack weapon = player.getMainHandItem();
 
-                ResourceLocation voidsBaneResource = new ResourceLocation("rechantment:voids_bane");
-                ResourceLocation hellsFuryResource = new ResourceLocation("rechantment:hells_fury");
+                Pair<VoidsBaneEnchantment, Integer> voidsBaneEnchantment = UtilFunctions
+                        .getEnchantmentFromItem("rechantment:voids_bane",
+                        weapon,
+                        VoidsBaneEnchantment.class);
 
-                Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(weapon);
-                Enchantment voidsBaneBase = ForgeRegistries.ENCHANTMENTS.getValue(voidsBaneResource);
-                Enchantment hellsFuryBase = ForgeRegistries.ENCHANTMENTS.getValue(hellsFuryResource);
-                // Make this better later yknow
-                // Check if the weapon has voids bane
-                if (enchantments.containsKey(voidsBaneBase)) {
-                   VoidsBaneEnchantment voidsBane = (VoidsBaneEnchantment) voidsBaneBase;
-                   ResourceLocation targetId = ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType());
-                   if (targetId != null && voidsBane != null) {
-                       String targetIdString = targetId.toString();
+                Pair<HellsFuryEnchantment, Integer> hellsFuryEnchantment = UtilFunctions
+                        .getEnchantmentFromItem("rechantment:hells_fury",
+                                weapon,
+                                HellsFuryEnchantment.class);
 
-                       // Check if the target can be effected by voids bane
-                       if (voidsBane.validTargets.contains(targetIdString)) {
-                           // Apply bonus damage
-                           int enchantmentOnWeaponLevel = enchantments.get(voidsBaneBase);
-                           float bonusDamage = voidsBane.getDamageBonus(enchantmentOnWeaponLevel);
-                           event.setAmount(event.getAmount() + bonusDamage);
+                ResourceLocation targetId = ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType());
 
-                       }
-                   }
-                } else if (enchantments.containsKey(hellsFuryBase)) {
-                    HellsFuryEnchantment hellsFury = (HellsFuryEnchantment) hellsFuryBase;
-                    ResourceLocation targetId = ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType());
-
-                    if (targetId != null && hellsFury != null) {
-                        String targetIdString = targetId.toString();
-
-                        if (hellsFury.validTargets.contains(targetIdString)) {
-                            int enchantmentOnWeaponLevel = enchantments.get(hellsFuryBase);
-                            float bonusDamage = hellsFury.getDamageBonus(enchantmentOnWeaponLevel);
-                            event.setAmount(event.getAmount() + bonusDamage);
-                        }
-                    }
-                }
             }
         }
         @SubscribeEvent
         public static void onBlockBreak(BlockEvent.BreakEvent event) {
             // Do the Wisdom stuff here
-            // to-do make a helper function that does the checks and returns the enchantment instance
             ItemStack pickaxe = event.getPlayer().getMainHandItem();
-            ResourceLocation wisdomResource = new ResourceLocation("rechantment:wisdom");
-            Map<Enchantment, Integer> pickaxeEnchantments = EnchantmentHelper.getEnchantments(pickaxe);
-            Enchantment wisdomBase = ForgeRegistries.ENCHANTMENTS.getValue(wisdomResource);
-            if (pickaxeEnchantments.containsKey(wisdomBase)) {
-                WisdomEnchantment wisdom = (WisdomEnchantment) wisdomBase;
-                int enchantLevel = pickaxeEnchantments.get(wisdomBase);
-                if (wisdom != null) {
+            Pair<WisdomEnchantment, Integer> wisdomEnchant = UtilFunctions.getEnchantmentFromItem("rechantment:wisdom", pickaxe, WisdomEnchantment.class);
+                if (wisdomEnchant != null) {
                     // Multiply the exp orbs droppped
-                    float expMultiplier = wisdom.getExpMultiplier(enchantLevel);
+                    float expMultiplier = wisdomEnchant.getA().getExpMultiplier(wisdomEnchant.getB());
                     int newExpToDrop = (int)((float)event.getExpToDrop() * expMultiplier);
-                    System.out.println("old exp before mult: " + event.getExpToDrop());
                     event.setExpToDrop(newExpToDrop);
-                    System.out.println("new exp: " + event.getExpToDrop());
                 }
-            }
+
         }
 
 
