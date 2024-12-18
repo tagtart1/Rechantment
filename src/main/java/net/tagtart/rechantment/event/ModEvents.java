@@ -5,6 +5,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageEffects;
 import net.minecraft.world.damagesource.DamageSource;
@@ -135,11 +136,14 @@ public class ModEvents {
                         .getEnchantmentFromItem("rechantment:voids_bane",
                                 weapon,
                                 VoidsBaneEnchantment.class);
-
                 Pair<HellsFuryEnchantment, Integer> hellsFuryEnchantment = UtilFunctions
                         .getEnchantmentFromItem("rechantment:hells_fury",
                                 weapon,
                                 HellsFuryEnchantment.class);
+                Pair<BerserkEnchantment, Integer> berserkEnchantment = UtilFunctions
+                        .getEnchantmentFromItem("rechantment:berserk",
+                                weapon,
+                                BerserkEnchantment.class);
 
                 ResourceLocation targetId = ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType());
                 if (targetId == null) return;
@@ -153,7 +157,10 @@ public class ModEvents {
                     bonusDamage += hellsFuryEnchantment.getA().getDamageBonus(enchantmentOnWeaponLevel);
                 }
 
-
+                if (berserkEnchantment != null) {
+                    int enchantmentOnWeaponLevel = berserkEnchantment.getB();
+                    bonusDamage += berserkEnchantment.getA().getDamageBonus(player, enchantmentOnWeaponLevel);
+                }
 
                 event.setAmount(event.getAmount() + bonusDamage);
 
@@ -189,7 +196,6 @@ public class ModEvents {
                 int newExpToDrop = (int)((float) event.getDroppedExperience() * inquisitiveEnchantInstance.getExpMultiplier(enchantLevel));
                 event.setDroppedExperience(newExpToDrop);
             }
-
         }
     }
 }

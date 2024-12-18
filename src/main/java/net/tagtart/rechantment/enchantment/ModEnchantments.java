@@ -53,6 +53,11 @@ public class ModEnchantments {
                     Enchantment.Rarity.COMMON, EnchantmentCategory.WEAPON, EquipmentSlot.MAINHAND
             ));
 
+    public static RegistryObject<Enchantment> BERSERK =
+            ENCHANTMENTS.register("berserk", () -> new BerserkEnchantment(
+                    Enchantment.Rarity.COMMON, EnchantmentCategory.WEAPON, EquipmentSlot.MAINHAND
+            ));
+
     public static void register(IEventBus eventBus) {
         ENCHANTMENTS.register(eventBus);
     }
