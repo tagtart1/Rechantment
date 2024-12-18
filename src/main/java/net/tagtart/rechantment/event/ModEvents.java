@@ -5,6 +5,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageEffects;
@@ -14,17 +16,17 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.phys.Vec2;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
-import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
-import net.minecraftforge.event.entity.living.ShieldBlockEvent;
+import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -32,6 +34,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.enchantment.*;
+import net.tagtart.rechantment.sound.ModSounds;
 import net.tagtart.rechantment.util.UtilFunctions;
 import oshi.util.tuples.Pair;
 
@@ -162,8 +165,8 @@ public class ModEvents {
                     bonusDamage += berserkEnchantment.getA().getDamageBonus(player, enchantmentOnWeaponLevel);
                 }
 
+                // Apply the damage effects
                 event.setAmount(event.getAmount() + bonusDamage);
-
             }
         }
         @SubscribeEvent
@@ -195,6 +198,32 @@ public class ModEvents {
                 int enchantLevel = inquisitiveEnchantment.getB();
                 int newExpToDrop = (int)((float) event.getDroppedExperience() * inquisitiveEnchantInstance.getExpMultiplier(enchantLevel));
                 event.setDroppedExperience(newExpToDrop);
+            }
+        }
+
+        @SubscribeEvent
+        public static void onArmorEquip(LivingEquipmentChangeEvent event) {
+            if (event.getSlot().getType() == EquipmentSlot.Type.ARMOR) {
+                LivingEntity player = event.getEntity();
+
+                // Example: Check if new item is a specific armor piece
+                ItemStack newArmor = event.getTo();
+                if (!newArmor.isEmpty()) {
+                    player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(24f);
+                    if (!player.level().isClientSide) {
+                        player.level().playSound(null, player.getOnPos(), SoundEvents.TRIDENT_RETURN, SoundSource.PLAYERS, 1f, 1f);
+                    }
+                    System.out.println(newArmor);
+                } else {
+                    player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(20f);
+
+                    if (player.getHealth() > player.getMaxHealth()) {
+                        player.setHealth(player.getMaxHealth());
+                    }
+
+
+                }
+
             }
         }
     }

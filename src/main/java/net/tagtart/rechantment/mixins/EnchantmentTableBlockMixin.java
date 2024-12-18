@@ -39,6 +39,7 @@ public class EnchantmentTableBlockMixin
             cir.setReturnValue(InteractionResult.CONSUME);
         }
     }
+
 }
 
 
