@@ -130,11 +130,11 @@ public class ModEvents {
             // Check if attacker is player
             if (event.getSource().getEntity() instanceof LivingEntity player) {
                 ItemStack weapon = player.getMainHandItem();
-
+                float bonusDamage = 0;
                 Pair<VoidsBaneEnchantment, Integer> voidsBaneEnchantment = UtilFunctions
                         .getEnchantmentFromItem("rechantment:voids_bane",
-                        weapon,
-                        VoidsBaneEnchantment.class);
+                                weapon,
+                                VoidsBaneEnchantment.class);
 
                 Pair<HellsFuryEnchantment, Integer> hellsFuryEnchantment = UtilFunctions
                         .getEnchantmentFromItem("rechantment:hells_fury",
@@ -142,6 +142,20 @@ public class ModEvents {
                                 HellsFuryEnchantment.class);
 
                 ResourceLocation targetId = ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType());
+                if (targetId == null) return;
+                String targetIdString = targetId.toString();
+                if (voidsBaneEnchantment != null && voidsBaneEnchantment.getA().validTargets.contains(targetIdString) )
+                {
+                    int enchantmentOnWeaponLevel = voidsBaneEnchantment.getB();
+                    bonusDamage += voidsBaneEnchantment.getA().getDamageBonus(enchantmentOnWeaponLevel);
+                } else if (hellsFuryEnchantment != null && hellsFuryEnchantment.getA().validTargets.contains(targetIdString)) {
+                    int enchantmentOnWeaponLevel = hellsFuryEnchantment.getB();
+                    bonusDamage += hellsFuryEnchantment.getA().getDamageBonus(enchantmentOnWeaponLevel);
+                }
+
+
+
+                event.setAmount(event.getAmount() + bonusDamage);
 
             }
         }
@@ -160,15 +174,20 @@ public class ModEvents {
         }
 
 
+
         @SubscribeEvent
         public static void onExpDropFromHostile(LivingExperienceDropEvent event) {
-
             MobCategory mobCategory = event.getEntity().getType().getCategory();
-            if (mobCategory == MobCategory.MONSTER) {
-                System.out.println("Original exp drop: " + event.getDroppedExperience());
-                int newExpToDrop = (int)((float) event.getDroppedExperience() * 10.5);
+            if (mobCategory != MobCategory.MONSTER ||
+                event.getAttackingPlayer() == null) return;
+
+            ItemStack weapon = event.getAttackingPlayer().getMainHandItem();
+            Pair<InquisitiveEnchantment, Integer> inquisitiveEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:inquisitive", weapon, InquisitiveEnchantment.class);
+            if (inquisitiveEnchantment != null) {
+                InquisitiveEnchantment inquisitiveEnchantInstance = inquisitiveEnchantment.getA();
+                int enchantLevel = inquisitiveEnchantment.getB();
+                int newExpToDrop = (int)((float) event.getDroppedExperience() * inquisitiveEnchantInstance.getExpMultiplier(enchantLevel));
                 event.setDroppedExperience(newExpToDrop);
-                System.out.println("New exp dropped: " + event.getDroppedExperience());
             }
 
         }
