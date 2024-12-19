@@ -18,18 +18,10 @@ public class ModItemProperties {
                     CompoundTag enchantmentTag = nbt.getCompound("Enchantment");
                     String enchantment = enchantmentTag.getString("id");
 
-                    // TODO: MAKE THE OTHER CONFIG FOR OTHER RARITES AND CODE THAT SHIT IN
-
-                    if (RechantmentCommonConfigs.RARITY_0_ENCHANTMENTS.get().contains(enchantment)) {
-                        rarity = 1f;
-                    } else if (RechantmentCommonConfigs.UNIQUE_ENCHANTMENTS.get().contains(enchantment)) {
-                        rarity = 2f;
-                    } else if (RechantmentCommonConfigs.ELITE_ENCHANTMENTS.get().contains(enchantment)) {
-                        rarity = 3f;
-                    } else if (RechantmentCommonConfigs.ULTIMATE_ENCHANTMENTS.get().contains(enchantment)) {
-                        rarity = 4f;
-                    } else if (RechantmentCommonConfigs.LEGENDARY_ENCHANTMENTS.get().contains(enchantment)) {
-                        rarity = 5f;
+                    for (BookRarityProperties bookProperties : BookRarityProperties.getAllProperties()) {
+                        if (bookProperties.isEnchantmentInPool(enchantment)) {
+                            rarity = bookProperties.rarity;
+                        }
                     }
                     return rarity;
                 });

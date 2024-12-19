@@ -2,8 +2,9 @@ package net.tagtart.rechantment.screen;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.EnchantmentTableBlockEntity;
-import net.tagtart.rechantment.util.AllBookProperties;
 import net.tagtart.rechantment.util.BookRarityProperties;
+
+import java.awt.print.Book;
 
 public class HoverableEnchantedBookItemRenderable extends HoverableItemRenderable {
 
@@ -17,7 +18,7 @@ public class HoverableEnchantedBookItemRenderable extends HoverableItemRenderabl
     public HoverableEnchantedBookItemRenderable(RechantmentTableScreen pScreen, int pPropertiesIndex, ResourceLocation textureResource, int posX, int posY) {
         super(pScreen.playerInventory, textureResource, posX, posY);
         propertiesIndex = pPropertiesIndex;
-        bookProperties = AllBookProperties.getAllProperties()[propertiesIndex];
+        bookProperties = BookRarityProperties.getAllProperties()[propertiesIndex];
         screen = pScreen;
     }
 

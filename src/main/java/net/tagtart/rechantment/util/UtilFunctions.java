@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -63,32 +64,17 @@ public class UtilFunctions {
         return new ItemStack(item);
     }
 
-    public static Pair<String, ChatFormatting> getRarityInfo(String enchantmentRaw) {
-        if (RechantmentCommonConfigs.RARITY_0_ENCHANTMENTS.get().contains(enchantmentRaw)) {
-            return new Pair<>("simple", ChatFormatting.GRAY);
-        } else if (RechantmentCommonConfigs.ELITE_ENCHANTMENTS.get().contains(enchantmentRaw)) {
-            return new Pair<>("elite", ChatFormatting.AQUA);
-        } else if (RechantmentCommonConfigs.UNIQUE_ENCHANTMENTS.get().contains(enchantmentRaw)) {
-            return new Pair<>("unique", ChatFormatting.GREEN);
-        } else if (RechantmentCommonConfigs.ULTIMATE_ENCHANTMENTS.get().contains(enchantmentRaw)) {
-            return new Pair<>("ultimate", ChatFormatting.YELLOW);
-        } else if (RechantmentCommonConfigs.LEGENDARY_ENCHANTMENTS.get().contains(enchantmentRaw)) {
-            return new Pair<>("legendary", ChatFormatting.GOLD);
+    public static Pair<String, Style> getRarityInfo(String enchantmentRaw) {
+
+        Style formatting = Style.EMPTY.withColor(11184810);
+        String key = "simple";
+        for (BookRarityProperties bookProperties : BookRarityProperties.getAllProperties()) {
+            if (bookProperties.isEnchantmentInPool(enchantmentRaw)) {
+                formatting = Style.EMPTY.withColor(bookProperties.color);
+                key = bookProperties.key;
+            }
         }
-        return new Pair<>("simple", ChatFormatting.GRAY);
-    }
-
-    public static Pair<String, ChatFormatting> getRarityInfo(float rarity) {
-
-        int rarityInt = Math.round(rarity);
-        return switch (rarityInt) {
-            case 1 -> new Pair<>("simple", ChatFormatting.GRAY);
-            case 2 -> new Pair<>("unique", ChatFormatting.GREEN);
-            case 3 -> new Pair<>("elite", ChatFormatting.AQUA);
-            case 4 -> new Pair<>("ultimate", ChatFormatting.YELLOW);
-            case 5 -> new Pair<>("legendary", ChatFormatting.GOLD);
-            default -> new Pair<>("simple", ChatFormatting.GRAY);
-        };
+        return new Pair<>(key, formatting);
     }
 
     // Forms a bounding box around the provided position by offsetting the corners by the provided offset values,

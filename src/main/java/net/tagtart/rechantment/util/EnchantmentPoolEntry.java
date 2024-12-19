@@ -3,8 +3,7 @@ package net.tagtart.rechantment.util;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EnchantmentPoolEntry
-{
+public class EnchantmentPoolEntry {
     public final String enchantment;
     public final int weight;
     public final int minLevel;
@@ -19,6 +18,8 @@ public class EnchantmentPoolEntry
         this.levelWeights = levelWeights;
     }
 
+    // TODO: ADD ERROR CHECKING IN THIS FUNCTION IN CASE USER IS RETARDED AND ENTERS CONFIG VALUES WRONG...
+    // WHICH IS VERY POSSIBLE DUE TO STUPID ASS FORMATTING WE HAVE TO DO.
     public static EnchantmentPoolEntry fromString(String configString) {
         String[] parts = configString.split("\\|");
         String enchantment = parts[0];
@@ -26,20 +27,25 @@ public class EnchantmentPoolEntry
 
         String[] levelRange = parts[2].split("-");
         int minLevel = Integer.parseInt(levelRange[0]);
-        int maxLevel = Integer.parseInt(levelRange[1]);
+        int maxLevel = minLevel;
+        if (levelRange.length > 1)
+            maxLevel = Integer.parseInt(levelRange[1]);
 
         List<Integer> levelWeights = new ArrayList<>();
         String[] weightStrings = parts[3].split(",");
         for (String weightString : weightStrings) {
             levelWeights.add(Integer.parseInt(weightString));
         }
-
         return new EnchantmentPoolEntry(enchantment, weight, minLevel, maxLevel, levelWeights);
     }
 
-    @Override
-    public String toString() {
-        return enchantment + "|" + weight + "|" + minLevel + "-" + maxLevel + "|" +
-                String.join(",", levelWeights.stream().map(String::valueOf).toList());
+    public static List<EnchantmentPoolEntry> listFromString(List<? extends String> configStrings) {
+        ArrayList<EnchantmentPoolEntry> buildPool = new ArrayList<>();
+
+        for (String configString : configStrings) {
+            buildPool.add(fromString(configString));
+        }
+
+        return buildPool;
     }
 }

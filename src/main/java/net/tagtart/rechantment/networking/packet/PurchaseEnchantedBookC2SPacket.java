@@ -12,7 +12,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 import net.tagtart.rechantment.item.ModItems;
 import net.tagtart.rechantment.networking.PurchaseBookResultCase;
-import net.tagtart.rechantment.util.AllBookProperties;
 import net.tagtart.rechantment.util.BookRarityProperties;
 import net.tagtart.rechantment.util.UtilFunctions;
 
@@ -57,7 +56,7 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
             ServerLevel level = player.serverLevel();
 
             Inventory playerInventory = player.getInventory();
-            BookRarityProperties bookProperties = AllBookProperties.getAllProperties()[bookPropertiesIndex];
+            BookRarityProperties bookProperties = BookRarityProperties.getAllProperties()[bookPropertiesIndex];
 
             var bookshelves = UtilFunctions.scanAroundBlockForBookshelves(level, enchantTablePos);
             var floorBlocks = UtilFunctions.scanAroundBlockForValidFloors(bookProperties.floorBlock, level, enchantTablePos);

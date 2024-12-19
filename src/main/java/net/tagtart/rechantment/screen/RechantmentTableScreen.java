@@ -167,11 +167,9 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
 
         ArrayList<Component> tooltipLines = new ArrayList<>();
 
-        Pair<String, ChatFormatting> enchantRarityInfo = UtilFunctions.getRarityInfo(properties.rarity);
-
         // Tooltip "title", with rarity icon and generic book name.
-        Component rarityIcon = Component.translatable("enchantment.rarity." + enchantRarityInfo.getA());
-        Component bookTitle = Component.translatable("item.rechantment.enchanted_book").withStyle(enchantRarityInfo.getB());
+        Component rarityIcon = Component.translatable("enchantment.rarity." + properties.key);
+        Component bookTitle = Component.translatable("item.rechantment.enchanted_book").withStyle(properties.colorAsStyle());
         tooltipLines.add(Component.literal(rarityIcon.getString()).append(" ").append(bookTitle));
         tooltipLines.add(Component.literal(" "));
 
@@ -229,7 +227,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
 
         // Shows left-click prompt if met, otherwise shows warning that requirements not met.
         if (playerMeetsAllEnchantRequirements(properties)) {
-            Component leftClickPrompt = Component.translatable("tooltip.rechantment.enchantment_table.left_click").withStyle(enchantRarityInfo.getB());
+            Component leftClickPrompt = Component.translatable("tooltip.rechantment.enchantment_table.left_click").withStyle(properties.colorAsStyle());
             tooltipLines.add(whiteArrow.copy().append(leftClickPrompt));
         }
         else {
@@ -238,7 +236,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         }
 
         // Final line, show right click prompt.
-        Component rightClickPrompt = Component.translatable("tooltip.rechantment.enchantment_table.right_click").withStyle(enchantRarityInfo.getB());
+        Component rightClickPrompt = Component.translatable("tooltip.rechantment.enchantment_table.right_click").withStyle(properties.colorAsStyle());
         tooltipLines.add(whiteArrow.copy().append(rightClickPrompt));
 
         return tooltipLines;

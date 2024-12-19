@@ -82,7 +82,7 @@ public class EnchantedBookItem extends Item {
         String[] enchantmentInfo = enchantmentRaw.split(":");
         String enchantmentSource = enchantmentInfo[0];
         String enchantmentName = enchantmentInfo[1];
-        Pair<String, ChatFormatting> enchantRarityInfo = UtilFunctions.getRarityInfo(enchantmentRaw);
+        Pair<String, Style> enchantRarityInfo = UtilFunctions.getRarityInfo(enchantmentRaw);
 
         ResourceLocation resourceLocation = new ResourceLocation(enchantmentRaw);
         Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(resourceLocation);

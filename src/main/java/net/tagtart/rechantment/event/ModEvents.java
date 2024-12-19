@@ -116,8 +116,7 @@ public class ModEvents {
                     String enchantmentRaw = ForgeRegistries.ENCHANTMENTS.getKey(enchantment).toString();
                     // Create the modified enchantment tooltip with color change
                     String enchantmentText = enchantment.getFullname(level).getString();
-                    Component modifiedText = Component.literal(enchantmentText).withStyle(Style.EMPTY
-                            .withColor(UtilFunctions.getRarityInfo(enchantmentRaw).getB()));  // Change to any color you prefer
+                    Component modifiedText = Component.literal(enchantmentText).withStyle(UtilFunctions.getRarityInfo(enchantmentRaw).getB());  // Change to any color you prefer
 
                     for(int i = 0; i < tooltip.size(); i++) {
                         Component tooltipLine = tooltip.get(i);
