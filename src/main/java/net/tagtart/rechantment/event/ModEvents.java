@@ -204,21 +204,30 @@ public class ModEvents {
         @SubscribeEvent
         public static void onArmorEquip(LivingEquipmentChangeEvent event) {
             if (event.getSlot().getType() == EquipmentSlot.Type.ARMOR) {
-                LivingEntity player = event.getEntity();
+                if (!(event.getEntity() instanceof  Player player)) return;
 
-                // Example: Check if new item is a specific armor piece
+
+
                 ItemStack newArmor = event.getTo();
-                if (!newArmor.isEmpty()) {
-                    player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(24f);
-                    if (!player.level().isClientSide) {
-                        player.level().playSound(null, player.getOnPos(), SoundEvents.TRIDENT_RETURN, SoundSource.PLAYERS, 1f, 1f);
+                Pair<OverloadEnchantment, Integer> overloadEnchantment = UtilFunctions.getEnchantmentFromItem(
+                        "rechantment:overload",
+                        newArmor,
+                        OverloadEnchantment.class
+                );
+
+                if (overloadEnchantment != null) {
+                   float newMaxHealth =  overloadEnchantment.getA().getMaxHealthTier(overloadEnchantment.getB());
+                    player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(newMaxHealth);
+                    if (player.getHealth() > player.getMaxHealth()) {
+                        player.setHealth(player.getMaxHealth());
                     }
-                    System.out.println(newArmor);
+                    player.level().playSound(null, player.getOnPos(), SoundEvents.TRIDENT_RETURN, SoundSource.PLAYERS, 1f, 1f);
                 } else {
                     player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(20f);
 
                     if (player.getHealth() > player.getMaxHealth()) {
                         player.setHealth(player.getMaxHealth());
+                        player.level().playSound(null, player.getOnPos(), SoundEvents.PLAYER_HURT, SoundSource.PLAYERS, 1f, 1f);
                     }
                 }
 
