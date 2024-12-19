@@ -5,6 +5,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
+import net.minecraft.world.item.enchantment.Enchantments;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -22,6 +23,11 @@ public class WisdomEnchantment extends Enchantment {
 
     public float getExpMultiplier(int level) {
         return WisdomMultipliers.get(level - 1);
+    }
+
+    @Override
+    public boolean checkCompatibility(Enchantment other) {
+        return !(other == Enchantments.SILK_TOUCH);
     }
 
 

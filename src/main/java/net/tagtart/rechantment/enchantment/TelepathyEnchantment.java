@@ -21,5 +21,4 @@ public class TelepathyEnchantment extends Enchantment {
         return item instanceof SwordItem || super.canEnchant(pStack);
     }
 
-
 }

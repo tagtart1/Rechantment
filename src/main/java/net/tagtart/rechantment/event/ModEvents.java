@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -17,6 +18,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
@@ -24,6 +26,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.Vec2;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.*;
@@ -168,8 +172,10 @@ public class ModEvents {
                 event.setAmount(event.getAmount() + bonusDamage);
             }
         }
+
+        // Wisdom Enchantment
         @SubscribeEvent
-        public static void onBlockBreak(BlockEvent.BreakEvent event) {
+        public static void onBlockExpDrop(BlockEvent.BreakEvent event) {
             // Do the Wisdom stuff here
             ItemStack pickaxe = event.getPlayer().getMainHandItem();
             Pair<WisdomEnchantment, Integer> wisdomEnchant = UtilFunctions.getEnchantmentFromItem("rechantment:wisdom", pickaxe, WisdomEnchantment.class);
@@ -182,6 +188,27 @@ public class ModEvents {
 
         }
 
+        // Telepathy Enchantment - Blocks
+        @SubscribeEvent
+        public static void onBlockBreak(BlockEvent.BreakEvent event) {
+            ItemStack handItem = event.getPlayer().getMainHandItem();
+            ServerLevel level = (ServerLevel) event.getPlayer().level();
+            Pair<TelepathyEnchantment, Integer> telepathyEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:telepathy", handItem, TelepathyEnchantment.class);
+            List<ItemStack> drops = Block.getDrops(event.getState(), level, event.getPos(), null, event.getPlayer(), event.getPlayer().getMainHandItem());
+
+            if (telepathyEnchantment == null) return;
+
+            for (ItemStack drop : drops) {
+                if (!event.getPlayer().canTakeItem(drop)) {
+                   event.getPlayer().drop(drop, false);
+                } else {
+                    event.getPlayer().addItem(drop);
+                }
+            }
+            event.getState().spawnAfterBreak(level, event.getPos(), handItem, true);
+            level.destroyBlock(event.getPos(), false);
+            event.setCanceled(true);
+        }
 
 
         @SubscribeEvent
