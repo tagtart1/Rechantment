@@ -58,6 +58,11 @@ public class ModEnchantments {
                     Enchantment.Rarity.COMMON, EnchantmentCategory.WEAPON, EquipmentSlot.MAINHAND
             ));
 
+    public static RegistryObject<Enchantment> OVERLOAD =
+            ENCHANTMENTS.register("overload", () -> new OverloadEnchantment(
+                    Enchantment.Rarity.COMMON, EnchantmentCategory.ARMOR_CHEST, EquipmentSlot.MAINHAND
+            ));
+
     public static void register(IEventBus eventBus) {
         ENCHANTMENTS.register(eventBus);
     }

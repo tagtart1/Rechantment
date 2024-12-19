@@ -220,8 +220,6 @@ public class ModEvents {
                     if (player.getHealth() > player.getMaxHealth()) {
                         player.setHealth(player.getMaxHealth());
                     }
-
-
                 }
 
             }
