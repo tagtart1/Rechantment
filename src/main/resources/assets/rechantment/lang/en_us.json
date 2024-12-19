@@ -69,6 +69,9 @@
   "enchantment.rechantment.overload": "Overload",
   "enchantment.rechantment.overload.description": "Increases maximum health.",
 
+  "enchantment.rechantment.telepathy": "Telepathy",
+  "enchantment.rechantment.telepathy.description": "Item drops teleport directly to your inventory.",
+
   "enchantment.minecraft.protection.description": "Reduces most types of damage by increasing amounts.",
   "enchantment.minecraft.fire_protection.description": "Reduces damage and burn time when lit on fire.",
   "enchantment.minecraft.feather_falling.description": "Reduces the damage dealt from falling.",

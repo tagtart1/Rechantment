@@ -60,7 +60,12 @@ public class ModEnchantments {
 
     public static RegistryObject<Enchantment> OVERLOAD =
             ENCHANTMENTS.register("overload", () -> new OverloadEnchantment(
-                    Enchantment.Rarity.COMMON, EnchantmentCategory.ARMOR_CHEST, EquipmentSlot.MAINHAND
+                    Enchantment.Rarity.COMMON, EnchantmentCategory.ARMOR_CHEST, EquipmentSlot.CHEST
+            ));
+
+    public static RegistryObject<Enchantment> TELEPATHY =
+            ENCHANTMENTS.register("telepathy", () -> new TelepathyEnchantment(
+                    Enchantment.Rarity.COMMON, EnchantmentCategory.DIGGER, EquipmentSlot.MAINHAND
             ));
 
     public static void register(IEventBus eventBus) {
