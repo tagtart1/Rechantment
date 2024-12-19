@@ -86,6 +86,8 @@ public class EnchantedBookItem extends Item {
 
         ResourceLocation resourceLocation = new ResourceLocation(enchantmentRaw);
         Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(resourceLocation);
+        if (enchantment == null)
+            return Component.literal("Invalid enchantment!");
         int enchantmentLvl = enchantmentTag.getInt("lvl");
         String romanLevel ="";
 
@@ -264,6 +266,10 @@ public class EnchantedBookItem extends Item {
     }
 
     private Component getApplicableIcons(Enchantment enchantment) {
+        if (enchantment == null) {
+            return Component.literal("");
+        }
+
         MutableComponent text = Component.translatable("");
         for (String itemName : baseIconItems) {
             ItemStack item = UtilFunctions.getItemStackFromString(itemName);

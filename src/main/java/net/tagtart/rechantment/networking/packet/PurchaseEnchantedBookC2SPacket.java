@@ -13,6 +13,7 @@ import net.minecraftforge.network.NetworkEvent;
 import net.tagtart.rechantment.item.ModItems;
 import net.tagtart.rechantment.networking.PurchaseBookResultCase;
 import net.tagtart.rechantment.util.BookRarityProperties;
+import net.tagtart.rechantment.util.EnchantmentPoolEntry;
 import net.tagtart.rechantment.util.UtilFunctions;
 
 import java.util.ArrayList;
@@ -128,10 +129,13 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
                 CompoundTag rootTag = toGive.getOrCreateTag();
 
                 CompoundTag enchantmentTag = new CompoundTag();
-                enchantmentTag.putInt("lvl", 1);
-                enchantmentTag.putString("id", "minecraft:unbreaking");
+                EnchantmentPoolEntry randomEnchantment = bookProperties.getRandomEnchantmentWeighted();
 
-                IntTag successTag = IntTag.valueOf(99);
+                enchantmentTag.putInt("lvl", randomEnchantment.getRandomEnchantLevelWeighted());
+                enchantmentTag.putString("id", randomEnchantment.enchantment);
+
+                int successRate = random.nextInt(bookProperties.minSuccess, bookProperties.maxSuccess);
+                IntTag successTag = IntTag.valueOf(successRate);
                 rootTag.put("Enchantment", enchantmentTag);
                 rootTag.put("SuccessRate", successTag);
 

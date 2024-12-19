@@ -6,6 +6,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import java.util.List;
+import java.util.Random;
 
 public class BookRarityProperties {
 
@@ -23,6 +24,7 @@ public class BookRarityProperties {
     public int requiredBookShelves;
     public Block floorBlock;
     public List<EnchantmentPoolEntry> enchantmentPool;
+    public int enchantmentPoolTotalWeights;
 
     private BookRarityProperties()
     {
@@ -41,6 +43,31 @@ public class BookRarityProperties {
 
     public Style colorAsStyle() {
         return Style.EMPTY.withColor(color);
+    }
+
+    public EnchantmentPoolEntry getRandomEnchantmentWeighted() {
+        Random rand = new Random();
+        int randVal = rand.nextInt(enchantmentPoolTotalWeights + 1);
+
+        int cumulativeWeight = 0;
+        for (EnchantmentPoolEntry entry : enchantmentPool) {
+            cumulativeWeight += entry.weight;
+            if (randVal <= cumulativeWeight) {
+                return entry;
+            }
+        }
+
+        throw new IllegalStateException("Failed to select an enchantment based on weight.\nEnsure Rechantment config is set up properly,");
+    }
+
+    // For caching the weight sum later.
+    private static int getEnchantmentPoolTotalWeight(List<EnchantmentPoolEntry> entries) {
+        int currentSum = 0;
+        for (int i = 0; i < entries.size(); ++i) {
+            currentSum += entries.get(i).weight;
+        }
+
+        return currentSum;
     }
 
     private static BookRarityProperties[] ALL_BOOK_PROPERTIES;
@@ -70,6 +97,7 @@ public class BookRarityProperties {
         simpleProperties.floorBreakChance =     RechantmentCommonConfigs.RARITY_0_FLOOR_BREAK_CHANCE.get();
         simpleProperties.requiredBookShelves =  RechantmentCommonConfigs.RARITY_0_REQUIRED_BOOKSHELVES.get();
         simpleProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_0_ENCHANTMENTS.get());
+        simpleProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(simpleProperties.enchantmentPool);
 
         ResourceLocation blockLocation = new ResourceLocation(RechantmentCommonConfigs.RARITY_0_FLOOR_BLOCK_TYPE.get());
         simpleProperties.floorBlock = ForgeRegistries.BLOCKS.getValue(blockLocation);
@@ -88,6 +116,7 @@ public class BookRarityProperties {
         uniqueProperties.floorBreakChance =     RechantmentCommonConfigs.RARITY_1_FLOOR_BREAK_CHANCE.get();
         uniqueProperties.requiredBookShelves =  RechantmentCommonConfigs.RARITY_1_REQUIRED_BOOKSHELVES.get();
         uniqueProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_1_ENCHANTMENTS.get());
+        uniqueProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(uniqueProperties.enchantmentPool);
 
 
         blockLocation = new ResourceLocation(RechantmentCommonConfigs.RARITY_1_FLOOR_BLOCK_TYPE.get());
@@ -107,6 +136,7 @@ public class BookRarityProperties {
         eliteProperties.floorBreakChance =     RechantmentCommonConfigs.RARITY_2_FLOOR_BREAK_CHANCE.get();
         eliteProperties.requiredBookShelves =  RechantmentCommonConfigs.RARITY_2_REQUIRED_BOOKSHELVES.get();
         eliteProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_2_ENCHANTMENTS.get());
+        eliteProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(eliteProperties.enchantmentPool);
 
         blockLocation = new ResourceLocation(RechantmentCommonConfigs.RARITY_2_FLOOR_BLOCK_TYPE.get());
         eliteProperties.floorBlock = ForgeRegistries.BLOCKS.getValue(blockLocation);
@@ -125,6 +155,7 @@ public class BookRarityProperties {
         ultimateProperties.floorBreakChance =     RechantmentCommonConfigs.RARITY_3_FLOOR_BREAK_CHANCE.get();
         ultimateProperties.requiredBookShelves =  RechantmentCommonConfigs.RARITY_3_REQUIRED_BOOKSHELVES.get();
         ultimateProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_3_ENCHANTMENTS.get());
+        ultimateProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(ultimateProperties.enchantmentPool);
 
         blockLocation = new ResourceLocation(RechantmentCommonConfigs.RARITY_3_FLOOR_BLOCK_TYPE.get());
         ultimateProperties.floorBlock = ForgeRegistries.BLOCKS.getValue(blockLocation);
@@ -143,6 +174,7 @@ public class BookRarityProperties {
         legendaryProperties.floorBreakChance =     RechantmentCommonConfigs.RARITY_4_FLOOR_BREAK_CHANCE.get();
         legendaryProperties.requiredBookShelves =  RechantmentCommonConfigs.RARITY_4_REQUIRED_BOOKSHELVES.get();
         legendaryProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_4_ENCHANTMENTS.get());
+        legendaryProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(legendaryProperties.enchantmentPool);
 
         blockLocation = new ResourceLocation(RechantmentCommonConfigs.RARITY_4_FLOOR_BLOCK_TYPE.get());
         legendaryProperties.floorBlock = ForgeRegistries.BLOCKS.getValue(blockLocation);

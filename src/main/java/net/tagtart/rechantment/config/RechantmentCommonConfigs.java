@@ -219,9 +219,6 @@ public class RechantmentCommonConfigs {
         rarity_3_default_enchantments.add("rechantment:timber|1|1|1");
         rarity_3_default_enchantments.add("minecraft:multishot|1|1|1");
         rarity_3_default_enchantments.add("minecraft:channeling|1|1|1");
-        rarity_3_default_enchantments.add("minecraft:voids_bane|1|4|1");
-        rarity_3_default_enchantments.add("minecraft:fire_aspect|1|1-2|2,1");
-        rarity_3_default_enchantments.add("minecraft:fortune|1|1-3|2,2,1");
         RARITY_3_ENCHANTMENTS = BUILDER.defineList("enchantments", rarity_3_default_enchantments, s -> s instanceof String);
 
         BUILDER.pop();
