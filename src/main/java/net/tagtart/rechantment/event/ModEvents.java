@@ -66,46 +66,42 @@ public class ModEvents {
             Entity attacker = source.getEntity();
             ItemStack shield = player.getUseItem();
 
-            if(shield.getItem() instanceof ShieldItem) {
+            if(!(shield.getItem() instanceof ShieldItem)) return;
 
 
-                // TODO: add Courage enchantment
-                ResourceLocation bashResource = new ResourceLocation("rechantment:bash");
-                ResourceLocation courageResource = new ResourceLocation("rechantment:courage");
-                Map<Enchantment, Integer> shieldEnchants = EnchantmentHelper.getEnchantments(shield);
-                // Handle bash enchantment
-                if (shieldEnchants.containsKey(ForgeRegistries.ENCHANTMENTS.getValue(bashResource))) {
-                    if (source.getDirectEntity() instanceof Projectile) {
-                        return;
-                    }
-
-                    double d0 = attacker.getX() - player.getX();
-                    double d1 = attacker.getZ() - player.getZ();
-                    Vec2 toAttacker = new Vec2((float)d0, (float)d1);
-                    toAttacker = toAttacker.normalized();
-                    toAttacker = toAttacker.scale(SHIELD_BASH_KNOCKBACK);
-
-
-                        if (attacker.isPushable()) {
-                            attacker.push(toAttacker.x, SHIELD_BASH_KNOCKBACK_Y, toAttacker.y);
-                        }
-
+            // TODO: add Courage enchantment
+            ResourceLocation bashResource = new ResourceLocation("rechantment:bash");
+            ResourceLocation courageResource = new ResourceLocation("rechantment:courage");
+            Map<Enchantment, Integer> shieldEnchants = EnchantmentHelper.getEnchantments(shield);
+            // Handle bash enchantment
+            if (shieldEnchants.containsKey(ForgeRegistries.ENCHANTMENTS.getValue(bashResource))) {
+                if (source.getDirectEntity() instanceof Projectile) {
+                    return;
                 }
 
-                // Check for Courage enchantment
-                if (shieldEnchants.containsKey(ForgeRegistries.ENCHANTMENTS.getValue(courageResource))) {
-                   int enchantmentLevel = shieldEnchants.get(ForgeRegistries.ENCHANTMENTS.getValue(courageResource));
-                   MobEffectInstance speedEffect = new MobEffectInstance(
-                           MobEffects.MOVEMENT_SPEED,
-                           SHIELD_COURAGE_SPEED_DURATION,
-                           enchantmentLevel - 1
-                   );
+                double d0 = attacker.getX() - player.getX();
+                double d1 = attacker.getZ() - player.getZ();
+                Vec2 toAttacker = new Vec2((float)d0, (float)d1);
+                toAttacker = toAttacker.normalized();
+                toAttacker = toAttacker.scale(SHIELD_BASH_KNOCKBACK);
 
-                    player.addEffect(speedEffect);
+
+                if (attacker.isPushable()) {
+                    attacker.push(toAttacker.x, SHIELD_BASH_KNOCKBACK_Y, toAttacker.y);
                 }
+
             }
 
-
+            // Check for Courage enchantment
+            if (shieldEnchants.containsKey(ForgeRegistries.ENCHANTMENTS.getValue(courageResource))) {
+                  int enchantmentLevel = shieldEnchants.get(ForgeRegistries.ENCHANTMENTS.getValue(courageResource));
+                  MobEffectInstance speedEffect = new MobEffectInstance(
+                          MobEffects.MOVEMENT_SPEED,
+                          SHIELD_COURAGE_SPEED_DURATION,
+                          enchantmentLevel - 1
+                  );
+                  player.addEffect(speedEffect);
+            }
         }
 
         @SubscribeEvent
@@ -199,14 +195,12 @@ public class ModEvents {
             if (telepathyEnchantment == null) return;
 
             for (ItemStack drop : drops) {
-                if (!event.getPlayer().canTakeItem(drop)) {
+                if (!event.getPlayer().addItem(drop)) {
                    event.getPlayer().drop(drop, false);
-                } else {
-                    event.getPlayer().addItem(drop);
                 }
             }
             event.getState().spawnAfterBreak(level, event.getPos(), handItem, true);
-            level.destroyBlock(event.getPos(), false);
+            level.removeBlock(event.getPos(), false);
             event.setCanceled(true);
         }
 
@@ -248,8 +242,8 @@ public class ModEvents {
                     if (player.getHealth() > player.getMaxHealth()) {
                         player.setHealth(player.getMaxHealth());
                     }
-
-                    player.level().playSound(null, player.getOnPos(), SoundEvents.TRIDENT_RETURN, SoundSource.PLAYERS, 1f, 1f);
+                    // Make sure this plays
+                    player.level().playSound(player, player.getOnPos(), SoundEvents.TRIDENT_RETURN, SoundSource.PLAYERS, 1f, 1f);
                 }
 
             } else {
