@@ -24,6 +24,9 @@ public class ModItemModelProvider extends ItemModelProvider {
         textureOnly("elite");
         textureOnly("ultimate");
         textureOnly("legendary");
+
+        simpleItem(ModItems.CHANCE_GEM);
+
     }
 
     private ItemModelBuilder simpleItem(RegistryObject<Item> item) {

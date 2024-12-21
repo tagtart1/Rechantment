@@ -39,6 +39,9 @@
   "enchantment.icon.sword": "瞖",
   "enchantment.icon.trident": "瞗",
 
+  "item.rechantment.chance_gem": "Gem of Chance",
+  "item.rechantment.chance_gem.description": "Randomizes the success chance on an enchanted book.",
+
   "enchantment.rechantment.thunder_strike": "Thunder Strike",
   "enchantment.rechantment.thunder_strike.description": "Chance to summon lightning to strike your targets.",
 
