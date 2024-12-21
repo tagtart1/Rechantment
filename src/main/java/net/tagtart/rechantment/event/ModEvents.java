@@ -10,8 +10,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
-import net.minecraft.world.damagesource.DamageEffects;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.*;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -43,10 +42,8 @@ import net.tagtart.rechantment.util.UtilFunctions;
 import oshi.util.tuples.Pair;
 
 import java.awt.*;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
 
 public class ModEvents {
 
@@ -204,6 +201,30 @@ public class ModEvents {
             event.setCanceled(true);
         }
 
+        @SubscribeEvent
+        public static void onLivingDrops(LivingDropsEvent event) {
+
+            if (event.getEntity() instanceof Player) return;
+
+           if ((event.getSource().getEntity() instanceof Player player)) {
+               ItemStack weapon = player.getMainHandItem();
+               Pair<TelepathyEnchantment, Integer> telepathyEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:telepathy", weapon, TelepathyEnchantment.class );
+               if (telepathyEnchantment == null) return;
+
+               Collection<ItemEntity> items = event.getDrops();
+
+
+               for (ItemEntity item : items) {
+                   if (!player.addItem(item.getItem())) {
+                       ItemStack itemToDrop = item.getItem();
+                       player.drop(itemToDrop, false);
+                   }
+               }
+
+               event.setCanceled(true);
+            }
+        }
+
 
         @SubscribeEvent
         public static void onExpDropFromHostile(LivingExperienceDropEvent event) {
@@ -243,7 +264,7 @@ public class ModEvents {
                         player.setHealth(player.getMaxHealth());
                     }
                     // Make sure this plays
-                    player.level().playSound(player, player.getOnPos(), SoundEvents.TRIDENT_RETURN, SoundSource.PLAYERS, 1f, 1f);
+                    player.level().playSound(null, player.getOnPos(), SoundEvents.TRIDENT_RETURN, SoundSource.PLAYERS, 1f, 1f);
                 }
 
             } else {
