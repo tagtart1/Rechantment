@@ -1,6 +1,7 @@
 package net.tagtart.rechantment.event;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -26,8 +27,10 @@ import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.Vec2;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -184,21 +187,43 @@ public class ModEvents {
         // Telepathy Enchantment - Blocks
         @SubscribeEvent
         public static void onBlockBreak(BlockEvent.BreakEvent event) {
+
             ItemStack handItem = event.getPlayer().getMainHandItem();
-            ServerLevel level = (ServerLevel) event.getPlayer().level();
             Pair<TelepathyEnchantment, Integer> telepathyEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:telepathy", handItem, TelepathyEnchantment.class);
-            List<ItemStack> drops = Block.getDrops(event.getState(), level, event.getPos(), null, event.getPlayer(), event.getPlayer().getMainHandItem());
+            Pair<VeinMinerEnchantment, Integer> veinMinerEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:vein_miner", handItem, VeinMinerEnchantment.class);
+            Pair<TimberEnchantment, Integer> timberEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:timber", handItem, TimberEnchantment.class);
 
-            if (telepathyEnchantment == null) return;
+            ServerLevel level = (ServerLevel) event.getPlayer().level();
 
-            for (ItemStack drop : drops) {
-                if (!event.getPlayer().addItem(drop)) {
-                   event.getPlayer().drop(drop, false);
+            // Telepathy checks
+            if (telepathyEnchantment != null) {
+                List<ItemStack> drops = Block.getDrops(event.getState(), level, event.getPos(), null, event.getPlayer(), event.getPlayer().getMainHandItem());
+
+                for (ItemStack drop : drops) {
+                    if (!event.getPlayer().addItem(drop)) {
+                        event.getPlayer().drop(drop, false);
+                    }
+                }
+                event.getState().spawnAfterBreak(level, event.getPos(), handItem, true);
+                level.removeBlock(event.getPos(), false);
+            }
+
+            // TODO: Combine these with telepathy enchantment
+            if (veinMinerEnchantment != null) {
+                BlockPos[] oresToDestroy = UtilFunctions.BFSLevelForBlocks(level, Tags.Blocks.ORES, event.getPos(), 10, true);
+
+                for (int i = 0; i < oresToDestroy.length; ++i) {
+                    level.destroyBlock(oresToDestroy[i], true);
                 }
             }
-            event.getState().spawnAfterBreak(level, event.getPos(), handItem, true);
-            level.removeBlock(event.getPos(), false);
-            event.setCanceled(true);
+
+            if (timberEnchantment != null) {
+                BlockPos[] oresToDestroy = UtilFunctions.BFSLevelForBlocks(level, BlockTags.LOGS, event.getPos(), 10, true);
+
+                for (int i = 0; i < oresToDestroy.length; ++i) {
+                    level.destroyBlock(oresToDestroy[i], true);
+                }
+            }
         }
 
         @SubscribeEvent

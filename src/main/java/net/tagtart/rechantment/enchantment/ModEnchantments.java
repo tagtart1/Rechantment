@@ -68,6 +68,16 @@ public class ModEnchantments {
                     Enchantment.Rarity.COMMON, EnchantmentCategory.DIGGER, EquipmentSlot.MAINHAND
             ));
 
+    public static RegistryObject<Enchantment> VEIN_MINER =
+            ENCHANTMENTS.register("vein_miner", () -> new VeinMinerEnchantment(
+                    Enchantment.Rarity.COMMON, EnchantmentCategory.DIGGER, EquipmentSlot.MAINHAND
+            ));
+
+    public static RegistryObject<Enchantment> TIMBER =
+            ENCHANTMENTS.register("timber", () -> new TimberEnchantment(
+                    Enchantment.Rarity.COMMON, EnchantmentCategory.DIGGER, EquipmentSlot.MAINHAND
+            ));
+
     public static void register(IEventBus eventBus) {
         ENCHANTMENTS.register(eventBus);
     }

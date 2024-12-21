@@ -1,12 +1,12 @@
 package net.tagtart.rechantment.util;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -17,17 +17,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import oshi.util.tuples.Pair;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class UtilFunctions {
-    // TO-DO MOVE THIS TO A UTIL
     // Utility method to wrap text into lines
     public static List<String> wrapText(String text, int maxWidth) {
         List<String> lines = new ArrayList<>();
@@ -180,4 +175,58 @@ public class UtilFunctions {
         return null;
     }
 
+    // Non-recursive, 3D, Breadth-first-search through the world for a particular block type including matching ones connected to each other
+    // Returns the block states and associated block positions from the provided level that match provided block tag key.
+    // Not async, ideally should provide a small search limit when called so the game doesn't shit itself.
+    public static BlockPos[] BFSLevelForBlocks(Level pLevel, TagKey<Block> pCheckBlock, BlockPos startPos, int searchLimit, boolean checkDiagonally) {
+
+        ArrayList<BlockPos> matchPositions = new ArrayList<>();
+
+        // BFS with queue, start at provided position, keep going until no more left to scan, or we've
+        // retrieved as many as the caller wants.
+        ArrayDeque<BlockPos> positionsToScan = new ArrayDeque<>();
+        HashSet<BlockPos> alreadyScanned = new HashSet<>();
+        positionsToScan.offer(startPos);
+        while (matchPositions.size() <= searchLimit && !positionsToScan.isEmpty()) {
+
+            BlockPos scanPos = positionsToScan.poll();
+            BlockState scanState = pLevel.getBlockState(scanPos);
+            alreadyScanned.add(scanPos);
+
+            if (scanState.is(pCheckBlock)) {
+                matchPositions.add(scanPos);
+
+                // Getting all positions around current one
+                for (int x = scanPos.getX() - 1; x <= scanPos.getX() + 1; ++x) {
+                    for (int y = scanPos.getY() - 1; y <= scanPos.getY() + 1; ++y) {
+                        for (int z = scanPos.getZ() - 1; z <= scanPos.getZ() + 1; ++z) {
+
+                            BlockPos newPos = new BlockPos(x, y, z);
+                            BlockPos diffVector = scanPos.subtract(newPos);
+                            int sqrDist = getSqrDistOfBlock(diffVector);
+
+                            // Omit position we are actually scanning right now (so difference distance is zero)...
+                            // ... and omit positions that already have been checked...
+                            // ... also if we want to omit diagonals, skip this position if distance is greater than 1
+                            // from scanPos, since adjacent blocks are always exactly 1 unit away
+                            if (sqrDist == 0 || alreadyScanned.contains(newPos) || (!checkDiagonally && sqrDist > 1))
+                                continue;
+
+                            positionsToScan.add(newPos);
+                        }
+                    }
+                }
+            }
+        }
+
+        return matchPositions.toArray(BlockPos[]::new);
+    }
+
+    public static int getSqrDistOfBlock(BlockPos pos) {
+        int dx = pos.getX();
+        int dy = pos.getY();
+        int dz = pos.getZ();
+
+        return dx * dx + dy * dy + dz * dz;
+    }
 }
