@@ -180,14 +180,14 @@ public class UtilFunctions {
     // Not async, ideally should provide a small search limit when called so the game doesn't shit itself.
     public static BlockPos[] BFSLevelForBlocks(Level pLevel, TagKey<Block> pCheckBlock, BlockPos startPos, int searchLimit, boolean checkDiagonally) {
 
-        ArrayList<BlockPos> matchPositions = new ArrayList<>();
+        HashSet<BlockPos> matchPositions = new HashSet<>();
 
         // BFS with queue, start at provided position, keep going until no more left to scan, or we've
         // retrieved as many as the caller wants.
         ArrayDeque<BlockPos> positionsToScan = new ArrayDeque<>();
         HashSet<BlockPos> alreadyScanned = new HashSet<>();
         positionsToScan.offer(startPos);
-        while (matchPositions.size() <= searchLimit && !positionsToScan.isEmpty()) {
+        while (matchPositions.size() < searchLimit && !positionsToScan.isEmpty()) {
 
             BlockPos scanPos = positionsToScan.poll();
             BlockState scanState = pLevel.getBlockState(scanPos);
