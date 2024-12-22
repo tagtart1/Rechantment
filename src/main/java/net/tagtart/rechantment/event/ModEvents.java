@@ -44,6 +44,7 @@ import net.tagtart.rechantment.sound.ModSounds;
 import net.tagtart.rechantment.util.UtilFunctions;
 import oshi.util.tuples.Pair;
 
+import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -188,6 +189,8 @@ public class ModEvents {
         @SubscribeEvent
         public static void onBlockBreak(BlockEvent.BreakEvent event) {
 
+            if (event.getPlayer().level().isClientSide()) return;
+
             ItemStack handItem = event.getPlayer().getMainHandItem();
             Pair<TelepathyEnchantment, Integer> telepathyEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:telepathy", handItem, TelepathyEnchantment.class);
             Pair<VeinMinerEnchantment, Integer> veinMinerEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:vein_miner", handItem, VeinMinerEnchantment.class);
@@ -195,35 +198,48 @@ public class ModEvents {
 
             ServerLevel level = (ServerLevel) event.getPlayer().level();
 
-            // Telepathy checks
-            if (telepathyEnchantment != null) {
-                List<ItemStack> drops = Block.getDrops(event.getState(), level, event.getPos(), null, event.getPlayer(), event.getPlayer().getMainHandItem());
-
-                for (ItemStack drop : drops) {
-                    if (!event.getPlayer().addItem(drop)) {
-                        event.getPlayer().drop(drop, false);
-                    }
-                }
-                event.getState().spawnAfterBreak(level, event.getPos(), handItem, true);
-                level.removeBlock(event.getPos(), false);
-            }
-
-            // TODO: Combine these with telepathy enchantment
             if (veinMinerEnchantment != null) {
                 BlockPos[] oresToDestroy = UtilFunctions.BFSLevelForBlocks(level, Tags.Blocks.ORES, event.getPos(), 10, true);
+                destroyBulkBlocks(event, oresToDestroy, level, handItem, (telepathyEnchantment != null) ? telepathyEnchantment.getA() : null);
+            }
 
-                for (int i = 0; i < oresToDestroy.length; ++i) {
-                    level.destroyBlock(oresToDestroy[i], true);
+            else if (timberEnchantment != null) {
+                BlockPos[] woodToDestroy = UtilFunctions.BFSLevelForBlocks(level, BlockTags.LOGS, event.getPos(), 10, true);
+                destroyBulkBlocks(event, woodToDestroy, level, handItem, (telepathyEnchantment != null) ? telepathyEnchantment.getA() : null);
+            }
+            // Telepathy check. Only happens when destroying a single block normally here
+            else if (telepathyEnchantment != null) {
+                telepathicallyDestroyBlock(event, event.getPos(), level, handItem);
+            }
+        }
+
+        private static boolean telepathicallyDestroyBlock(BlockEvent.BreakEvent event, BlockPos blockPos, ServerLevel level, ItemStack handItem) {
+            List<ItemStack> drops = Block.getDrops(event.getState(), level, blockPos, null, event.getPlayer(), event.getPlayer().getMainHandItem());
+
+            for (ItemStack drop : drops) {
+                if (!event.getPlayer().addItem(drop)) {
+                    event.getPlayer().drop(drop, false);
+                }
+            }
+            event.getState().spawnAfterBreak(level, blockPos, handItem, true);
+            event.setCanceled(true);
+            return level.removeBlock(blockPos, false);
+        }
+
+        private static void destroyBulkBlocks(BlockEvent.BreakEvent event, BlockPos[] blocksToDestroy, ServerLevel level, ItemStack handItem, @Nullable TelepathyEnchantment telepathyEnchantment) {
+            int destroyedSuccessfully = 0;
+            for (BlockPos blockPos : blocksToDestroy) {
+                // Account for telepathy with each block to destroy
+                if (telepathyEnchantment != null && telepathicallyDestroyBlock(event, blockPos, level, handItem)) {
+                    ++destroyedSuccessfully;
+                }
+                // If no telepathy, just do basic block destroy.
+                else if (level.destroyBlock(blockPos, true)) {
+                    ++destroyedSuccessfully;
                 }
             }
 
-            if (timberEnchantment != null) {
-                BlockPos[] oresToDestroy = UtilFunctions.BFSLevelForBlocks(level, BlockTags.LOGS, event.getPos(), 10, true);
-
-                for (int i = 0; i < oresToDestroy.length; ++i) {
-                    level.destroyBlock(oresToDestroy[i], true);
-                }
-            }
+            handItem.hurt(destroyedSuccessfully, level.random, (ServerPlayer)event.getPlayer());
         }
 
         @SubscribeEvent
