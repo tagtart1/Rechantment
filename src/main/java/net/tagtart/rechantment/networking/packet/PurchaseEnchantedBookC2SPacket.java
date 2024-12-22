@@ -126,6 +126,7 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
 
                 ItemStack toGive = new ItemStack(ModItems.ENCHANTED_BOOK.get());
 
+
                 CompoundTag rootTag = toGive.getOrCreateTag();
 
                 CompoundTag enchantmentTag = new CompoundTag();
@@ -139,7 +140,19 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
                 rootTag.put("Enchantment", enchantmentTag);
                 rootTag.put("SuccessRate", successTag);
 
+
+                // Give enchanted book
                 player.addItem(toGive);
+
+                // Roll for gem of chance
+                int gemOfChanceDropRate = 50; // move to config later
+                // Play sound effects, send a message
+                if (random.nextInt(100) < gemOfChanceDropRate) {
+                    ItemStack chanceGemToGive = new ItemStack(ModItems.CHANCE_GEM.get());
+                    if(!player.addItem(chanceGemToGive)) {
+                        player.drop(chanceGemToGive, false);
+                    }
+                }
             }
 
             sendEnchantResultPlayerMessage(player, failCase);
