@@ -9,7 +9,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
+import net.tagtart.rechantment.block.entity.RechantmentTableBlockEntity;
 import net.tagtart.rechantment.item.ModItems;
 import net.tagtart.rechantment.networking.PurchaseBookResultCase;
 import net.tagtart.rechantment.util.BookRarityProperties;
@@ -58,6 +60,9 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
 
             Inventory playerInventory = player.getInventory();
             BookRarityProperties bookProperties = BookRarityProperties.getAllProperties()[bookPropertiesIndex];
+            BlockEntity blockEntity = level.getBlockEntity(enchantTablePos);
+            RechantmentTableBlockEntity enchTableEntity = (blockEntity instanceof RechantmentTableBlockEntity) ?
+                    (RechantmentTableBlockEntity)blockEntity : null;
 
             var bookshelves = UtilFunctions.scanAroundBlockForBookshelves(level, enchantTablePos);
             var floorBlocks = UtilFunctions.scanAroundBlockForValidFloors(bookProperties.floorBlock, level, enchantTablePos);
@@ -65,6 +70,7 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
             boolean meetsEXPRequirement = UtilFunctions.playerMeetsExpRequirement(bookProperties, player);
             boolean meetsBookshelfRequirement = UtilFunctions.playerMeetsBookshelfRequirement(bookProperties, bookshelves.getA());
             boolean meetsFloorBlocksRequirement = UtilFunctions.playerMeetsFloorRequirement(bookProperties, floorBlocks.getA());
+            boolean meetsLapisRequirement = UtilFunctions.playerMeetsLapisRequirement(bookProperties, enchTableEntity.getItemHandlerLapisStack());
 
             PurchaseBookResultCase failCase = PurchaseBookResultCase.SUCCESS;
 
@@ -75,6 +81,7 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
             else if (!meetsEXPRequirement) failCase = PurchaseBookResultCase.INSUFFICIENT_EXP;
             else if (!meetsBookshelfRequirement) failCase = PurchaseBookResultCase.INSUFFICIENT_BOOKS;
             else if (!meetsFloorBlocksRequirement) failCase = PurchaseBookResultCase.INSUFFICIENT_FLOOR;
+            else if (!meetsLapisRequirement) failCase = PurchaseBookResultCase.INSUFFICIENT_LAPIS;
 
             // At this point, should be good to go. Can destroy blocks and reward the book.
             else
@@ -124,6 +131,10 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
                     level.destroyBlock(position, false);
                 }
 
+                // Remove EXP and Lapis from player.
+                player.giveExperiencePoints(-Math.min(player.totalExperience, bookProperties.requiredExp));
+                enchTableEntity.getItemHandlerLapisStack().shrink(bookProperties.requiredLapis);
+
                 ItemStack toGive = new ItemStack(ModItems.ENCHANTED_BOOK.get());
 
                 CompoundTag rootTag = toGive.getOrCreateTag();
@@ -152,6 +163,7 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
     private void sendEnchantResultPlayerMessage(Player player, PurchaseBookResultCase failCase) {
         switch(failCase) {
             case INVENTORY_FULL:
+                //player.closeContainer();
                 break;
             // Not enough EXP
             case INSUFFICIENT_EXP:
@@ -162,8 +174,10 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
             // Not enough floor blocks.
             case INSUFFICIENT_FLOOR:
                 break;
+            // Not enough lapis.
+            case INSUFFICIENT_LAPIS:
+                break;
         }
 
-        player.closeContainer();
     }
 }

@@ -11,6 +11,7 @@
   "tooltip.rechantment.enchantment_table.right_click": "Right click to preview pools",
   "tooltip.rechantment.enchantment_table.requirements_not_met": "Requirements not met!",
   "tooltip.rechantment.enchantment_table.bookshelves": "Bookshelves",
+  "tooltip.rechantment.enchantment_table.lapis": "Lapis Lazuli",
 
   "message.rechantment.insufficient_exp": "You only have %d/%d experience!",
   "message.rechantment.insufficient_books": "You only have %d/%d of the required bookshelves in range!",

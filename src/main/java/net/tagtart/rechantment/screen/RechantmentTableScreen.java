@@ -27,6 +27,7 @@ import java.util.List;
 
 public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentTableMenu> {
 
+
     public static final Style PINK_COLOR_STYLE = Style.EMPTY.withColor(0xFCB4B4);
     public static final Style MID_GRAY_COLOR_STYLE = Style.EMPTY.withColor(0xA8A8A8);
 
@@ -64,7 +65,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
 
         // Why isn't there an easy to just read these from the PNG?
         this.imageWidth = 176;
-        this.imageHeight = 90;
+        this.imageHeight = 217;
 
         this.leftPos = (width - imageWidth) / 2;
         this.topPos = (height - imageHeight) / 2;
@@ -72,7 +73,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         hoverables = new ArrayList<>();
         hoverables.add(new HoverableEnchantedBookItemRenderable(this, 0, SIMPLE_LOCATION, leftPos + 10, topPos + 44));
         hoverables.add(new HoverableEnchantedBookItemRenderable(this, 1, UNIQUE_LOCATION,  leftPos + 150, topPos + 44));
-        hoverables.add(new HoverableEnchantedBookItemRenderable(this,  2, ELITE_LOCATION,leftPos + 43,  topPos + 40));
+        hoverables.add(new HoverableEnchantedBookItemRenderable(this,  2, ELITE_LOCATION,leftPos + 43,  topPos + 41));
         hoverables.add(new HoverableEnchantedBookItemRenderable(this, 3, ULTIMATE_LOCATION, leftPos + 116, topPos + 41));
         hoverables.add(new HoverableEnchantedBookItemRenderable(this, 4, LEGENDARY_LOCATION, leftPos + 78, topPos + 38));
     }
@@ -83,13 +84,16 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
 
-        guiGraphics.blit(TEXTURE, this.leftPos, this.topPos, 0, 0, imageWidth, imageHeight);
+        guiGraphics.blit(TEXTURE, this.leftPos, this.topPos, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+
+
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 
         renderBackground(guiGraphics);
+
         super.render(guiGraphics, mouseX, mouseY, delta);
 
         // Render all hoverables. They will handle tooltip rendering as well.
@@ -114,7 +118,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
                     System.out.println(String.format("clicked a hoverable, %d books, %d floors!", cachedBookshelvesInRange.length, cachedFloorBlocksInRange.length));
                     BookRarityProperties properties = hoverable.bookProperties;
 
-                    if (!floorRequirementsMet(properties) && !bookshelfRequirementsMet(properties)) {
+                    if (!floorRequirementsMet(properties) && !bookshelfRequirementsMet(properties) && !lapisRequirementsMet(properties)) {
                         // Just play sound, don't close TODO: ADD PROPER SOUND LIKE MOD HAS.
                         level.playSound(null, player.getOnPos(), ModSounds.ENCHANTED_BOOK_FAIL.get(), SoundSource.PLAYERS, 10f, 1f);
                         break;
@@ -144,6 +148,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
 
                     // At this point, they meet the requirements. Can try to send a packet to server!
                     ModPackets.sentToServer(new PurchaseEnchantedBookC2SPacket(hoverable.propertiesIndex, menu.blockEntity.getBlockPos()));
+                    hoverable.updateTooltipLines();
                     return true;
                 }
             }
@@ -151,7 +156,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
 
         // else if right-clicked:
         // display pools? might have to have pool display code contained in this class too.
-        return false;
+        return super.mouseClicked(pMouseX, pMouseY, pButton);
     }
 
     @Override
@@ -189,6 +194,13 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         // Other requirements:
         Component requirementsTitle = Component.translatable("tooltip.rechantment.enchantment_table.requirements").append(": ").withStyle(MID_GRAY_COLOR_STYLE);
         tooltipLines.add(requirementsTitle);
+
+        // Lapis Lazuli count requirement.
+        String lapisCount = String.valueOf(properties.requiredLapis);
+        String lapisName = Component.translatable("tooltip.rechantment.enchantment_table.lapis").getString();
+        ChatFormatting lapisReqMetColor = lapisRequirementsMet(properties) ? ChatFormatting.GREEN : ChatFormatting.RED;
+        Component fullLapisRequirementColored = Component.literal(lapisCount + " " + lapisName).withStyle(lapisReqMetColor);
+        tooltipLines.add(grayHyphen.copy().append(fullLapisRequirementColored));
 
         // Bookshelf count requirement. Green color if requirement met.
         String bookshelfCount = String.valueOf(properties.requiredBookShelves);
@@ -261,6 +273,10 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
 
     public boolean floorRequirementsMet(BookRarityProperties bookProperties) {
         return UtilFunctions.playerMeetsFloorRequirement(bookProperties, cachedFloorBlocksInRange);
+    }
+
+    public boolean lapisRequirementsMet(BookRarityProperties bookProperties) {
+        return UtilFunctions.playerMeetsLapisRequirement(bookProperties, menu.getLapisSlotStack());
     }
 
     public boolean playerMeetsAllEnchantRequirements(BookRarityProperties bookProperties) {

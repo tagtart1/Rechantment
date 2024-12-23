@@ -24,6 +24,7 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<? extends Float>        RARITY_0_BOOK_BREAK_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<? extends Float>        RARITY_0_FLOOR_BREAK_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_0_REQUIRED_BOOKSHELVES;
+    public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_0_REQUIRED_LAPIS;
     public static final ForgeConfigSpec.ConfigValue<? extends String>       RARITY_0_FLOOR_BLOCK_TYPE;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> RARITY_0_ENCHANTMENTS;
 
@@ -40,6 +41,7 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<? extends Float>        RARITY_1_FLOOR_BREAK_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<? extends String>       RARITY_1_FLOOR_BLOCK_TYPE;
     public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_1_REQUIRED_BOOKSHELVES;
+    public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_1_REQUIRED_LAPIS;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> RARITY_1_ENCHANTMENTS;
 
     // Elite tier configs.
@@ -54,6 +56,7 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<? extends Float>        RARITY_2_BOOK_BREAK_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<? extends Float>        RARITY_2_FLOOR_BREAK_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_2_REQUIRED_BOOKSHELVES;
+    public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_2_REQUIRED_LAPIS;
     public static final ForgeConfigSpec.ConfigValue<? extends String>       RARITY_2_FLOOR_BLOCK_TYPE;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> RARITY_2_ENCHANTMENTS;
 
@@ -69,6 +72,7 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<? extends Float>        RARITY_3_BOOK_BREAK_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<? extends Float>        RARITY_3_FLOOR_BREAK_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_3_REQUIRED_BOOKSHELVES;
+    public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_3_REQUIRED_LAPIS;
     public static final ForgeConfigSpec.ConfigValue<? extends String>       RARITY_3_FLOOR_BLOCK_TYPE;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> RARITY_3_ENCHANTMENTS;
 
@@ -84,6 +88,7 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<? extends Float>        RARITY_4_BOOK_BREAK_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<? extends Float>        RARITY_4_FLOOR_BREAK_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_4_REQUIRED_BOOKSHELVES;
+    public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_4_REQUIRED_LAPIS;
     public static final ForgeConfigSpec.ConfigValue<? extends String>       RARITY_4_FLOOR_BLOCK_TYPE;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> RARITY_4_ENCHANTMENTS;
 
@@ -110,6 +115,7 @@ public class RechantmentCommonConfigs {
         RARITY_0_BOOK_BREAK_CHANCE = BUILDER.define("book_break_chance", 0.00f);
         RARITY_0_FLOOR_BREAK_CHANCE = BUILDER.define("floor_break_chance", 0.05f);
         RARITY_0_REQUIRED_BOOKSHELVES = BUILDER.define("required_bookshelves", 4);
+        RARITY_0_REQUIRED_LAPIS = BUILDER.define("required_lapis", 2);
         RARITY_0_FLOOR_BLOCK_TYPE = BUILDER.define("floor_block_type", "minecraft:iron_block");
         BUILDER.comment(
                 "List of potential enchantments with weights, levels, and per-level weights.",
@@ -143,6 +149,7 @@ public class RechantmentCommonConfigs {
         RARITY_1_BOOK_BREAK_CHANCE = BUILDER.define("book_break_chance", 0.00f);
         RARITY_1_FLOOR_BREAK_CHANCE = BUILDER.define("floor_break_chance", 0.045f);
         RARITY_1_REQUIRED_BOOKSHELVES = BUILDER.define("required_bookshelves", 8);
+        RARITY_1_REQUIRED_LAPIS = BUILDER.define("required_lapis", 3);
         RARITY_1_FLOOR_BLOCK_TYPE = BUILDER.define("floor_block_type", "minecraft:gold_block");
 
         ArrayList<String> rarity_1_default_enchantments = new ArrayList<>();
@@ -174,6 +181,7 @@ public class RechantmentCommonConfigs {
         RARITY_2_BOOK_BREAK_CHANCE = BUILDER.define("book_break_chance", 0.015f);
         RARITY_2_FLOOR_BREAK_CHANCE = BUILDER.define("floor_break_chance", 0.03f);
         RARITY_2_REQUIRED_BOOKSHELVES = BUILDER.define("required_bookshelves", 16);
+        RARITY_2_REQUIRED_LAPIS = BUILDER.define("required_lapis", 3);
         RARITY_2_FLOOR_BLOCK_TYPE = BUILDER.define("floor_block_type", "minecraft:diamond_block");
 
         ArrayList<String> rarity_2_default_enchantments = new ArrayList<>();
@@ -207,6 +215,7 @@ public class RechantmentCommonConfigs {
         RARITY_3_BOOK_BREAK_CHANCE = BUILDER.define("book_break_chance", 0.015f);
         RARITY_3_FLOOR_BREAK_CHANCE = BUILDER.define("floor_break_chance", 0.075f);
         RARITY_3_REQUIRED_BOOKSHELVES = BUILDER.define("required_bookshelves", 32);
+        RARITY_3_REQUIRED_LAPIS = BUILDER.define("required_lapis", 4);
         RARITY_3_FLOOR_BLOCK_TYPE = BUILDER.define("floor_block_type", "minecraft:emerald_block");
 
         ArrayList<String> rarity_3_default_enchantments = new ArrayList<>();
@@ -237,6 +246,7 @@ public class RechantmentCommonConfigs {
         RARITY_4_BOOK_BREAK_CHANCE = BUILDER.define("book_break_chance", 0.015f);
         RARITY_4_FLOOR_BREAK_CHANCE = BUILDER.define("floor_break_chance", 0.08f);
         RARITY_4_REQUIRED_BOOKSHELVES = BUILDER.define("required_bookshelves", 45);
+        RARITY_4_REQUIRED_LAPIS = BUILDER.define("required_lapis", 5);
         RARITY_4_FLOOR_BLOCK_TYPE = BUILDER.define("floor_block_type", "minecraft:ancient_debris");
 
         ArrayList<String> rarity_4_default_enchantments = new ArrayList<>();

@@ -16,4 +16,7 @@ public enum PurchaseBookResultCase {
 
     // Not enough of required floor for a given tier
     INSUFFICIENT_FLOOR,
+
+    // Not enough of required lapis for a given tier
+    INSUFFICIENT_LAPIS
 }

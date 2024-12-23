@@ -5,7 +5,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EnchantmentTableBlock;
@@ -14,6 +13,7 @@ import net.minecraft.world.level.block.entity.EnchantmentTableBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.network.NetworkHooks;
+import net.tagtart.rechantment.block.entity.RechantmentTableBlockEntity;
 import net.tagtart.rechantment.screen.RechantmentTableMenu;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,13 +31,18 @@ public class EnchantmentTableBlockMixin
         } else {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
 
-            if (entity instanceof EnchantmentTableBlockEntity) {
+            if (entity instanceof RechantmentTableBlockEntity) {
                 SimpleMenuProvider openMenu = new SimpleMenuProvider(
-                    (id, inventory, player) -> new RechantmentTableMenu(id, inventory, entity), ((EnchantmentTableBlockEntity)entity).getDisplayName());
+                    (id, inventory, player) -> new RechantmentTableMenu(id, inventory, entity), ((RechantmentTableBlockEntity)entity).getDisplayName());
                 NetworkHooks.openScreen((ServerPlayer)pPlayer, openMenu, pPos);
             }
             cir.setReturnValue(InteractionResult.CONSUME);
         }
+    }
+
+    @Inject(method = "newBlockEntity", at = @At("HEAD"), cancellable = true)
+    public void newBlockEntity(BlockPos pPos, BlockState pState, CallbackInfoReturnable<BlockEntity> cir) {
+        cir.setReturnValue(new RechantmentTableBlockEntity(pPos, pState));
     }
 
 }
