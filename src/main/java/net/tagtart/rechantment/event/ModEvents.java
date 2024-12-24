@@ -7,10 +7,12 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.*;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -23,10 +25,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.Vec2;
@@ -170,22 +174,9 @@ public class ModEvents {
             }
         }
 
-        // Wisdom Enchantment
-        @SubscribeEvent
-        public static void onBlockExpDrop(BlockEvent.BreakEvent event) {
-            // Do the Wisdom stuff here
-            ItemStack pickaxe = event.getPlayer().getMainHandItem();
-            Pair<WisdomEnchantment, Integer> wisdomEnchant = UtilFunctions.getEnchantmentFromItem("rechantment:wisdom", pickaxe, WisdomEnchantment.class);
-                if (wisdomEnchant != null) {
-                    // Multiply the exp orbs droppped
-                    float expMultiplier = wisdomEnchant.getA().getExpMultiplier(wisdomEnchant.getB());
-                    int newExpToDrop = (int)((float)event.getExpToDrop() * expMultiplier);
-                    event.setExpToDrop(newExpToDrop);
-                }
 
-        }
 
-        // Telepathy Enchantment - Blocks
+        // Telepathy, Vein Miner, Timber, Wisdom Enchantments - Blocks
         @SubscribeEvent
         public static void onBlockBreak(BlockEvent.BreakEvent event) {
 
@@ -195,47 +186,125 @@ public class ModEvents {
             Pair<TelepathyEnchantment, Integer> telepathyEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:telepathy", handItem, TelepathyEnchantment.class);
             Pair<VeinMinerEnchantment, Integer> veinMinerEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:vein_miner", handItem, VeinMinerEnchantment.class);
             Pair<TimberEnchantment, Integer> timberEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:timber", handItem, TimberEnchantment.class);
-
+            Pair<WisdomEnchantment, Integer> wisdomEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:wisdom", handItem, WisdomEnchantment.class);
             ServerLevel level = (ServerLevel) event.getPlayer().level();
+
+
+
+
+
+
 
             if (veinMinerEnchantment != null) {
                 BlockPos[] oresToDestroy = UtilFunctions.BFSLevelForBlocks(level, Tags.Blocks.ORES, event.getPos(), 10, true);
                 destroyBulkBlocks(event, oresToDestroy, level, handItem, (telepathyEnchantment != null) ? telepathyEnchantment.getA() : null);
+                event.setCanceled(true);
             }
 
             else if (timberEnchantment != null) {
                 BlockPos[] woodToDestroy = UtilFunctions.BFSLevelForBlocks(level, BlockTags.LOGS, event.getPos(), 10, true);
                 destroyBulkBlocks(event, woodToDestroy, level, handItem, (telepathyEnchantment != null) ? telepathyEnchantment.getA() : null);
+                event.setCanceled(true);
             }
+
             // Telepathy check. Only happens when destroying a single block normally here
             else if (telepathyEnchantment != null) {
                 telepathicallyDestroyBlock(event, event.getPos(), level, handItem);
             }
+
+            // Wisdom by itself without the other breakevent enchants
+            else if (wisdomEnchantment != null) {
+                float expMultiplier = wisdomEnchantment.getA().getExpMultiplier(wisdomEnchantment.getB());
+                int newExpToDrop = (int)((float)event.getExpToDrop() * expMultiplier);
+                event.setExpToDrop(newExpToDrop);
+            }
+        }
+
+        @SubscribeEvent
+        public static void onFortuneProc(BlockEvent.BreakEvent event) {
+            if (!(event.getState().is(Tags.Blocks.ORES))) return;
+
+            Player player = event.getPlayer();
+            ServerLevel level = (ServerLevel) event.getLevel();
+            System.out.println("THIS IS AN ORE!");
+
+
+            // event.setCanceled(true);
+
         }
 
         private static boolean telepathicallyDestroyBlock(BlockEvent.BreakEvent event, BlockPos blockPos, ServerLevel level, ItemStack handItem) {
-            List<ItemStack> drops = Block.getDrops(event.getState(), level, blockPos, null, event.getPlayer(), event.getPlayer().getMainHandItem());
+            List<ItemStack> drops = Block.getDrops(event.getState(), level, blockPos, null, event.getPlayer(), handItem);
+            BlockState blockState = level.getBlockState(blockPos);
 
+            // Get silk if applied
+            boolean hasSilkTouch = EnchantmentHelper.hasSilkTouch(handItem);
+
+            int expToDrop = blockState.getExpDrop(level, RandomSource.create(), blockPos, 0, hasSilkTouch ? 1 : 0);
             for (ItemStack drop : drops) {
                 if (!event.getPlayer().addItem(drop)) {
                     event.getPlayer().drop(drop, false);
                 }
             }
-            event.getState().spawnAfterBreak(level, blockPos, handItem, true);
+            // Cancelling event prevents the block from doing its drops
             event.setCanceled(true);
-            return level.removeBlock(blockPos, false);
+
+            if (expToDrop > 0) {
+                Player player = event.getPlayer();
+                ExperienceOrb expOrb = new ExperienceOrb(level, player.getX(), player.getY(), player.getZ(), expToDrop);
+                level.addFreshEntity(expOrb);
+            }
+
+
+
+            // This check prevents a block from "breaking" twice while also working with vein miner breaks
+            if (event.getPos() != blockPos) {
+               return level.destroyBlock(blockPos, false);
+            } else {
+                return level.removeBlock(blockPos, false);
+            }
+
         }
 
+        // Vein miner specific
         private static void destroyBulkBlocks(BlockEvent.BreakEvent event, BlockPos[] blocksToDestroy, ServerLevel level, ItemStack handItem, @Nullable TelepathyEnchantment telepathyEnchantment) {
             int destroyedSuccessfully = 0;
+            Pair<WisdomEnchantment, Integer> wisdomEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:wisdom", handItem, WisdomEnchantment.class);
+            System.out.println("Block to destroy length: " + blocksToDestroy.length);
             for (BlockPos blockPos : blocksToDestroy) {
+                BlockState blockState = level.getBlockState(blockPos);
+
+                // This can prevent fortunte from working, or enable
+                List<ItemStack> itemsToDrop = Block.getDrops(blockState, level, blockPos, null, event.getPlayer(), handItem);
+
+
                 // Account for telepathy with each block to destroy
                 if (telepathyEnchantment != null && telepathicallyDestroyBlock(event, blockPos, level, handItem)) {
                     ++destroyedSuccessfully;
                 }
+
                 // If no telepathy, just do basic block destroy.
-                else if (level.destroyBlock(blockPos, true)) {
+                else if (level.removeBlock(blockPos, false)) {
                     ++destroyedSuccessfully;
+
+
+                    // Manually pop the resource
+                    for (ItemStack item : itemsToDrop) {
+                        // This can prevent fortunte from working, or enable
+                        Block.popResource(level, blockPos,item);
+                    }
+
+
+                    Block block = blockState.getBlock();
+                    boolean hasSilkTouch = EnchantmentHelper.hasSilkTouch(handItem);
+                    int expToDrop = blockState.getExpDrop(level, RandomSource.create(), blockPos, 0, hasSilkTouch ? 1 : 0);
+
+                    if (wisdomEnchantment != null) {
+                        float expMultiplier = wisdomEnchantment.getA().getExpMultiplier(wisdomEnchantment.getB());
+                        expToDrop = (int)((float)event.getExpToDrop() * expMultiplier);
+                    }
+
+                    block.popExperience(level, blockPos, expToDrop);
                 }
             }
 
