@@ -237,6 +237,9 @@ public class ModEvents {
             List<ItemStack> drops = Block.getDrops(event.getState(), level, blockPos, null, event.getPlayer(), handItem);
             BlockState blockState = level.getBlockState(blockPos);
 
+            // Get wisdom if applied
+            Pair<WisdomEnchantment, Integer> wisdomEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:wisdom", handItem, WisdomEnchantment.class);
+
             // Get silk if applied
             boolean hasSilkTouch = EnchantmentHelper.hasSilkTouch(handItem);
 
@@ -251,6 +254,10 @@ public class ModEvents {
 
             if (expToDrop > 0) {
                 Player player = event.getPlayer();
+                if (wisdomEnchantment != null) {
+                    float expMultiplier = wisdomEnchantment.getA().getExpMultiplier(wisdomEnchantment.getB());
+                    expToDrop = (int)((float)expToDrop * expMultiplier);
+                }
                 ExperienceOrb expOrb = new ExperienceOrb(level, player.getX(), player.getY(), player.getZ(), expToDrop);
                 level.addFreshEntity(expOrb);
             }
@@ -307,7 +314,7 @@ public class ModEvents {
 
                     if (wisdomEnchantment != null) {
                         float expMultiplier = wisdomEnchantment.getA().getExpMultiplier(wisdomEnchantment.getB());
-                        expToDrop = (int)((float)event.getExpToDrop() * expMultiplier);
+                        expToDrop = (int)((float)expToDrop * expMultiplier);
                     }
 
                     block.popExperience(level, blockPos, expToDrop);
