@@ -284,9 +284,15 @@ public class ModEvents {
                 }
 
                 // If no telepathy, just do basic block destroy.
-                else if (level.removeBlock(blockPos, false)) {
+
+                else {
                     ++destroyedSuccessfully;
 
+                    if (event.getPos() != blockPos ) {
+                        level.destroyBlock(blockPos, false);
+                    } else {
+                        level.removeBlock(blockPos, false);
+                    }
 
                     // Manually pop the resource
                     for (ItemStack item : itemsToDrop) {
