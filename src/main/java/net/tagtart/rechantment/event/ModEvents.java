@@ -180,6 +180,7 @@ public class ModEvents {
 
 
         // Telepathy, Vein Miner, Timber, Wisdom Enchantments - Blocks
+        // TODO: TELEPATHY ONLY DOESNT TAKE DURABILITY
         @SubscribeEvent
         public static void onBlockBreak(BlockEvent.BreakEvent event) {
 
@@ -209,6 +210,7 @@ public class ModEvents {
             // Telepathy check. Only happens when destroying a single block normally here
             else if (telepathyEnchantment != null) {
                 telepathicallyDestroyBlock(event, event.getPos(), level, handItem, fortuneEnchantmentLevel);
+                handItem.hurt(1, level.random, (ServerPlayer)event.getPlayer());
             }
 
             // Fortune by itself with vanilla enchants without other breakevent enchant
@@ -250,10 +252,8 @@ public class ModEvents {
                 int newExpToDrop = (int)((float)event.getExpToDrop() * expMultiplier);
                 event.setExpToDrop(newExpToDrop);
             }
-
-
-
         }
+
         private static void applyNerfedFortune(List<ItemStack> items, int eLevel) {
             for(ItemStack item : items) {
                 int chanceToDouble = 0;
@@ -281,12 +281,18 @@ public class ModEvents {
         }
 
         private static boolean telepathicallyDestroyBlock(BlockEvent.BreakEvent event, BlockPos blockPos, ServerLevel level, ItemStack handItem, int fortuneEnchantmentLevel) {
-            List<ItemStack> drops = null;
+            List<ItemStack> drops = Collections.emptyList();
             BlockState blockState = level.getBlockState(blockPos);
+
+            // Cancelling event prevents the block from doing its drops
+            event.setCanceled(true);
+
+            // Checks if the tool can actually mine and cause drops
+
 
             // TODO: config this
             // checking if the state is an ore makes fortune with axe on melon and mushrooms not work but whatever, who really does that?
-            if (fortuneEnchantmentLevel != 0 && blockState.is(Tags.Blocks.ORES) && handItem.isCorrectToolForDrops(blockState)) {
+            if (fortuneEnchantmentLevel != 0 && blockState.is(Tags.Blocks.ORES)) {
                 drops = Block.getDrops(blockState, level, blockPos, null);
                 applyNerfedFortune(drops, fortuneEnchantmentLevel);
             } else {
@@ -298,40 +304,37 @@ public class ModEvents {
             // Get wisdom if applied
             Pair<WisdomEnchantment, Integer> wisdomEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:wisdom", handItem, WisdomEnchantment.class);
 
+            // This check prevents a block from "breaking" twice while also working with vein miner breaks
+            if (event.getPos() != blockPos) {
+                 level.destroyBlock(blockPos, false);
+            } else {
+                 level.removeBlock(blockPos, false);
+            }
+
+            if (!handItem.isCorrectToolForDrops(blockState)) return true;
+
             // Get silk if applied
             boolean hasSilkTouch = EnchantmentHelper.hasSilkTouch(handItem);
-
             int expToDrop = blockState.getExpDrop(level, RandomSource.create(), blockPos, 0, hasSilkTouch ? 1 : 0);
             for (ItemStack drop : drops) {
                 if (!event.getPlayer().addItem(drop)) {
                     event.getPlayer().drop(drop, false);
                 }
             }
-            // Cancelling event prevents the block from doing its drops
-            event.setCanceled(true);
 
             if (expToDrop > 0) {
                 Player player = event.getPlayer();
                 if (wisdomEnchantment != null) {
                     float expMultiplier = wisdomEnchantment.getA().getExpMultiplier(wisdomEnchantment.getB());
-                    expToDrop = (int)((float)expToDrop * expMultiplier);
+                    expToDrop = (int) ((float) expToDrop * expMultiplier);
                 }
                 ExperienceOrb expOrb = new ExperienceOrb(level, player.getX(), player.getY(), player.getZ(), expToDrop);
                 level.addFreshEntity(expOrb);
             }
-
-
-
-            // This check prevents a block from "breaking" twice while also working with vein miner breaks
-            if (event.getPos() != blockPos) {
-               return level.destroyBlock(blockPos, false);
-            } else {
-                return level.removeBlock(blockPos, false);
-            }
-
+            return true;
         }
 
-        // Vein miner specific
+        // Vein miner / timber specific
         private static void destroyBulkBlocks(BlockEvent.BreakEvent event, BlockPos[] blocksToDestroy, ServerLevel level, ItemStack handItem, @Nullable TelepathyEnchantment telepathyEnchantment, int fortuneEnchantmentLevel) {
             int destroyedSuccessfully = 0;
             Pair<WisdomEnchantment, Integer> wisdomEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:wisdom", handItem, WisdomEnchantment.class);
@@ -339,14 +342,12 @@ public class ModEvents {
             for (BlockPos blockPos : blocksToDestroy) {
                 BlockState blockState = level.getBlockState(blockPos);
 
-
                 // Account for telepathy with each block to destroy
                 if (telepathyEnchantment != null && telepathicallyDestroyBlock(event, blockPos, level, handItem, fortuneEnchantmentLevel)) {
                     ++destroyedSuccessfully;
                 }
 
-                // If no telepathy, just do basic block destroy.
-
+                // If no telepathy, just do basic block destroy manually.
                 else {
                     ++destroyedSuccessfully;
                     List<ItemStack> itemsToDrop = null;
@@ -367,21 +368,23 @@ public class ModEvents {
 
 
                     // Manually pop the resource
-                    for (ItemStack item : itemsToDrop) {
-                        Block.popResource(level, blockPos,item);
+                    if (handItem.isCorrectToolForDrops(blockState)) {
+                        for (ItemStack item : itemsToDrop) {
+                            Block.popResource(level, blockPos, item);
+                        }
+
+
+                        Block block = blockState.getBlock();
+                        boolean hasSilkTouch = EnchantmentHelper.hasSilkTouch(handItem);
+                        int expToDrop = blockState.getExpDrop(level, RandomSource.create(), blockPos, 0, hasSilkTouch ? 1 : 0);
+
+                        if (wisdomEnchantment != null) {
+                            float expMultiplier = wisdomEnchantment.getA().getExpMultiplier(wisdomEnchantment.getB());
+                            expToDrop = (int) ((float) expToDrop * expMultiplier);
+                        }
+
+                        block.popExperience(level, blockPos, expToDrop);
                     }
-
-
-                    Block block = blockState.getBlock();
-                    boolean hasSilkTouch = EnchantmentHelper.hasSilkTouch(handItem);
-                    int expToDrop = blockState.getExpDrop(level, RandomSource.create(), blockPos, 0, hasSilkTouch ? 1 : 0);
-
-                    if (wisdomEnchantment != null) {
-                        float expMultiplier = wisdomEnchantment.getA().getExpMultiplier(wisdomEnchantment.getB());
-                        expToDrop = (int)((float)expToDrop * expMultiplier);
-                    }
-
-                    block.popExperience(level, blockPos, expToDrop);
                 }
             }
 
@@ -413,6 +416,7 @@ public class ModEvents {
         }
 
 
+        // TODO: make telpathy exp goto player
         @SubscribeEvent
         public static void onExpDropFromHostile(LivingExperienceDropEvent event) {
             MobCategory mobCategory = event.getEntity().getType().getCategory();
