@@ -76,8 +76,6 @@ public class ModEvents {
 
             if(!(shield.getItem() instanceof ShieldItem)) return;
 
-
-            // TODO: add Courage enchantment
             ResourceLocation bashResource = new ResourceLocation("rechantment:bash");
             ResourceLocation courageResource = new ResourceLocation("rechantment:courage");
             Map<Enchantment, Integer> shieldEnchants = EnchantmentHelper.getEnchantments(shield);
@@ -97,7 +95,6 @@ public class ModEvents {
                 if (attacker.isPushable()) {
                     attacker.push(toAttacker.x, SHIELD_BASH_KNOCKBACK_Y, toAttacker.y);
                 }
-
             }
 
             // Check for Courage enchantment
@@ -180,7 +177,6 @@ public class ModEvents {
 
 
         // Telepathy, Vein Miner, Timber, Wisdom Enchantments - Blocks
-        // TODO: TELEPATHY ONLY DOESNT TAKE DURABILITY
         @SubscribeEvent
         public static void onBlockBreak(BlockEvent.BreakEvent event) {
 
@@ -209,8 +205,11 @@ public class ModEvents {
 
             // Telepathy check. Only happens when destroying a single block normally here
             else if (telepathyEnchantment != null) {
+
                 telepathicallyDestroyBlock(event, event.getPos(), level, handItem, fortuneEnchantmentLevel);
-                handItem.hurt(1, level.random, (ServerPlayer)event.getPlayer());
+
+                if (event.getState().getDestroySpeed(level, event.getPos()) != 0)
+                    handItem.hurt(1, level.random, (ServerPlayer)event.getPlayer());
             }
 
             // Fortune by itself with vanilla enchants without other breakevent enchant
@@ -223,6 +222,7 @@ public class ModEvents {
 
                 if (!blockState.is(Tags.Blocks.ORES) || !handItem.isCorrectToolForDrops(blockState)) return;
 
+                level.removeBlock(blockPos, false);
                 // Fetch the block drops without tool
                List<ItemStack> drops = Block.getDrops(event.getState(), level, event.getPos(), null);
                // Pop exp
@@ -241,7 +241,8 @@ public class ModEvents {
                     Block.popResource(level, blockPos, drop);
                 }
 
-               level.removeBlock(blockPos, false);
+                handItem.hurt(1, level.random, (ServerPlayer)event.getPlayer());
+
                event.setCanceled(true);
 
             }
@@ -280,14 +281,12 @@ public class ModEvents {
             }
         }
 
-        private static boolean telepathicallyDestroyBlock(BlockEvent.BreakEvent event, BlockPos blockPos, ServerLevel level, ItemStack handItem, int fortuneEnchantmentLevel) {
+        private static void telepathicallyDestroyBlock(BlockEvent.BreakEvent event, BlockPos blockPos, ServerLevel level, ItemStack handItem, int fortuneEnchantmentLevel) {
             List<ItemStack> drops = Collections.emptyList();
             BlockState blockState = level.getBlockState(blockPos);
 
             // Cancelling event prevents the block from doing its drops
             event.setCanceled(true);
-
-            // Checks if the tool can actually mine and cause drops
 
 
             // TODO: config this
@@ -297,6 +296,7 @@ public class ModEvents {
                 applyNerfedFortune(drops, fortuneEnchantmentLevel);
             } else {
                 drops =  Block.getDrops(blockState, level, blockPos, null, event.getPlayer(), handItem);
+                System.out.println(drops);
             }
 
 
@@ -311,7 +311,8 @@ public class ModEvents {
                  level.removeBlock(blockPos, false);
             }
 
-            if (!handItem.isCorrectToolForDrops(blockState)) return true;
+            if (!blockState.canHarvestBlock(level, blockPos, event.getPlayer())) return;
+
 
             // Get silk if applied
             boolean hasSilkTouch = EnchantmentHelper.hasSilkTouch(handItem);
@@ -331,7 +332,8 @@ public class ModEvents {
                 ExperienceOrb expOrb = new ExperienceOrb(level, player.getX(), player.getY(), player.getZ(), expToDrop);
                 level.addFreshEntity(expOrb);
             }
-            return true;
+
+
         }
 
         // Vein miner / timber specific
@@ -343,7 +345,8 @@ public class ModEvents {
                 BlockState blockState = level.getBlockState(blockPos);
 
                 // Account for telepathy with each block to destroy
-                if (telepathyEnchantment != null && telepathicallyDestroyBlock(event, blockPos, level, handItem, fortuneEnchantmentLevel)) {
+                if (telepathyEnchantment != null ) {
+                    telepathicallyDestroyBlock(event, blockPos, level, handItem, fortuneEnchantmentLevel);
                     ++destroyedSuccessfully;
                 }
 
@@ -372,7 +375,6 @@ public class ModEvents {
                         for (ItemStack item : itemsToDrop) {
                             Block.popResource(level, blockPos, item);
                         }
-
 
                         Block block = blockState.getBlock();
                         boolean hasSilkTouch = EnchantmentHelper.hasSilkTouch(handItem);
@@ -416,7 +418,7 @@ public class ModEvents {
         }
 
 
-        // TODO: make telpathy exp goto player
+
         @SubscribeEvent
         public static void onExpDropFromHostile(LivingExperienceDropEvent event) {
             MobCategory mobCategory = event.getEntity().getType().getCategory();
