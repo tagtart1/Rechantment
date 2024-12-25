@@ -15,6 +15,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.tagtart.rechantment.block.ModBlocks;
+import net.tagtart.rechantment.block.entity.ModReplacementBlockEntities;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.enchantment.ModEnchantments;
 import net.tagtart.rechantment.item.ModCreativeModeTabs;
@@ -43,6 +44,7 @@ public class Rechantment
 
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
+        ModReplacementBlockEntities.register(modEventBus);
         ModSounds.register(modEventBus);
         ModEnchantments.register(modEventBus);
 
@@ -59,9 +61,9 @@ public class Rechantment
 
     private void commonSetup(final FMLCommonSetupEvent event)
     {
-            event.enqueueWork(() -> {
-                ModPackets.register();
-            });
+        event.enqueueWork(() -> {
+            ModPackets.register();
+        });
     }
 
     // Add the example block item to the building blocks tab

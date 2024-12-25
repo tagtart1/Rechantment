@@ -118,6 +118,10 @@ public class UtilFunctions {
         return blocksPresent >= 9;
     }
 
+    public static boolean playerMeetsLapisRequirement(BookRarityProperties bookProperties, ItemStack inventoryItemStack) {
+        return inventoryItemStack.getCount() >= bookProperties.requiredLapis;
+    }
+
     public static Pair<BlockState[], BlockPos[]> scanAroundBlockForBookshelves(Level level, BlockPos blockPos){
 
         // Might read these from config instead but probably not for now?

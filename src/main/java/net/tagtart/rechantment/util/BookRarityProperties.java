@@ -22,6 +22,7 @@ public class BookRarityProperties {
     public float bookBreakChance;
     public float floorBreakChance;
     public int requiredBookShelves;
+    public int requiredLapis;
     public Block floorBlock;
     public List<EnchantmentPoolEntry> enchantmentPool;
     public int enchantmentPoolTotalWeights;
@@ -96,6 +97,7 @@ public class BookRarityProperties {
         simpleProperties.bookBreakChance =      RechantmentCommonConfigs.RARITY_0_BOOK_BREAK_CHANCE.get();
         simpleProperties.floorBreakChance =     RechantmentCommonConfigs.RARITY_0_FLOOR_BREAK_CHANCE.get();
         simpleProperties.requiredBookShelves =  RechantmentCommonConfigs.RARITY_0_REQUIRED_BOOKSHELVES.get();
+        simpleProperties.requiredLapis =        RechantmentCommonConfigs.RARITY_0_REQUIRED_LAPIS.get();
         simpleProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_0_ENCHANTMENTS.get());
         simpleProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(simpleProperties.enchantmentPool);
 
@@ -114,6 +116,7 @@ public class BookRarityProperties {
         uniqueProperties.forcedFloorBreaks =    RechantmentCommonConfigs.RARITY_1_FORCED_FLOOR_BREAKS.get();
         uniqueProperties.bookBreakChance =      RechantmentCommonConfigs.RARITY_1_BOOK_BREAK_CHANCE.get();
         uniqueProperties.floorBreakChance =     RechantmentCommonConfigs.RARITY_1_FLOOR_BREAK_CHANCE.get();
+        uniqueProperties.requiredLapis =        RechantmentCommonConfigs.RARITY_1_REQUIRED_LAPIS.get();
         uniqueProperties.requiredBookShelves =  RechantmentCommonConfigs.RARITY_1_REQUIRED_BOOKSHELVES.get();
         uniqueProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_1_ENCHANTMENTS.get());
         uniqueProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(uniqueProperties.enchantmentPool);
@@ -135,6 +138,7 @@ public class BookRarityProperties {
         eliteProperties.bookBreakChance =      RechantmentCommonConfigs.RARITY_2_BOOK_BREAK_CHANCE.get();
         eliteProperties.floorBreakChance =     RechantmentCommonConfigs.RARITY_2_FLOOR_BREAK_CHANCE.get();
         eliteProperties.requiredBookShelves =  RechantmentCommonConfigs.RARITY_2_REQUIRED_BOOKSHELVES.get();
+        eliteProperties.requiredLapis =        RechantmentCommonConfigs.RARITY_2_REQUIRED_LAPIS.get();
         eliteProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_2_ENCHANTMENTS.get());
         eliteProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(eliteProperties.enchantmentPool);
 
@@ -154,6 +158,7 @@ public class BookRarityProperties {
         ultimateProperties.bookBreakChance =      RechantmentCommonConfigs.RARITY_3_BOOK_BREAK_CHANCE.get();
         ultimateProperties.floorBreakChance =     RechantmentCommonConfigs.RARITY_3_FLOOR_BREAK_CHANCE.get();
         ultimateProperties.requiredBookShelves =  RechantmentCommonConfigs.RARITY_3_REQUIRED_BOOKSHELVES.get();
+        ultimateProperties.requiredLapis =        RechantmentCommonConfigs.RARITY_3_REQUIRED_LAPIS.get();
         ultimateProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_3_ENCHANTMENTS.get());
         ultimateProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(ultimateProperties.enchantmentPool);
 
@@ -173,6 +178,7 @@ public class BookRarityProperties {
         legendaryProperties.bookBreakChance =      RechantmentCommonConfigs.RARITY_4_BOOK_BREAK_CHANCE.get();
         legendaryProperties.floorBreakChance =     RechantmentCommonConfigs.RARITY_4_FLOOR_BREAK_CHANCE.get();
         legendaryProperties.requiredBookShelves =  RechantmentCommonConfigs.RARITY_4_REQUIRED_BOOKSHELVES.get();
+        legendaryProperties.requiredLapis =        RechantmentCommonConfigs.RARITY_4_REQUIRED_LAPIS.get();
         legendaryProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_4_ENCHANTMENTS.get());
         legendaryProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(legendaryProperties.enchantmentPool);
 

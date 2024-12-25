@@ -24,12 +24,16 @@ public class HoverableEnchantedBookItemRenderable extends HoverableItemRenderabl
 
     @Override
     protected void onHoverStart() {
-        // If we just hovered over this object, create tooltip info (ensure it's updated if info, like exp, changed at any point)
-        customTooltipLines = screen.getEnchantTableTooltipLines(bookProperties);
+        updateTooltipLines();
     }
 
     @Override
     protected void onHoverEnd() {
         customTooltipLines.clear();
+    }
+
+    public void updateTooltipLines() {
+        // If we just hovered over this object, create tooltip info (ensure it's updated if info, like exp, changed at any point)
+        customTooltipLines = screen.getEnchantTableTooltipLines(bookProperties);
     }
 }

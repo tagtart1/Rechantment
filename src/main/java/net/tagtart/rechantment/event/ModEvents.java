@@ -13,6 +13,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.Containers;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.damagesource.*;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -33,6 +35,8 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.enchantment.UntouchingEnchantment;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.Vec2;
@@ -46,6 +50,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.Rechantment;
+import net.tagtart.rechantment.block.entity.RechantmentTableBlockEntity;
 import net.tagtart.rechantment.enchantment.*;
 import net.tagtart.rechantment.sound.ModSounds;
 import net.tagtart.rechantment.util.UtilFunctions;
@@ -181,6 +186,12 @@ public class ModEvents {
         public static void onBlockBreak(BlockEvent.BreakEvent event) {
 
             if (event.getPlayer().level().isClientSide()) return;
+
+            // For enchantment table replacement inventory, this is necessary since it isn't tied to a custom block, just an entity.
+            BlockEntity blockEntity = event.getPlayer().level().getBlockEntity(event.getPos());
+            if (blockEntity instanceof RechantmentTableBlockEntity) {
+                ((RechantmentTableBlockEntity) blockEntity).dropInventory();
+            }
 
             ItemStack handItem = event.getPlayer().getMainHandItem();
             Pair<TelepathyEnchantment, Integer> telepathyEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:telepathy", handItem, TelepathyEnchantment.class);
