@@ -29,6 +29,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.enchantment.UntouchingEnchantment;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -187,12 +189,8 @@ public class ModEvents {
             Pair<VeinMinerEnchantment, Integer> veinMinerEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:vein_miner", handItem, VeinMinerEnchantment.class);
             Pair<TimberEnchantment, Integer> timberEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:timber", handItem, TimberEnchantment.class);
             Pair<WisdomEnchantment, Integer> wisdomEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:wisdom", handItem, WisdomEnchantment.class);
+            int fortuneEnchantmentLevel = handItem.getEnchantmentLevel(Enchantments.BLOCK_FORTUNE);
             ServerLevel level = (ServerLevel) event.getPlayer().level();
-
-
-
-
-
 
 
             if (veinMinerEnchantment != null) {
@@ -212,24 +210,70 @@ public class ModEvents {
                 telepathicallyDestroyBlock(event, event.getPos(), level, handItem);
             }
 
-            // Wisdom by itself without the other breakevent enchants
+            // Fortune by itself with vanilla enchants without other breakevent enchant
+            else if (fortuneEnchantmentLevel != 0){
+                // Block info
+                BlockState blockState = event.getState();
+                Block block = blockState.getBlock();
+                BlockPos blockPos = event.getPos();
+
+                if (!blockState.is(Tags.Blocks.ORES)) return;
+
+                // Fetch the block drops without tool
+               List<ItemStack> drops = Block.getDrops(event.getState(), level, event.getPos(), null);
+               System.out.println("Drops: " + drops);
+
+               // Pop exp
+               int expToPop = blockState.getExpDrop(level, RandomSource.create(), blockPos, 0, 0);
+               if (wisdomEnchantment != null) {
+                   float expMultiplier = wisdomEnchantment.getA().getExpMultiplier(wisdomEnchantment.getB());
+                   expToPop = (int)((float)expToPop * expMultiplier);
+                }
+                block.popExperience(level, blockPos, expToPop);
+
+               // Pop the resource with nerfed fortune
+                for(ItemStack drop : drops) {
+                    int chanceToDouble = 0;
+                    switch(fortuneEnchantmentLevel) {
+                        case 1: {
+                            chanceToDouble = 30;
+                            break;
+                        }
+                        case 2: {
+                            chanceToDouble = 50;
+                            break;
+                        }
+                        case 3: {
+                            chanceToDouble = 80;
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                    Random random = new Random();
+                    if (random.nextInt(100 ) < chanceToDouble) {
+                        drop.setCount(drop.getCount() * 2);
+                    }
+                    System.out.println("Drop: " + drop);
+                    Block.popResource(level, blockPos, drop);
+                }
+
+
+
+
+               level.removeBlock(blockPos, false);
+               event.setCanceled(true);
+
+            }
+
+            // Wisdom by itself without the other breakevent enchant
             else if (wisdomEnchantment != null) {
                 float expMultiplier = wisdomEnchantment.getA().getExpMultiplier(wisdomEnchantment.getB());
                 int newExpToDrop = (int)((float)event.getExpToDrop() * expMultiplier);
                 event.setExpToDrop(newExpToDrop);
             }
-        }
-
-        @SubscribeEvent
-        public static void onFortuneProc(BlockEvent.BreakEvent event) {
-            if (!(event.getState().is(Tags.Blocks.ORES))) return;
-
-            Player player = event.getPlayer();
-            ServerLevel level = (ServerLevel) event.getLevel();
-            System.out.println("THIS IS AN ORE!");
 
 
-            // event.setCanceled(true);
 
         }
 
@@ -277,7 +321,7 @@ public class ModEvents {
         private static void destroyBulkBlocks(BlockEvent.BreakEvent event, BlockPos[] blocksToDestroy, ServerLevel level, ItemStack handItem, @Nullable TelepathyEnchantment telepathyEnchantment) {
             int destroyedSuccessfully = 0;
             Pair<WisdomEnchantment, Integer> wisdomEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:wisdom", handItem, WisdomEnchantment.class);
-            System.out.println("Block to destroy length: " + blocksToDestroy.length);
+
             for (BlockPos blockPos : blocksToDestroy) {
                 BlockState blockState = level.getBlockState(blockPos);
 
