@@ -36,6 +36,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.Vec2;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.*;
@@ -195,34 +196,33 @@ public class ModEvents {
 
             if (veinMinerEnchantment != null && event.getState().is(Tags.Blocks.ORES)) {
                 BlockPos[] oresToDestroy = UtilFunctions.BFSLevelForBlocks(level, Tags.Blocks.ORES, event.getPos(), 10, true);
-                destroyBulkBlocks(event, oresToDestroy, level, handItem, (telepathyEnchantment != null) ? telepathyEnchantment.getA() : null);
+                destroyBulkBlocks(event, oresToDestroy, level, handItem, (telepathyEnchantment != null) ? telepathyEnchantment.getA() : null, fortuneEnchantmentLevel);
                 event.setCanceled(true);
             }
 
             else if (timberEnchantment != null && event.getState().is(BlockTags.LOGS)) {
                 BlockPos[] woodToDestroy = UtilFunctions.BFSLevelForBlocks(level, BlockTags.LOGS, event.getPos(), 10, true);
-                destroyBulkBlocks(event, woodToDestroy, level, handItem, (telepathyEnchantment != null) ? telepathyEnchantment.getA() : null);
+                destroyBulkBlocks(event, woodToDestroy, level, handItem, (telepathyEnchantment != null) ? telepathyEnchantment.getA() : null, fortuneEnchantmentLevel);
                 event.setCanceled(true);
             }
 
             // Telepathy check. Only happens when destroying a single block normally here
             else if (telepathyEnchantment != null) {
-                telepathicallyDestroyBlock(event, event.getPos(), level, handItem);
+                telepathicallyDestroyBlock(event, event.getPos(), level, handItem, fortuneEnchantmentLevel);
             }
 
             // Fortune by itself with vanilla enchants without other breakevent enchant
+            // TODO: coniditionly ensure this is allowed in config
             else if (fortuneEnchantmentLevel != 0){
                 // Block info
                 BlockState blockState = event.getState();
                 Block block = blockState.getBlock();
                 BlockPos blockPos = event.getPos();
 
-                if (!blockState.is(Tags.Blocks.ORES)) return;
+                if (!blockState.is(Tags.Blocks.ORES) || !handItem.isCorrectToolForDrops(blockState)) return;
 
                 // Fetch the block drops without tool
                List<ItemStack> drops = Block.getDrops(event.getState(), level, event.getPos(), null);
-               System.out.println("Drops: " + drops);
-
                // Pop exp
                int expToPop = blockState.getExpDrop(level, RandomSource.create(), blockPos, 0, 0);
                if (wisdomEnchantment != null) {
@@ -231,42 +231,20 @@ public class ModEvents {
                 }
                 block.popExperience(level, blockPos, expToPop);
 
+
+               applyNerfedFortune(drops, fortuneEnchantmentLevel);
+
                // Pop the resource with nerfed fortune
                 for(ItemStack drop : drops) {
-                    int chanceToDouble = 0;
-                    switch(fortuneEnchantmentLevel) {
-                        case 1: {
-                            chanceToDouble = 30;
-                            break;
-                        }
-                        case 2: {
-                            chanceToDouble = 50;
-                            break;
-                        }
-                        case 3: {
-                            chanceToDouble = 80;
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-                    Random random = new Random();
-                    if (random.nextInt(100 ) < chanceToDouble) {
-                        drop.setCount(drop.getCount() * 2);
-                    }
-                    System.out.println("Drop: " + drop);
                     Block.popResource(level, blockPos, drop);
                 }
-
-
-
 
                level.removeBlock(blockPos, false);
                event.setCanceled(true);
 
             }
 
-            // Wisdom by itself without the other breakevent enchant
+            // Wisdom by itself without the other break event enchant
             else if (wisdomEnchantment != null) {
                 float expMultiplier = wisdomEnchantment.getA().getExpMultiplier(wisdomEnchantment.getB());
                 int newExpToDrop = (int)((float)event.getExpToDrop() * expMultiplier);
@@ -276,10 +254,46 @@ public class ModEvents {
 
 
         }
+        private static void applyNerfedFortune(List<ItemStack> items, int eLevel) {
+            for(ItemStack item : items) {
+                int chanceToDouble = 0;
+                switch(eLevel) {
+                    case 1: {
+                        chanceToDouble = 30; // Config later
+                        break;
+                    }
+                    case 2: {
+                        chanceToDouble = 50; // Config later
+                        break;
+                    }
+                    case 3: {
+                        chanceToDouble = 80; // Config later
+                        break;
+                    }
+                    default:
+                        break;
+                }
+                Random random = new Random();
+                if (random.nextInt(100 ) < chanceToDouble) {
+                    item.setCount(item.getCount() * 2);
+                }
+            }
+        }
 
-        private static boolean telepathicallyDestroyBlock(BlockEvent.BreakEvent event, BlockPos blockPos, ServerLevel level, ItemStack handItem) {
-            List<ItemStack> drops = Block.getDrops(event.getState(), level, blockPos, null, event.getPlayer(), handItem);
+        private static boolean telepathicallyDestroyBlock(BlockEvent.BreakEvent event, BlockPos blockPos, ServerLevel level, ItemStack handItem, int fortuneEnchantmentLevel) {
+            List<ItemStack> drops = null;
             BlockState blockState = level.getBlockState(blockPos);
+
+            // TODO: config this
+            // checking if the state is an ore makes fortune with axe on melon and mushrooms not work but whatever, who really does that?
+            if (fortuneEnchantmentLevel != 0 && blockState.is(Tags.Blocks.ORES) && handItem.isCorrectToolForDrops(blockState)) {
+                drops = Block.getDrops(blockState, level, blockPos, null);
+                applyNerfedFortune(drops, fortuneEnchantmentLevel);
+            } else {
+                drops =  Block.getDrops(blockState, level, blockPos, null, event.getPlayer(), handItem);
+            }
+
+
 
             // Get wisdom if applied
             Pair<WisdomEnchantment, Integer> wisdomEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:wisdom", handItem, WisdomEnchantment.class);
@@ -318,19 +332,16 @@ public class ModEvents {
         }
 
         // Vein miner specific
-        private static void destroyBulkBlocks(BlockEvent.BreakEvent event, BlockPos[] blocksToDestroy, ServerLevel level, ItemStack handItem, @Nullable TelepathyEnchantment telepathyEnchantment) {
+        private static void destroyBulkBlocks(BlockEvent.BreakEvent event, BlockPos[] blocksToDestroy, ServerLevel level, ItemStack handItem, @Nullable TelepathyEnchantment telepathyEnchantment, int fortuneEnchantmentLevel) {
             int destroyedSuccessfully = 0;
             Pair<WisdomEnchantment, Integer> wisdomEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:wisdom", handItem, WisdomEnchantment.class);
 
             for (BlockPos blockPos : blocksToDestroy) {
                 BlockState blockState = level.getBlockState(blockPos);
 
-                // This can prevent fortunte from working, or enable
-                List<ItemStack> itemsToDrop = Block.getDrops(blockState, level, blockPos, null, event.getPlayer(), handItem);
-
 
                 // Account for telepathy with each block to destroy
-                if (telepathyEnchantment != null && telepathicallyDestroyBlock(event, blockPos, level, handItem)) {
+                if (telepathyEnchantment != null && telepathicallyDestroyBlock(event, blockPos, level, handItem, fortuneEnchantmentLevel)) {
                     ++destroyedSuccessfully;
                 }
 
@@ -338,6 +349,15 @@ public class ModEvents {
 
                 else {
                     ++destroyedSuccessfully;
+                    List<ItemStack> itemsToDrop = null;
+
+                    // TODO: config this !
+                    if (fortuneEnchantmentLevel != 0 && blockState.is(Tags.Blocks.ORES)) {
+                        itemsToDrop = Block.getDrops(blockState, level, blockPos, null);
+                        applyNerfedFortune(itemsToDrop, fortuneEnchantmentLevel);
+                    } else {
+                        itemsToDrop = Block.getDrops(blockState, level, blockPos, null, event.getPlayer(), handItem);
+                    }
 
                     if (event.getPos() != blockPos ) {
                         level.destroyBlock(blockPos, false);
@@ -345,9 +365,9 @@ public class ModEvents {
                         level.removeBlock(blockPos, false);
                     }
 
+
                     // Manually pop the resource
                     for (ItemStack item : itemsToDrop) {
-                        // This can prevent fortunte from working, or enable
                         Block.popResource(level, blockPos,item);
                     }
 
