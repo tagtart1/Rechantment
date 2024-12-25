@@ -193,13 +193,13 @@ public class ModEvents {
             ServerLevel level = (ServerLevel) event.getPlayer().level();
 
 
-            if (veinMinerEnchantment != null) {
+            if (veinMinerEnchantment != null && event.getState().is(Tags.Blocks.ORES)) {
                 BlockPos[] oresToDestroy = UtilFunctions.BFSLevelForBlocks(level, Tags.Blocks.ORES, event.getPos(), 10, true);
                 destroyBulkBlocks(event, oresToDestroy, level, handItem, (telepathyEnchantment != null) ? telepathyEnchantment.getA() : null);
                 event.setCanceled(true);
             }
 
-            else if (timberEnchantment != null) {
+            else if (timberEnchantment != null && event.getState().is(BlockTags.LOGS)) {
                 BlockPos[] woodToDestroy = UtilFunctions.BFSLevelForBlocks(level, BlockTags.LOGS, event.getPos(), 10, true);
                 destroyBulkBlocks(event, woodToDestroy, level, handItem, (telepathyEnchantment != null) ? telepathyEnchantment.getA() : null);
                 event.setCanceled(true);
