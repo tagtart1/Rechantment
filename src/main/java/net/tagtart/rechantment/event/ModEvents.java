@@ -433,17 +433,30 @@ public class ModEvents {
         @SubscribeEvent
         public static void onExpDropFromHostile(LivingExperienceDropEvent event) {
             MobCategory mobCategory = event.getEntity().getType().getCategory();
-            if (mobCategory != MobCategory.MONSTER ||
-                event.getAttackingPlayer() == null) return;
 
             ItemStack weapon = event.getAttackingPlayer().getMainHandItem();
             Pair<InquisitiveEnchantment, Integer> inquisitiveEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:inquisitive", weapon, InquisitiveEnchantment.class);
-            if (inquisitiveEnchantment != null) {
+            Pair<TelepathyEnchantment, Integer> telepathyEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:telepathy", weapon, TelepathyEnchantment.class);
+
+
+            int expToDrop = event.getDroppedExperience();
+
+            if (inquisitiveEnchantment != null && mobCategory == MobCategory.MONSTER && event.getAttackingPlayer() != null) {
                 InquisitiveEnchantment inquisitiveEnchantInstance = inquisitiveEnchantment.getA();
                 int enchantLevel = inquisitiveEnchantment.getB();
-                int newExpToDrop = (int)((float) event.getDroppedExperience() * inquisitiveEnchantInstance.getExpMultiplier(enchantLevel));
-                event.setDroppedExperience(newExpToDrop);
+                expToDrop = (int)((float) expToDrop * inquisitiveEnchantInstance.getExpMultiplier(enchantLevel));
             }
+
+            if (telepathyEnchantment != null) {
+                Player player = event.getAttackingPlayer();
+                ExperienceOrb expOrb = new ExperienceOrb(event.getAttackingPlayer().level(), player.getX(), player.getY(), player.getZ(), expToDrop);
+                event.getAttackingPlayer().level().addFreshEntity(expOrb);
+                event.setDroppedExperience(0);
+            } else {
+                event.setDroppedExperience(expToDrop);
+            }
+
+
         }
 
         @SubscribeEvent
