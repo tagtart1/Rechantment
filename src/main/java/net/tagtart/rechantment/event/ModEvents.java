@@ -25,10 +25,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.ShieldItem;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -136,6 +133,10 @@ public class ModEvents {
                         }
                     }
                 }
+            }
+
+            if (stack.getItem() instanceof EnchantedBookItem) {
+                tooltip.add(Component.literal("Vanilla books have been disabled.").withStyle(ChatFormatting.RED));
             }
         }
 
