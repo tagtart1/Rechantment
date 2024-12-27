@@ -39,6 +39,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.Vec2;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.Tags;
@@ -307,7 +308,6 @@ public class ModEvents {
                 applyNerfedFortune(drops, fortuneEnchantmentLevel);
             } else {
                 drops =  Block.getDrops(blockState, level, blockPos, null, event.getPlayer(), handItem);
-                System.out.println(drops);
             }
 
 
@@ -331,6 +331,10 @@ public class ModEvents {
             for (ItemStack drop : drops) {
                 if (!event.getPlayer().addItem(drop)) {
                     event.getPlayer().drop(drop, false);
+                } else {
+                    Random random = new Random();
+                    float randomPitch = .9f + random.nextFloat() * (1.6f - .9f);
+                    level.playSound(null, blockPos.getX(), blockPos.getY(), blockPos.getZ(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .25f, randomPitch);
                 }
             }
 
@@ -407,6 +411,7 @@ public class ModEvents {
         @SubscribeEvent
         public static void onLivingDrops(LivingDropsEvent event) {
 
+            // Prevents teleporting player drops
             if (event.getEntity() instanceof Player) return;
 
            if ((event.getSource().getEntity() instanceof Player player)) {
@@ -415,7 +420,6 @@ public class ModEvents {
                if (telepathyEnchantment == null) return;
 
                Collection<ItemEntity> items = event.getDrops();
-
 
                for (ItemEntity item : items) {
                    if (!player.addItem(item.getItem())) {
@@ -427,7 +431,6 @@ public class ModEvents {
                event.setCanceled(true);
             }
         }
-
 
 
         @SubscribeEvent
@@ -455,8 +458,6 @@ public class ModEvents {
             } else {
                 event.setDroppedExperience(expToDrop);
             }
-
-
         }
 
         @SubscribeEvent
