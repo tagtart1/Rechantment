@@ -40,7 +40,9 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.Vec2;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.loot.LootModifier;
 import net.minecraftforge.event.AnvilUpdateEvent;
+import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -502,6 +504,7 @@ public class ModEvents {
             ItemStack left = event.getLeft();
             ItemStack right = event.getRight();
 
+            // Turn off vanilla enchanted book from applying
             if (left.getItem() instanceof EnchantedBookItem || right.getItem() instanceof EnchantedBookItem) {
                 event.setCanceled(true);
             }

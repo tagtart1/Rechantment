@@ -32,5 +32,6 @@ public class DataGenerators {
 
         generator.addProvider(event.includeServer(), new net.tagtart.rechantment.datagen.ModItemTagGenerator(packOutput, lookupProvider, blockTagGenerator.contentsGetter(), existingFileHelper));
 
+        generator.addProvider(event.includeServer(), new ModGlobalLootModifierProvider(packOutput));
     }
 }
