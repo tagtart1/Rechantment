@@ -6,7 +6,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -16,6 +15,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.networking.ModPackets;
@@ -30,9 +30,19 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
+
 public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentTableMenu> {
 
     private static final ResourceLocation LINE_SHADER_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "shaders/program/ench_table_line_shader");
+    private static final ResourceLocation SIMPLE_LINE_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/gui/enchant_table_effect_simple.png");
+    private static final ResourceLocation UNIQUE_LINE_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/gui/enchant_table_effect_unique.png");
+    private static final ResourceLocation ELITE_LINE_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/gui/enchant_table_effect_elite.png");
+    private static final ResourceLocation ULTIMATE_LINE_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/gui/enchant_table_effect_ultimate.png");
+    private static final ResourceLocation LEGENDARY_LINE_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/gui/enchant_table_effect_legendary.png");
+    private static final ResourceLocation EMPTY_LINE_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/gui/enchant_table_effect_empty.png");
+    private ResourceLocation[] shaderEffectsByBookID;
     private ShaderInstance lineShader;
 
     public static final Style PINK_COLOR_STYLE = Style.EMPTY.withColor(0xFCB4B4);
@@ -57,6 +67,12 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
 
     private BlockState[] cachedBookshelvesInRange;
     private BlockState[] cachedFloorBlocksInRange;
+
+    private float timeElapsed = 0.0f;
+
+    private final float REQ_CHECK_RATE = 0.2f;  // How often shader will check if requirements are met to display effect.
+    private float timeSinceLastReqCheck = 0.0f; // Time since last requirement check was made for shader effect.
+    private int currentIndexRequirementsMet = 0; // Which book has its current requirements met; if -1, none are met.
 
     public RechantmentTableScreen(RechantmentTableMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
@@ -84,6 +100,16 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         hoverables.add(new HoverableEnchantedBookItemRenderable(this, 3, ULTIMATE_LOCATION, leftPos + 116, topPos + 41));
         hoverables.add(new HoverableEnchantedBookItemRenderable(this, 4, LEGENDARY_LOCATION, leftPos + 78, topPos + 38));
 
+        // Diffuse textures for line shader effect.
+        // Indices are offset by 1 for efficiency; empty/no effect is index zero.
+        this.shaderEffectsByBookID = new ResourceLocation[6];
+        this.shaderEffectsByBookID[0] = EMPTY_LINE_LOCATION;
+        this.shaderEffectsByBookID[1] = SIMPLE_LINE_LOCATION;
+        this.shaderEffectsByBookID[2] = UNIQUE_LINE_LOCATION;
+        this.shaderEffectsByBookID[3] = ELITE_LINE_LOCATION;
+        this.shaderEffectsByBookID[4] = ULTIMATE_LINE_LOCATION;
+        this.shaderEffectsByBookID[5] = LEGENDARY_LINE_LOCATION;
+
         this.lineShader = loadShader(LINE_SHADER_LOCATION);
     }
 
@@ -97,7 +123,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         }
     }
 
-    private void fakeInnerBlit(GuiGraphics guiGraphics, ResourceLocation pAtlasLocation, int pX1, int pX2, int pY1, int pY2, int pBlitOffset, float pMinU, float pMaxU, float pMinV, float pMaxV) {
+    private void fakeInnerBlit(GuiGraphics guiGraphics, int pX1, int pX2, int pY1, int pY2, int pBlitOffset, float pMinU, float pMaxU, float pMinV, float pMaxV) {
         Matrix4f matrix4f = guiGraphics.pose().last().pose();
         BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
         bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
@@ -110,13 +136,50 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
-        //RenderSystem.setShader(() -> lineShader);
-        //RenderSystem.setShaderTexture(0, TEXTURE);
 
-        //fakeInnerBlit(guiGraphics, TEXTURE, this.leftPos, this.leftPos + imageWidth, this.topPos, this.topPos + imageHeight, 0,
-        //        imageWidth, imageHeight, imageWidth, imageHeight);
-
+        // Normal blitting of GUI is first. Custom shader effect is applied on top.
         guiGraphics.blit(TEXTURE, this.leftPos, this.topPos, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+        renderBGEffect(guiGraphics, pPartialTick, pMouseX, pMouseY);
+    }
+
+    protected void renderBGEffect(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
+        timeElapsed += pPartialTick;
+        timeSinceLastReqCheck += pPartialTick;
+
+        // Check if requirements are met currently after certain interval passed,
+        // then set which book index can currently be crafted for use elsewhere.
+        if (timeSinceLastReqCheck >= REQ_CHECK_RATE)
+        {
+            currentIndexRequirementsMet = 0;
+            for (int i = 0; i < 5; ++i) {
+                BookRarityProperties properties = BookRarityProperties.getAllProperties()[i];
+                var reqBlockStates = getReqBlockStates(properties);
+                BlockState[] renderCheckShelfStates = reqBlockStates.getA();
+                BlockState[] renderCheckFloorStates = reqBlockStates.getB();
+                if (playerMeetsAllEnchantRequirements(properties, renderCheckShelfStates, renderCheckFloorStates)) {
+                    currentIndexRequirementsMet = i + 1;
+                    break;
+                }
+            }
+
+            timeSinceLastReqCheck = 0.0f;
+        }
+
+        lineShader.safeGetUniform("Time").set(timeElapsed);
+        lineShader.safeGetUniform("Resolution").set((float)imageWidth, (float)imageHeight);
+
+        RenderSystem.setShader(() -> lineShader);
+        /*RenderSystem.activeTexture(GL_TEXTURE0);
+        Minecraft.getInstance().getTextureManager().bindForSetup(TEXTURE);
+        lineShader.safeGetUniform("MainDiffuse").set(0);*/
+
+        Minecraft.getInstance().getTextureManager().bindForSetup(shaderEffectsByBookID[currentIndexRequirementsMet]);
+        lineShader.safeGetUniform("LineEffectMap").set(0);
+
+        lineShader.apply();
+
+        fakeInnerBlit(guiGraphics, this.leftPos, this.leftPos + imageWidth, this.topPos, this.topPos + imageHeight, 0,
+                0.0f, 1.0f, 0.0f, 1.0f);
     }
 
     @Override
@@ -148,7 +211,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
                     System.out.println(String.format("clicked a hoverable, %d books, %d floors!", cachedBookshelvesInRange.length, cachedFloorBlocksInRange.length));
                     BookRarityProperties properties = hoverable.bookProperties;
 
-                    if (!floorRequirementsMet(properties) && !bookshelfRequirementsMet(properties) && !lapisRequirementsMet(properties)) {
+                    if (!floorRequirementsMet(properties, cachedFloorBlocksInRange) && !bookshelfRequirementsMet(properties, cachedBookshelvesInRange) && !lapisRequirementsMet(properties)) {
                         // Just play sound, don't close TODO: ADD PROPER SOUND LIKE MOD HAS.
                         level.playSound(null, player.getOnPos(), ModSounds.ENCHANTED_BOOK_FAIL.get(), SoundSource.PLAYERS, 10f, 1f);
                         break;
@@ -235,14 +298,14 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         // Bookshelf count requirement. Green color if requirement met.
         String bookshelfCount = String.valueOf(properties.requiredBookShelves);
         String bookshelvesName = Component.translatable("tooltip.rechantment.enchantment_table.bookshelves").getString();
-        ChatFormatting bookReqMetColor = bookshelfRequirementsMet(properties) ? ChatFormatting.GREEN : ChatFormatting.RED;
+        ChatFormatting bookReqMetColor = bookshelfRequirementsMet(properties, cachedBookshelvesInRange) ? ChatFormatting.GREEN : ChatFormatting.RED;
         Component fullBookRequirementColored = Component.literal(bookshelfCount + " " + bookshelvesName).withStyle(bookReqMetColor);
         tooltipLines.add(grayHyphen.copy().append(fullBookRequirementColored));
 
         // Floor block requirement. Green color if requirement met.
         String floorBlockName = properties.floorBlock.getName().getString();
         String floorTranslated = Component.translatable("tooltip.rechantment.enchantment_table.floor").getString();
-        ChatFormatting floorReqMetColor = floorRequirementsMet(properties) ? ChatFormatting.GREEN : ChatFormatting.RED;
+        ChatFormatting floorReqMetColor = floorRequirementsMet(properties, cachedFloorBlocksInRange) ? ChatFormatting.GREEN : ChatFormatting.RED;
         Component fullFloorRequirementColored = Component.literal(floorBlockName + " " + floorTranslated).withStyle(floorReqMetColor);
         tooltipLines.add(grayHyphen.copy().append(fullFloorRequirementColored));
         tooltipLines.add(Component.literal(" "));
@@ -268,7 +331,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         }
 
         // Shows left-click prompt if met, otherwise shows warning that requirements not met.
-        if (playerMeetsAllEnchantRequirements(properties)) {
+        if (playerMeetsAllEnchantRequirements(properties, cachedBookshelvesInRange, cachedFloorBlocksInRange)) {
             Component leftClickPrompt = Component.translatable("tooltip.rechantment.enchantment_table.left_click").withStyle(properties.colorAsStyle());
             tooltipLines.add(whiteArrow.copy().append(leftClickPrompt));
         }
@@ -285,33 +348,41 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
     }
 
     public void refreshCachedBlockStates(BookRarityProperties bookProperties) {
+        var reqBlockStates = getReqBlockStates(bookProperties);
+        cachedBookshelvesInRange = reqBlockStates.getA();
+        cachedFloorBlocksInRange = reqBlockStates.getB();
+    }
 
+    private Pair<BlockState[], BlockState[]> getReqBlockStates(BookRarityProperties bookProperties) {
         Level level = playerInventory.player.level();
         BlockPos enchantTablePos = menu.blockEntity.getBlockPos();
 
-        cachedBookshelvesInRange = UtilFunctions.scanAroundBlockForBookshelves(level, enchantTablePos).getA();
-        cachedFloorBlocksInRange = UtilFunctions.scanAroundBlockForValidFloors(bookProperties.floorBlock, level, enchantTablePos).getA();
+        BlockState[] shelfStates = UtilFunctions.scanAroundBlockForBookshelves(level, enchantTablePos).getA();
+        BlockState[] floorStates = UtilFunctions.scanAroundBlockForValidFloors(bookProperties.floorBlock, level, enchantTablePos).getA();
+        return new Pair<>(shelfStates, floorStates);
     }
 
-    public boolean expRequirementMet(BookRarityProperties bookProperties) {
+    // These extra requirement checks are kinda pointless but uh yeah whatever
+    protected boolean expRequirementMet(BookRarityProperties bookProperties) {
         return UtilFunctions.playerMeetsExpRequirement(bookProperties, playerInventory.player);
     }
 
-    public boolean bookshelfRequirementsMet (BookRarityProperties bookProperties) {
-        return UtilFunctions.playerMeetsBookshelfRequirement(bookProperties, cachedBookshelvesInRange);
+    protected boolean bookshelfRequirementsMet (BookRarityProperties bookProperties, BlockState[] shelfStates) {
+        return UtilFunctions.playerMeetsBookshelfRequirement(bookProperties, shelfStates);
     }
 
-    public boolean floorRequirementsMet(BookRarityProperties bookProperties) {
-        return UtilFunctions.playerMeetsFloorRequirement(bookProperties, cachedFloorBlocksInRange);
+    protected boolean floorRequirementsMet(BookRarityProperties bookProperties, BlockState[] floorStates) {
+        return UtilFunctions.playerMeetsFloorRequirement(bookProperties, floorStates);
     }
 
-    public boolean lapisRequirementsMet(BookRarityProperties bookProperties) {
+    protected boolean lapisRequirementsMet(BookRarityProperties bookProperties) {
         return UtilFunctions.playerMeetsLapisRequirement(bookProperties, menu.getLapisSlotStack());
     }
 
-    public boolean playerMeetsAllEnchantRequirements(BookRarityProperties bookProperties) {
-        return  bookshelfRequirementsMet(bookProperties) &&
+    protected boolean playerMeetsAllEnchantRequirements(BookRarityProperties bookProperties, BlockState[] shelfStates, BlockState[] floorStates) {
+        return  bookshelfRequirementsMet(bookProperties, shelfStates) &&
                 expRequirementMet(bookProperties) &&
-                floorRequirementsMet(bookProperties);
+                floorRequirementsMet(bookProperties, floorStates) &&
+                lapisRequirementsMet(bookProperties);
     }
 }
