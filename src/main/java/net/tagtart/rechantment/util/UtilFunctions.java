@@ -72,6 +72,17 @@ public class UtilFunctions {
         return new Pair<>(key, formatting);
     }
 
+    @Nullable
+    public static BookRarityProperties getPropertiesFromEnchantment(String enchantmentRaw) {
+        for (BookRarityProperties bookProperties : BookRarityProperties.getAllProperties()) {
+            if (bookProperties.isEnchantmentInPool(enchantmentRaw)) {
+                return bookProperties;
+            }
+        }
+
+        return null;
+    }
+
     // Forms a bounding box around the provided position by offsetting the corners by the provided offset values,
     // then returns an array of all block states in the level inside that bounding box. If a filter is provided,
     // only blocks matching the type provided will be returned (otherwise, all are returned). Keep in mind the offsets are absolutes,

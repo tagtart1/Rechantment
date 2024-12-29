@@ -156,9 +156,10 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
                 player.addItem(toGive);
 
                 // Roll for gem of chance
-                int gemOfChanceDropRate = 50; // move to config later
-                // Play sound effects, send a message
-                if (random.nextInt(100) < gemOfChanceDropRate) {
+                float gemOfChanceDropRate = bookProperties.rerollGemChance;
+                if (random.nextFloat() < gemOfChanceDropRate) {
+
+                    // Play sound effects, send a message
                     ItemStack chanceGemToGive = new ItemStack(ModItems.CHANCE_GEM.get());
                     if(!player.addItem(chanceGemToGive)) {
                         player.drop(chanceGemToGive, false);

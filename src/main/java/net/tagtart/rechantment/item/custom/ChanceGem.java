@@ -1,6 +1,7 @@
 package net.tagtart.rechantment.item.custom;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -11,6 +12,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.tagtart.rechantment.util.BookRarityProperties;
 import net.tagtart.rechantment.util.UtilFunctions;
 
 import javax.annotation.Nullable;
@@ -69,13 +71,20 @@ public class ChanceGem extends Item {
             if (pPlayer.level().isClientSide)
                  pPlayer.sendSystemMessage(Component.literal("This book has already been randomized!").withStyle(ChatFormatting.RED));
         } else {
+
+            CompoundTag enchantmentTag = stack.getTag().getCompound("Enchantment");
+            String enchantmentRaw = enchantmentTag.getString("id");
+            BookRarityProperties appliedBookProperties = UtilFunctions.getPropertiesFromEnchantment(enchantmentRaw);
+
+            if (appliedBookProperties == null) return false;
+
             // Randomize the rate
-            int upperBound = 100; // Config this later
-            int lowerBound = 0; // Config this later
+            int upperBound = appliedBookProperties.maxSuccess;
+            int lowerBound = appliedBookProperties.minSuccess;
             Random rand = new Random();
 
             // Generate a new SuccessRate, inclusive bounds
-            int newSuccessRate = rand.nextInt((upperBound - lowerBound) + 1) + lowerBound;
+            int newSuccessRate = rand.nextInt(lowerBound, upperBound + 1);
             tag.putInt("SuccessRate", newSuccessRate );
 
             // Prevents this book from being randomized again

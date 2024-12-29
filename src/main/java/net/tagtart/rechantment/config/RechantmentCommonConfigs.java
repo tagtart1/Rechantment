@@ -26,6 +26,7 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_0_REQUIRED_BOOKSHELVES;
     public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_0_REQUIRED_LAPIS;
     public static final ForgeConfigSpec.ConfigValue<? extends String>       RARITY_0_FLOOR_BLOCK_TYPE;
+    public static final ForgeConfigSpec.ConfigValue<? extends Float>      RARITY_0_REROLL_GEM_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> RARITY_0_ENCHANTMENTS;
 
     // Unique tier configs.
@@ -42,6 +43,7 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<? extends String>       RARITY_1_FLOOR_BLOCK_TYPE;
     public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_1_REQUIRED_BOOKSHELVES;
     public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_1_REQUIRED_LAPIS;
+    public static final ForgeConfigSpec.ConfigValue<? extends Float>      RARITY_1_REROLL_GEM_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> RARITY_1_ENCHANTMENTS;
 
     // Elite tier configs.
@@ -58,6 +60,7 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_2_REQUIRED_BOOKSHELVES;
     public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_2_REQUIRED_LAPIS;
     public static final ForgeConfigSpec.ConfigValue<? extends String>       RARITY_2_FLOOR_BLOCK_TYPE;
+    public static final ForgeConfigSpec.ConfigValue<? extends Float>      RARITY_2_REROLL_GEM_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> RARITY_2_ENCHANTMENTS;
 
     // Ultimate tier configs.
@@ -74,6 +77,7 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_3_REQUIRED_BOOKSHELVES;
     public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_3_REQUIRED_LAPIS;
     public static final ForgeConfigSpec.ConfigValue<? extends String>       RARITY_3_FLOOR_BLOCK_TYPE;
+    public static final ForgeConfigSpec.ConfigValue<? extends Float>      RARITY_3_REROLL_GEM_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> RARITY_3_ENCHANTMENTS;
 
     // Legendary tier configs.
@@ -90,8 +94,8 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_4_REQUIRED_BOOKSHELVES;
     public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_4_REQUIRED_LAPIS;
     public static final ForgeConfigSpec.ConfigValue<? extends String>       RARITY_4_FLOOR_BLOCK_TYPE;
+    public static final ForgeConfigSpec.ConfigValue<? extends Float>        RARITY_4_REROLL_GEM_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> RARITY_4_ENCHANTMENTS;
-
 
     static {
 
@@ -117,6 +121,7 @@ public class RechantmentCommonConfigs {
         RARITY_0_REQUIRED_BOOKSHELVES = BUILDER.define("required_bookshelves", 4);
         RARITY_0_REQUIRED_LAPIS = BUILDER.define("required_lapis", 2);
         RARITY_0_FLOOR_BLOCK_TYPE = BUILDER.define("floor_block_type", "minecraft:iron_block");
+        RARITY_0_REROLL_GEM_CHANCE = BUILDER.define("reroll_gem_chance", 0.01f);
         BUILDER.comment(
                 "List of potential enchantments with weights, levels, and per-level weights.",
                 "Format: <enchantment>|<weight>|<level-range>|<level-weights>",
@@ -151,7 +156,7 @@ public class RechantmentCommonConfigs {
         RARITY_1_REQUIRED_BOOKSHELVES = BUILDER.define("required_bookshelves", 8);
         RARITY_1_REQUIRED_LAPIS = BUILDER.define("required_lapis", 3);
         RARITY_1_FLOOR_BLOCK_TYPE = BUILDER.define("floor_block_type", "minecraft:gold_block");
-
+        RARITY_1_REROLL_GEM_CHANCE = BUILDER.define("reroll_gem_chance", 0.015f);
         ArrayList<String> rarity_1_default_enchantments = new ArrayList<>();
         rarity_1_default_enchantments.add("minecraft:bane_of_arthropods|1|4|1");
         rarity_1_default_enchantments.add("minecraft:loyalty|1|3|1");
@@ -183,6 +188,7 @@ public class RechantmentCommonConfigs {
         RARITY_2_REQUIRED_BOOKSHELVES = BUILDER.define("required_bookshelves", 16);
         RARITY_2_REQUIRED_LAPIS = BUILDER.define("required_lapis", 3);
         RARITY_2_FLOOR_BLOCK_TYPE = BUILDER.define("floor_block_type", "minecraft:diamond_block");
+        RARITY_2_REROLL_GEM_CHANCE = BUILDER.define("reroll_gem_chance", 0.02f);
 
         ArrayList<String> rarity_2_default_enchantments = new ArrayList<>();
         rarity_2_default_enchantments.add("minecraft:looting|1|1-3|3,2,1");
@@ -217,6 +223,7 @@ public class RechantmentCommonConfigs {
         RARITY_3_REQUIRED_BOOKSHELVES = BUILDER.define("required_bookshelves", 32);
         RARITY_3_REQUIRED_LAPIS = BUILDER.define("required_lapis", 4);
         RARITY_3_FLOOR_BLOCK_TYPE = BUILDER.define("floor_block_type", "minecraft:emerald_block");
+        RARITY_3_REROLL_GEM_CHANCE = BUILDER.define("reroll_gem_chance", 0.03f);
 
         ArrayList<String> rarity_3_default_enchantments = new ArrayList<>();
         rarity_3_default_enchantments.add("minecraft:swift_sneak|1|1-3|3,2,1");
@@ -248,7 +255,7 @@ public class RechantmentCommonConfigs {
         RARITY_4_REQUIRED_BOOKSHELVES = BUILDER.define("required_bookshelves", 45);
         RARITY_4_REQUIRED_LAPIS = BUILDER.define("required_lapis", 5);
         RARITY_4_FLOOR_BLOCK_TYPE = BUILDER.define("floor_block_type", "minecraft:ancient_debris");
-
+        RARITY_4_REROLL_GEM_CHANCE = BUILDER.define("reroll_gem_chance", 0.05f);
         ArrayList<String> rarity_4_default_enchantments = new ArrayList<>();
         rarity_4_default_enchantments.add("minecraft:infinity|1|1|1");
         rarity_4_default_enchantments.add("rechantment:inquisitive|1|1-4|4,3,2,1");
