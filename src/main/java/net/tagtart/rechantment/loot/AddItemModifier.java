@@ -35,6 +35,12 @@ public class AddItemModifier extends LootModifier {
                 CompoundTag rootTag = replacementBook.getOrCreateTag();
                 CompoundTag enchantmentTag = new CompoundTag();
 
+                enchantmentTag.putString("id", "minecraft:fortune");
+                enchantmentTag.putInt("lvl", 3);
+                int successRate = 99;
+
+                rootTag.put("Enchantment", enchantmentTag);
+                rootTag.putInt("SuccessRate", successRate);
 
                 generatedLoot.set(i, replacementBook);
             }
