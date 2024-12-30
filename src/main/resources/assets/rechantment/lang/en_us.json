@@ -76,6 +76,12 @@
   "enchantment.rechantment.telepathy": "Telepathy",
   "enchantment.rechantment.telepathy.description": "Item drops teleport directly to your inventory.",
 
+  "enchantment.rechantment.timber": "Timber",
+  "enchantment.rechantment.timber.description": "Harvest the entire tree when breaking logs.",
+
+  "enchantment.rechantment.vein_miner": "Vein Miner",
+  "enchantment.rechantment.vein_miner.description": "Mine entire veins of ore.",
+
   "enchantment.minecraft.protection.description": "Reduces most types of damage by increasing amounts.",
   "enchantment.minecraft.fire_protection.description": "Reduces damage and burn time when lit on fire.",
   "enchantment.minecraft.feather_falling.description": "Reduces the damage dealt from falling.",
