@@ -66,6 +66,7 @@ public class EnchantedBookItem extends Item {
             "minecraft:fishing_rod",
             "minecraft:trident",
             "minecraft:shield",
+            "minecraft:bow",
             "minecraft:crossbow",
             "minecraft:elytra",
     };
@@ -277,7 +278,6 @@ public class EnchantedBookItem extends Item {
                 // Breaks up the itemname to only get the identify string for the icon
                 String[] itemNameParts = itemName.split("[:_]");
                 String coreName = itemNameParts[itemNameParts.length - 1];
-
                 // Get the icon png from the translatable
                 text.append(Component.translatable("enchantment.icon." +coreName));
             }
