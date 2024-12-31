@@ -13,7 +13,7 @@ public class ModLootModifiers {
             DeferredRegister.create(ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, Rechantment.MOD_ID);
 
     public static final RegistryObject<Codec<? extends IGlobalLootModifier>> ADD_ITEM =
-            LOOT_MODIFIER_SERIALIZERS.register("add_item", AddItemModifier.CODEC);
+            LOOT_MODIFIER_SERIALIZERS.register("add_item", ReplaceItemModifier.CODEC);
 
 
     public static void register(IEventBus eventBus) {

@@ -7,12 +7,10 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.common.loot.LootModifier;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.item.ModItems;
 import net.tagtart.rechantment.util.BookRarityProperties;
 import net.tagtart.rechantment.util.EnchantmentPoolEntry;
@@ -21,11 +19,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Random;
 import java.util.function.Supplier;
 
-public class AddItemModifier extends LootModifier {
-    public static final Supplier<Codec<AddItemModifier>> CODEC = Suppliers.memoize(()
-    -> RecordCodecBuilder.create(inst -> codecStart(inst).apply(inst, AddItemModifier::new)));
+public class ReplaceItemModifier extends LootModifier {
+    public static final Supplier<Codec<ReplaceItemModifier>> CODEC = Suppliers.memoize(()
+    -> RecordCodecBuilder.create(inst -> codecStart(inst).apply(inst, ReplaceItemModifier::new)));
 
-    public AddItemModifier(LootItemCondition[] conditionsIn) {
+    public ReplaceItemModifier(LootItemCondition[] conditionsIn) {
         super(conditionsIn);
     }
 
