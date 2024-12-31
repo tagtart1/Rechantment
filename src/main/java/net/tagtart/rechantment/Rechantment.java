@@ -20,6 +20,7 @@ import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.enchantment.ModEnchantments;
 import net.tagtart.rechantment.item.ModCreativeModeTabs;
 import net.tagtart.rechantment.item.ModItems;
+import net.tagtart.rechantment.loot.ModLootModifiers;
 import net.tagtart.rechantment.networking.ModPackets;
 import net.tagtart.rechantment.sound.ModSounds;
 import net.tagtart.rechantment.screen.ModMenuTypes;
@@ -47,6 +48,7 @@ public class Rechantment
         ModReplacementBlockEntities.register(modEventBus);
         ModSounds.register(modEventBus);
         ModEnchantments.register(modEventBus);
+        ModLootModifiers.register(modEventBus);
 
         ModCreativeModeTabs.register(modEventBus);
 

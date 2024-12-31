@@ -5,6 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -59,7 +61,7 @@ public class BookRarityProperties {
             }
         }
 
-        throw new IllegalStateException("Failed to select an enchantment based on weight.\nEnsure Rechantment config is set up properly,");
+        throw new IllegalStateException("Failed to select an enchantment based on weight.\nEnsure Rechantment config is set up properly.");
     }
 
     // For caching the weight sum later.
@@ -72,7 +74,31 @@ public class BookRarityProperties {
         return currentSum;
     }
 
+
+
     private static BookRarityProperties[] ALL_BOOK_PROPERTIES;
+
+
+    public static BookRarityProperties getRandomRarityWeighted() {
+
+        BookRarityProperties[] properties = getAllProperties();
+
+        int totalWeight = Arrays.stream(properties).mapToInt(property -> property.worldSpawnWeight).sum();
+
+        Random random = new Random();
+        int roll = random.nextInt(totalWeight);
+
+        int cumulativeWeight = 0;
+        for (BookRarityProperties property : properties) {
+            cumulativeWeight += property.worldSpawnWeight;
+            if (roll < cumulativeWeight) {
+                return property;
+            }
+        }
+        throw new IllegalStateException("Failed to select a rarity based on weight.\nEnsure Rechantment config is set up properly.");
+    }
+
+
 
     public static BookRarityProperties[] getAllProperties() {
         if (ALL_BOOK_PROPERTIES != null) {

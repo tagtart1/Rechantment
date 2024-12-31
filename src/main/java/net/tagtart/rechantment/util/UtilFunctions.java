@@ -1,5 +1,6 @@
 package net.tagtart.rechantment.util;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.core.BlockPos;
@@ -67,6 +68,11 @@ public class UtilFunctions {
             if (bookProperties.isEnchantmentInPool(enchantmentRaw)) {
                 formatting = Style.EMPTY.withColor(bookProperties.color);
                 key = bookProperties.key;
+            }
+
+            // Makes the curse enchants red unless they are specified in the pools
+            else if (Objects.equals(enchantmentRaw, "minecraft:vanishing_curse") || Objects.equals(enchantmentRaw, "minecraft:binding_curse")) {
+                formatting = Style.EMPTY.withColor(ChatFormatting.RED);
             }
         }
         return new Pair<>(key, formatting);

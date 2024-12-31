@@ -25,14 +25,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.ShieldItem;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.item.enchantment.UntouchingEnchantment;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.enchantment.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.Blocks;
@@ -43,6 +37,9 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.Vec2;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.loot.LootModifier;
+import net.minecraftforge.event.AnvilUpdateEvent;
+import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -136,6 +133,10 @@ public class ModEvents {
                         }
                     }
                 }
+            }
+
+            if (stack.getItem() instanceof EnchantedBookItem) {
+                tooltip.add(Component.literal("Vanilla books have been disabled.").withStyle(ChatFormatting.RED));
             }
         }
 
@@ -492,6 +493,17 @@ public class ModEvents {
                     player.setHealth(player.getMaxHealth());
                     player.level().playSound(null, player.getOnPos(), SoundEvents.PLAYER_HURT, SoundSource.PLAYERS, 1f, 1f);
                 }
+            }
+        }
+
+        @SubscribeEvent
+        public static void onAnvilUpdate(AnvilUpdateEvent event) {
+            ItemStack left = event.getLeft();
+            ItemStack right = event.getRight();
+
+            // Turn off vanilla enchanted book from applying
+            if (left.getItem() instanceof EnchantedBookItem || right.getItem() instanceof EnchantedBookItem) {
+                event.setCanceled(true);
             }
         }
     }
