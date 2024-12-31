@@ -18,7 +18,8 @@ public class CourageEnchantment extends Enchantment {
         return 2;
     }
 
+    @Override
     public boolean canEnchant(ItemStack pStack) {
-        return pStack.is(Items.SHIELD);
+        return pStack.getItem() instanceof ShieldItem;
     }
 }

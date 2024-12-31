@@ -64,7 +64,6 @@ public class UtilFunctions {
 
         Style formatting = Style.EMPTY.withColor(11184810);
         String key = "simple";
-        System.out.println(enchantmentRaw);
         for (BookRarityProperties bookProperties : BookRarityProperties.getAllProperties()) {
             if (bookProperties.isEnchantmentInPool(enchantmentRaw)) {
                 formatting = Style.EMPTY.withColor(bookProperties.color);

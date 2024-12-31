@@ -23,7 +23,7 @@ public class BashEnchantment extends Enchantment {
         return 1;
     }
 
-
+    @Override
     public boolean canEnchant(ItemStack pStack) {
         return pStack.getItem() instanceof ShieldItem;
     }

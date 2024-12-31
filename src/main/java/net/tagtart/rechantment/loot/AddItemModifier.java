@@ -14,8 +14,11 @@ import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.common.loot.LootModifier;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.item.ModItems;
+import net.tagtart.rechantment.util.BookRarityProperties;
+import net.tagtart.rechantment.util.EnchantmentPoolEntry;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Random;
 import java.util.function.Supplier;
 
 public class AddItemModifier extends LootModifier {
@@ -32,12 +35,17 @@ public class AddItemModifier extends LootModifier {
             ItemStack stack = generatedLoot.get(i);
             if (stack.getItem() instanceof EnchantedBookItem) {
                 ItemStack replacementBook = new ItemStack(ModItems.ENCHANTED_BOOK.get());
+                BookRarityProperties bookRarityProperties = BookRarityProperties.getRandomRarityWeighted();
+                EnchantmentPoolEntry randomEnchantment = bookRarityProperties.getRandomEnchantmentWeighted();
+                int enchantmentLevel = randomEnchantment.getRandomEnchantLevelWeighted();
                 CompoundTag rootTag = replacementBook.getOrCreateTag();
                 CompoundTag enchantmentTag = new CompoundTag();
 
-                enchantmentTag.putString("id", "minecraft:fortune");
-                enchantmentTag.putInt("lvl", 3);
-                int successRate = 99;
+                enchantmentTag.putString("id", randomEnchantment.enchantment);
+                enchantmentTag.putInt("lvl", enchantmentLevel);
+
+                Random random = new Random();
+                int successRate = random.nextInt(bookRarityProperties.minSuccess, bookRarityProperties.maxSuccess);
 
                 rootTag.put("Enchantment", enchantmentTag);
                 rootTag.putInt("SuccessRate", successRate);
