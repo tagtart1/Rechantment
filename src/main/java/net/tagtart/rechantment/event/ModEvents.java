@@ -334,15 +334,20 @@ public class ModEvents {
             for (ItemStack drop : drops) {
                 if (!event.getPlayer().addItem(drop)) {
                     event.getPlayer().drop(drop, false);
-                } else {
+                }
+                // Make pickup noise for telepathy
+                else {
                     Random random = new Random();
                     float randomPitch = .9f + random.nextFloat() * (1.6f - .9f);
                     level.playSound(null, blockPos.getX(), blockPos.getY(), blockPos.getZ(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .25f, randomPitch);
                 }
             }
 
+            // Teleports the exp orb to player
             if (expToDrop > 0) {
                 Player player = event.getPlayer();
+
+                // Multiply if we have wisdom on the tool
                 if (wisdomEnchantment != null) {
                     float expMultiplier = wisdomEnchantment.getA().getExpMultiplier(wisdomEnchantment.getB());
                     expToDrop = (int) ((float) expToDrop * expMultiplier);
@@ -350,8 +355,6 @@ public class ModEvents {
                 ExperienceOrb expOrb = new ExperienceOrb(level, player.getX(), player.getY(), player.getZ(), expToDrop);
                 level.addFreshEntity(expOrb);
             }
-
-
         }
 
         // Vein miner / timber specific
@@ -373,15 +376,22 @@ public class ModEvents {
                     ++destroyedSuccessfully;
                     List<ItemStack> itemsToDrop = null;
 
+
+                    // Checks for fortune nerf requirements
                     if (RechantmentCommonConfigs.FORTUNE_NERF_ENABLED.get()
                             && fortuneEnchantmentLevel != 0
                             && blockState.is(Tags.Blocks.ORES)) {
                         itemsToDrop = Block.getDrops(blockState, level, blockPos, null);
                         applyNerfedFortune(itemsToDrop, fortuneEnchantmentLevel);
-                    } else {
+                    }
+
+                    // Normal drops based off the tool in hand
+                    else {
                         itemsToDrop = Block.getDrops(blockState, level, blockPos, null, event.getPlayer(), handItem);
                     }
 
+
+                    // Create correct particle and noise block breaking effects
                     if (event.getPos() != blockPos ) {
                         level.destroyBlock(blockPos, false);
                     } else {
