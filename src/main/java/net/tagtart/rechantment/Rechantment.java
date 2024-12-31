@@ -37,9 +37,9 @@ public class Rechantment
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public Rechantment(FMLJavaModLoadingContext context)
+    public Rechantment()
     {
-        IEventBus modEventBus = context.getModEventBus();
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         ModMenuTypes.register(modEventBus);
 
