@@ -176,6 +176,7 @@ public class RechantmentCommonConfigs {
         rarity_1_default_enchantments.add("minecraft:respiration|1|1-3|3,2,1");
         rarity_1_default_enchantments.add("minecraft:blast_protection|1|4|1");
         rarity_1_default_enchantments.add("minecraft:impaling|1|3-4|2,1");
+        rarity_1_default_enchantments.add("rechantment:wisdom|1|1|1");
         RARITY_1_ENCHANTMENTS = BUILDER.defineList("enchantments", rarity_1_default_enchantments, s -> s instanceof String);
 
         BUILDER.pop();
@@ -209,6 +210,7 @@ public class RechantmentCommonConfigs {
         rarity_2_default_enchantments.add("minecraft:voids_bane|1|4|1");
         rarity_2_default_enchantments.add("minecraft:fire_aspect|1|1-2|2,1");
         rarity_2_default_enchantments.add("minecraft:fortune|1|1-3|2,2,1");
+        rarity_2_default_enchantments.add("rechantment:bash|1|1|1");
         RARITY_2_ENCHANTMENTS = BUILDER.defineList("enchantments", rarity_2_default_enchantments, s -> s instanceof String);
 
         BUILDER.pop();
@@ -236,11 +238,13 @@ public class RechantmentCommonConfigs {
         rarity_3_default_enchantments.add("minecraft:luck_of_the_sea|1|2-3|2,1");
         rarity_3_default_enchantments.add("minecraft:sweeping|1|2-3|2,1");
         rarity_3_default_enchantments.add("minecraft:silk_touch|1|1|1");
-        rarity_3_default_enchantments.add("rechantment:ice_aspect|1|2-3|2,1");
+        rarity_3_default_enchantments.add("rechantment:ice_aspect|1|1-2|2,1");
         rarity_3_default_enchantments.add("rechantment:vein_miner|1|1|1");
         rarity_3_default_enchantments.add("rechantment:timber|1|1|1");
         rarity_3_default_enchantments.add("minecraft:multishot|1|1|1");
         rarity_3_default_enchantments.add("minecraft:channeling|1|1|1");
+        rarity_3_default_enchantments.add("rechantment:courage|1|1|1");
+        rarity_3_default_enchantments.add("rechantment:telepathy|1|1|1");
         RARITY_3_ENCHANTMENTS = BUILDER.defineList("enchantments", rarity_3_default_enchantments, s -> s instanceof String);
 
         BUILDER.pop();
@@ -266,6 +270,8 @@ public class RechantmentCommonConfigs {
         rarity_4_default_enchantments.add("minecraft:infinity|1|1|1");
         rarity_4_default_enchantments.add("rechantment:inquisitive|1|1-4|4,3,2,1");
         rarity_4_default_enchantments.add("rechantment:overload|1|1-3|4,2,1");
+        rarity_4_default_enchantments.add("minecraft:mending|1|1|1");
+        rarity_4_default_enchantments.add("rechantment:thunder_strike|1|1|1");
         RARITY_4_ENCHANTMENTS = BUILDER.defineList("enchantments", rarity_4_default_enchantments, s -> s instanceof String);
 
 
