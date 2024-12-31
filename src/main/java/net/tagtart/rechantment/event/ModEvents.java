@@ -49,6 +49,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.block.entity.RechantmentTableBlockEntity;
+import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.enchantment.*;
 import net.tagtart.rechantment.sound.ModSounds;
 import net.tagtart.rechantment.util.UtilFunctions;
@@ -226,8 +227,7 @@ public class ModEvents {
             }
 
             // Fortune by itself with vanilla enchants without other breakevent enchant
-            // TODO: coniditionly ensure this is allowed in config
-            else if (fortuneEnchantmentLevel != 0){
+            else if (fortuneEnchantmentLevel != 0 && RechantmentCommonConfigs.FORTUNE_NERF_ENABLED.get()){
                 // Block info
                 BlockState blockState = event.getState();
                 Block block = blockState.getBlock();
@@ -270,25 +270,25 @@ public class ModEvents {
 
         private static void applyNerfedFortune(List<ItemStack> items, int eLevel) {
             for(ItemStack item : items) {
-                int chanceToDouble = 0;
+                float chanceToDouble = 0;
                 switch(eLevel) {
                     case 1: {
-                        chanceToDouble = 30; // Config later
+                        chanceToDouble = RechantmentCommonConfigs.FORTUNE_1_CHANCE.get(); // Config later
                         break;
                     }
                     case 2: {
-                        chanceToDouble = 50; // Config later
+                        chanceToDouble = RechantmentCommonConfigs.FORTUNE_2_CHANCE.get(); // Config later
                         break;
                     }
                     case 3: {
-                        chanceToDouble = 80; // Config later
+                        chanceToDouble = RechantmentCommonConfigs.FORTUNE_3_CHANCE.get(); // Config later
                         break;
                     }
                     default:
                         break;
                 }
                 Random random = new Random();
-                if (random.nextInt(100 ) < chanceToDouble) {
+                if (random.nextFloat() < chanceToDouble) {
                     item.setCount(item.getCount() * 2);
                 }
             }
@@ -302,9 +302,10 @@ public class ModEvents {
             event.setCanceled(true);
 
 
-            // TODO: config this
             // checking if the state is an ore makes fortune with axe on melon and mushrooms not work but whatever, who really does that?
-            if (fortuneEnchantmentLevel != 0 && blockState.is(Tags.Blocks.ORES)) {
+            if (RechantmentCommonConfigs.FORTUNE_NERF_ENABLED.get()
+                    && fortuneEnchantmentLevel != 0
+                    && blockState.is(Tags.Blocks.ORES)) {
                 drops = Block.getDrops(blockState, level, blockPos, null);
                 applyNerfedFortune(drops, fortuneEnchantmentLevel);
             } else {
@@ -323,6 +324,7 @@ public class ModEvents {
                  level.removeBlock(blockPos, false);
             }
 
+            // Prevents an axe from mining diamonds for example
             if (!blockState.canHarvestBlock(level, blockPos, event.getPlayer())) return;
 
 
@@ -371,8 +373,9 @@ public class ModEvents {
                     ++destroyedSuccessfully;
                     List<ItemStack> itemsToDrop = null;
 
-                    // TODO: config this !
-                    if (fortuneEnchantmentLevel != 0 && blockState.is(Tags.Blocks.ORES)) {
+                    if (RechantmentCommonConfigs.FORTUNE_NERF_ENABLED.get()
+                            && fortuneEnchantmentLevel != 0
+                            && blockState.is(Tags.Blocks.ORES)) {
                         itemsToDrop = Block.getDrops(blockState, level, blockPos, null);
                         applyNerfedFortune(itemsToDrop, fortuneEnchantmentLevel);
                     } else {

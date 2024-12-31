@@ -97,6 +97,12 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<? extends Float>        RARITY_4_REROLL_GEM_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> RARITY_4_ENCHANTMENTS;
 
+    // Fortune nerf configs
+    public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      FORTUNE_NERF_ENABLED;
+    public static final ForgeConfigSpec.ConfigValue<? extends Float>        FORTUNE_1_CHANCE;
+    public static final ForgeConfigSpec.ConfigValue<? extends Float>        FORTUNE_2_CHANCE;
+    public static final ForgeConfigSpec.ConfigValue<? extends Float>        FORTUNE_3_CHANCE;
+
     static {
 
         // Simple rarity builder default config
@@ -262,8 +268,20 @@ public class RechantmentCommonConfigs {
         rarity_4_default_enchantments.add("rechantment:overload|1|1-3|4,2,1");
         RARITY_4_ENCHANTMENTS = BUILDER.defineList("enchantments", rarity_4_default_enchantments, s -> s instanceof String);
 
+
+
+        BUILDER.pop();
         BUILDER.pop();
 
+        BUILDER.push("Fortune Nerf");
+        BUILDER.comment(
+                "If enabled, fortune will only double drops based on the chances defined at each level");
+        FORTUNE_NERF_ENABLED = BUILDER.define("nerf_enabled", false);
+        FORTUNE_1_CHANCE = BUILDER.define("fortune_1_chance", 0.33f);
+        FORTUNE_2_CHANCE = BUILDER.define("fortune_2_chance", 0.5f);
+        FORTUNE_3_CHANCE = BUILDER.define("fortune_3_chance", 0.65f);
+
+        BUILDER.pop();
 
         SPEC = BUILDER.build();
     }
