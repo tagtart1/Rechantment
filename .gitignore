@@ -22,6 +22,8 @@ src/generated
 # other
 eclipse
 run
+*.log.gz
+*.log
 
 # Files from Forge MDK
 forge*changelog.txt
