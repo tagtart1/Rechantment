@@ -154,12 +154,19 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
             currentIndexRequirementsMet = 0;
             for (int i = 0; i < 5; ++i) {
                 BookRarityProperties properties = BookRarityProperties.getAllProperties()[i];
-                var reqBlockStates = getReqBlockStates(properties);
-                BlockState[] renderCheckShelfStates = reqBlockStates.getA();
-                BlockState[] renderCheckFloorStates = reqBlockStates.getB();
-                if (playerMeetsAllEnchantRequirements(properties, renderCheckShelfStates, renderCheckFloorStates)) {
+                refreshCachedBlockStates(properties);
+                if (playerMeetsAllEnchantRequirements(properties, cachedBookshelvesInRange, cachedFloorBlocksInRange)) {
                     currentIndexRequirementsMet = i + 1;
                     break;
+                }
+
+                // Update tooltip line if it's being hovered over currently as well
+                // This will account for destroyed blocks shortly after destroyed if user is still hovering for tooltip.
+                if (i < hoverables.size()) {
+                    HoverableEnchantedBookItemRenderable hoverable = hoverables.get(i);
+                    if (hoverable.isMouseOverlapped(pMouseX, pMouseY)) {
+                        hoverable.updateTooltipLines();
+                    }
                 }
             }
 
