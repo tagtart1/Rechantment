@@ -41,7 +41,7 @@
   "enchantment.icon.trident": "瞗",
 
   "item.rechantment.chance_gem": "Gem of Chance",
-  "item.rechantment.chance_gem.description": "Randomizes the success chance on an enchanted book.",
+  "item.rechantment.chance_gem.description": "Randomizes the success rate on an enchanted book.",
 
   "enchantment.rechantment.thunder_strike": "Thunder Strike",
   "enchantment.rechantment.thunder_strike.description": "Chance to summon lightning to strike your targets.",
@@ -75,6 +75,12 @@
 
   "enchantment.rechantment.telepathy": "Telepathy",
   "enchantment.rechantment.telepathy.description": "Item drops teleport directly to your inventory.",
+
+  "enchantment.rechantment.timber": "Timber",
+  "enchantment.rechantment.timber.description": "Harvest the entire tree when breaking logs.",
+
+  "enchantment.rechantment.vein_miner": "Vein Miner",
+  "enchantment.rechantment.vein_miner.description": "Mine entire veins of ore.",
 
   "enchantment.minecraft.protection.description": "Reduces most types of damage by increasing amounts.",
   "enchantment.minecraft.fire_protection.description": "Reduces damage and burn time when lit on fire.",

@@ -20,6 +20,7 @@ import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.enchantment.ModEnchantments;
 import net.tagtart.rechantment.item.ModCreativeModeTabs;
 import net.tagtart.rechantment.item.ModItems;
+import net.tagtart.rechantment.loot.ModLootModifiers;
 import net.tagtart.rechantment.networking.ModPackets;
 import net.tagtart.rechantment.screen.RechantmentTablePoolDisplayScreen;
 import net.tagtart.rechantment.sound.ModSounds;
@@ -37,9 +38,9 @@ public class Rechantment
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public Rechantment(FMLJavaModLoadingContext context)
+    public Rechantment()
     {
-        IEventBus modEventBus = context.getModEventBus();
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         ModMenuTypes.register(modEventBus);
 
@@ -48,6 +49,7 @@ public class Rechantment
         ModReplacementBlockEntities.register(modEventBus);
         ModSounds.register(modEventBus);
         ModEnchantments.register(modEventBus);
+        ModLootModifiers.register(modEventBus);
 
         ModCreativeModeTabs.register(modEventBus);
 

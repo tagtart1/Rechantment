@@ -25,14 +25,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.ShieldItem;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.item.enchantment.UntouchingEnchantment;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.enchantment.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.Blocks;
@@ -43,6 +37,9 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.Vec2;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.loot.LootModifier;
+import net.minecraftforge.event.AnvilUpdateEvent;
+import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -52,6 +49,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.block.entity.RechantmentTableBlockEntity;
+import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.enchantment.*;
 import net.tagtart.rechantment.sound.ModSounds;
 import net.tagtart.rechantment.util.UtilFunctions;
@@ -136,6 +134,10 @@ public class ModEvents {
                         }
                     }
                 }
+            }
+
+            if (stack.getItem() instanceof EnchantedBookItem) {
+                tooltip.add(Component.literal("Vanilla books have been disabled.").withStyle(ChatFormatting.RED));
             }
         }
 
@@ -225,8 +227,7 @@ public class ModEvents {
             }
 
             // Fortune by itself with vanilla enchants without other breakevent enchant
-            // TODO: coniditionly ensure this is allowed in config
-            else if (fortuneEnchantmentLevel != 0){
+            else if (fortuneEnchantmentLevel != 0 && RechantmentCommonConfigs.FORTUNE_NERF_ENABLED.get()){
                 // Block info
                 BlockState blockState = event.getState();
                 Block block = blockState.getBlock();
@@ -269,25 +270,25 @@ public class ModEvents {
 
         private static void applyNerfedFortune(List<ItemStack> items, int eLevel) {
             for(ItemStack item : items) {
-                int chanceToDouble = 0;
+                float chanceToDouble = 0;
                 switch(eLevel) {
                     case 1: {
-                        chanceToDouble = 30; // Config later
+                        chanceToDouble = RechantmentCommonConfigs.FORTUNE_1_CHANCE.get(); // Config later
                         break;
                     }
                     case 2: {
-                        chanceToDouble = 50; // Config later
+                        chanceToDouble = RechantmentCommonConfigs.FORTUNE_2_CHANCE.get(); // Config later
                         break;
                     }
                     case 3: {
-                        chanceToDouble = 80; // Config later
+                        chanceToDouble = RechantmentCommonConfigs.FORTUNE_3_CHANCE.get(); // Config later
                         break;
                     }
                     default:
                         break;
                 }
                 Random random = new Random();
-                if (random.nextInt(100 ) < chanceToDouble) {
+                if (random.nextFloat() < chanceToDouble) {
                     item.setCount(item.getCount() * 2);
                 }
             }
@@ -301,9 +302,10 @@ public class ModEvents {
             event.setCanceled(true);
 
 
-            // TODO: config this
             // checking if the state is an ore makes fortune with axe on melon and mushrooms not work but whatever, who really does that?
-            if (fortuneEnchantmentLevel != 0 && blockState.is(Tags.Blocks.ORES)) {
+            if (RechantmentCommonConfigs.FORTUNE_NERF_ENABLED.get()
+                    && fortuneEnchantmentLevel != 0
+                    && blockState.is(Tags.Blocks.ORES)) {
                 drops = Block.getDrops(blockState, level, blockPos, null);
                 applyNerfedFortune(drops, fortuneEnchantmentLevel);
             } else {
@@ -322,6 +324,7 @@ public class ModEvents {
                  level.removeBlock(blockPos, false);
             }
 
+            // Prevents an axe from mining diamonds for example
             if (!blockState.canHarvestBlock(level, blockPos, event.getPlayer())) return;
 
 
@@ -331,15 +334,20 @@ public class ModEvents {
             for (ItemStack drop : drops) {
                 if (!event.getPlayer().addItem(drop)) {
                     event.getPlayer().drop(drop, false);
-                } else {
+                }
+                // Make pickup noise for telepathy
+                else {
                     Random random = new Random();
                     float randomPitch = .9f + random.nextFloat() * (1.6f - .9f);
                     level.playSound(null, blockPos.getX(), blockPos.getY(), blockPos.getZ(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .25f, randomPitch);
                 }
             }
 
+            // Teleports the exp orb to player
             if (expToDrop > 0) {
                 Player player = event.getPlayer();
+
+                // Multiply if we have wisdom on the tool
                 if (wisdomEnchantment != null) {
                     float expMultiplier = wisdomEnchantment.getA().getExpMultiplier(wisdomEnchantment.getB());
                     expToDrop = (int) ((float) expToDrop * expMultiplier);
@@ -347,8 +355,6 @@ public class ModEvents {
                 ExperienceOrb expOrb = new ExperienceOrb(level, player.getX(), player.getY(), player.getZ(), expToDrop);
                 level.addFreshEntity(expOrb);
             }
-
-
         }
 
         // Vein miner / timber specific
@@ -370,14 +376,22 @@ public class ModEvents {
                     ++destroyedSuccessfully;
                     List<ItemStack> itemsToDrop = null;
 
-                    // TODO: config this !
-                    if (fortuneEnchantmentLevel != 0 && blockState.is(Tags.Blocks.ORES)) {
+
+                    // Checks for fortune nerf requirements
+                    if (RechantmentCommonConfigs.FORTUNE_NERF_ENABLED.get()
+                            && fortuneEnchantmentLevel != 0
+                            && blockState.is(Tags.Blocks.ORES)) {
                         itemsToDrop = Block.getDrops(blockState, level, blockPos, null);
                         applyNerfedFortune(itemsToDrop, fortuneEnchantmentLevel);
-                    } else {
+                    }
+
+                    // Normal drops based off the tool in hand
+                    else {
                         itemsToDrop = Block.getDrops(blockState, level, blockPos, null, event.getPlayer(), handItem);
                     }
 
+
+                    // Create correct particle and noise block breaking effects
                     if (event.getPos() != blockPos ) {
                         level.destroyBlock(blockPos, false);
                     } else {
@@ -492,6 +506,17 @@ public class ModEvents {
                     player.setHealth(player.getMaxHealth());
                     player.level().playSound(null, player.getOnPos(), SoundEvents.PLAYER_HURT, SoundSource.PLAYERS, 1f, 1f);
                 }
+            }
+        }
+
+        @SubscribeEvent
+        public static void onAnvilUpdate(AnvilUpdateEvent event) {
+            ItemStack left = event.getLeft();
+            ItemStack right = event.getRight();
+
+            // Turn off vanilla enchanted book from applying
+            if (left.getItem() instanceof EnchantedBookItem || right.getItem() instanceof EnchantedBookItem) {
+                event.setCanceled(true);
             }
         }
     }
