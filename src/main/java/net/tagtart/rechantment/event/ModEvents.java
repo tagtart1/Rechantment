@@ -270,7 +270,7 @@ public class ModEvents {
 
         private static void applyNerfedFortune(List<ItemStack> items, int eLevel) {
             for(ItemStack item : items) {
-                float chanceToDouble = 0;
+                double chanceToDouble = 0.0;
                 switch(eLevel) {
                     case 1: {
                         chanceToDouble = RechantmentCommonConfigs.FORTUNE_1_CHANCE.get(); // Config later
@@ -288,7 +288,7 @@ public class ModEvents {
                         break;
                 }
                 Random random = new Random();
-                if (random.nextFloat() < chanceToDouble) {
+                if (random.nextDouble() < chanceToDouble) {
                     item.setCount(item.getCount() * 2);
                 }
             }

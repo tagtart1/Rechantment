@@ -21,12 +21,12 @@ public class BookRarityProperties {
     public int maxSuccess;
     public int forcedBookBreaks;
     public int forcedFloorBreaks;
-    public float bookBreakChance;
-    public float floorBreakChance;
+    public double bookBreakChance;
+    public double floorBreakChance;
     public int requiredBookShelves;
     public int requiredLapis;
     public Block floorBlock;
-    public float rerollGemChance;
+    public double rerollGemChance;
     public List<EnchantmentPoolEntry> enchantmentPool;
     public int enchantmentPoolTotalWeights;
 
