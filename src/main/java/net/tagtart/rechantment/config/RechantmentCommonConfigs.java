@@ -200,13 +200,12 @@ public class RechantmentCommonConfigs {
         ArrayList<String> rarity_2_default_enchantments = new ArrayList<>();
         rarity_2_default_enchantments.add("minecraft:looting|1|1-3|3,2,1");
         rarity_2_default_enchantments.add("minecraft:flame|1|1|1");
-        rarity_2_default_enchantments.add("minecraft:allurement|1|3|1");
         rarity_2_default_enchantments.add("minecraft:frost_walker|1|2|1");
-        rarity_2_default_enchantments.add("minecraft:berserk|1|3|1");
+        rarity_2_default_enchantments.add("rechantment:berserk|1|3|1");
         rarity_2_default_enchantments.add("minecraft:depth_strider|1|3|1");
         rarity_2_default_enchantments.add("minecraft:soul_speed|1|3|1");
-        rarity_2_default_enchantments.add("minecraft:hells_fury|1|4|1");
-        rarity_2_default_enchantments.add("minecraft:voids_bane|1|4|1");
+        rarity_2_default_enchantments.add("rechantment:hells_fury|1|4|1");
+        rarity_2_default_enchantments.add("rechantment:voids_bane|1|4|1");
         rarity_2_default_enchantments.add("minecraft:fire_aspect|1|1-2|2,1");
         rarity_2_default_enchantments.add("minecraft:fortune|1|1-3|2,2,1");
         rarity_2_default_enchantments.add("rechantment:bash|1|1|1");
@@ -268,9 +267,10 @@ public class RechantmentCommonConfigs {
         ArrayList<String> rarity_4_default_enchantments = new ArrayList<>();
         rarity_4_default_enchantments.add("minecraft:infinity|1|1|1");
         rarity_4_default_enchantments.add("rechantment:inquisitive|1|1-4|4,3,2,1");
+        rarity_4_default_enchantments.add("rechantment:wisdom|1|1-2|2,1");
         rarity_4_default_enchantments.add("rechantment:overload|1|1-3|4,2,1");
         rarity_4_default_enchantments.add("minecraft:mending|1|1|1");
-        rarity_4_default_enchantments.add("rechantment:thunder_strike|1|1|1");
+        rarity_4_default_enchantments.add("rechantment:thunder_strike|1|1-2|2,1");
         RARITY_4_ENCHANTMENTS = BUILDER.defineList("enchantments", rarity_4_default_enchantments, s -> s instanceof String);
 
 
