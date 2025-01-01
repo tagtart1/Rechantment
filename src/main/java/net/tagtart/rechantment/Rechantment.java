@@ -21,6 +21,7 @@ import net.tagtart.rechantment.enchantment.ModEnchantments;
 import net.tagtart.rechantment.item.ModCreativeModeTabs;
 import net.tagtart.rechantment.item.ModItems;
 import net.tagtart.rechantment.networking.ModPackets;
+import net.tagtart.rechantment.screen.RechantmentTablePoolDisplayScreen;
 import net.tagtart.rechantment.sound.ModSounds;
 import net.tagtart.rechantment.screen.ModMenuTypes;
 import net.tagtart.rechantment.screen.RechantmentTableScreen;
@@ -87,6 +88,7 @@ public class Rechantment
         {
             ModItemProperties.addCustomItemProperties();
             MenuScreens.register(ModMenuTypes.RECHANTMENT_TABLE_MENU.get(), RechantmentTableScreen::new);
+            MenuScreens.register(ModMenuTypes.RECHANTMENT_TABLE_POOL_DISPLAY_MENU.get(), RechantmentTablePoolDisplayScreen::new);
         }
     }
 }

@@ -18,6 +18,9 @@ public class ModMenuTypes {
     public static final RegistryObject<MenuType<RechantmentTableMenu>> RECHANTMENT_TABLE_MENU =
             registerMenuType("rechantment_table_menu", RechantmentTableMenu::new);
 
+    public static final RegistryObject<MenuType<RechantmentTablePoolDisplayMenu>> RECHANTMENT_TABLE_POOL_DISPLAY_MENU =
+            registerMenuType("rechantment_table_pool_display_menu", RechantmentTablePoolDisplayMenu::new);
+
     private static <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> registerMenuType(String name, IContainerFactory<T> factory) {
         return MENUS.register(name, () -> IForgeMenuType.create(factory));
     }

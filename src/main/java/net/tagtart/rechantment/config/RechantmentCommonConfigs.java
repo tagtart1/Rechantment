@@ -43,7 +43,7 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<? extends String>       RARITY_1_FLOOR_BLOCK_TYPE;
     public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_1_REQUIRED_BOOKSHELVES;
     public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_1_REQUIRED_LAPIS;
-    public static final ForgeConfigSpec.ConfigValue<? extends Float>      RARITY_1_REROLL_GEM_CHANCE;
+    public static final ForgeConfigSpec.ConfigValue<? extends Float>        RARITY_1_REROLL_GEM_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> RARITY_1_ENCHANTMENTS;
 
     // Elite tier configs.
@@ -60,7 +60,7 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_2_REQUIRED_BOOKSHELVES;
     public static final ForgeConfigSpec.ConfigValue<? extends Integer>      RARITY_2_REQUIRED_LAPIS;
     public static final ForgeConfigSpec.ConfigValue<? extends String>       RARITY_2_FLOOR_BLOCK_TYPE;
-    public static final ForgeConfigSpec.ConfigValue<? extends Float>      RARITY_2_REROLL_GEM_CHANCE;
+    public static final ForgeConfigSpec.ConfigValue<? extends Float>        RARITY_2_REROLL_GEM_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> RARITY_2_ENCHANTMENTS;
 
     // Ultimate tier configs.

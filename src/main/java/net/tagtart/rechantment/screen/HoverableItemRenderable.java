@@ -14,7 +14,7 @@ import java.util.Optional;
 
 public class HoverableItemRenderable implements Renderable {
 
-    protected final ResourceLocation texture;
+    protected ResourceLocation renderTexture;
 
     protected Inventory playerInventory;
 
@@ -40,7 +40,7 @@ public class HoverableItemRenderable implements Renderable {
     public HoverableItemRenderable(ResourceLocation textureResource, int posX, int posY) {
         renderOffsetPosX = posX;
         renderOffsetPosY = posY;
-        texture = textureResource;
+        renderTexture = textureResource;
 
         customTooltipLines = new ArrayList<>();
     }
@@ -50,9 +50,9 @@ public class HoverableItemRenderable implements Renderable {
     {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, texture);
+        RenderSystem.setShaderTexture(0, renderTexture);
 
-        guiGraphics.blit(texture, renderOffsetPosX, renderOffsetPosY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+        guiGraphics.blit(renderTexture, renderOffsetPosX, renderOffsetPosY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
 
         hoveredThisFrame = isMouseOverlapped(mouseX, mouseY);
         if (hoveredThisFrame) {

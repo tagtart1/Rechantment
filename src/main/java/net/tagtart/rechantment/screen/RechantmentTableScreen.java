@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.networking.ModPackets;
+import net.tagtart.rechantment.networking.packet.OpenEnchantTableLootPoolScreenC2SPacket;
 import net.tagtart.rechantment.networking.packet.PurchaseEnchantedBookC2SPacket;
 import net.tagtart.rechantment.sound.ModSounds;
 import net.tagtart.rechantment.util.BookRarityProperties;
@@ -98,7 +99,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         hoverables.add(new HoverableEnchantedBookItemRenderable(this, 1, UNIQUE_LOCATION,  leftPos + 150, topPos + 44));
         hoverables.add(new HoverableEnchantedBookItemRenderable(this,  2, ELITE_LOCATION,leftPos + 43,  topPos + 41));
         hoverables.add(new HoverableEnchantedBookItemRenderable(this, 3, ULTIMATE_LOCATION, leftPos + 116, topPos + 41));
-        hoverables.add(new HoverableEnchantedBookItemRenderable(this, 4, LEGENDARY_LOCATION, leftPos + 78, topPos + 38));
+        hoverables.add(new HoverableEnchantedBookItemRenderable(this, 4, LEGENDARY_LOCATION, leftPos + 79, topPos + 38));
 
         // Diffuse textures for line shader effect.
         // Indices are offset by 1 for efficiency; empty/no effect is index zero.
@@ -208,11 +209,9 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
 
             for (HoverableEnchantedBookItemRenderable hoverable : hoverables) {
                 if (hoverable.isMouseOverlapped((int) Math.round(pMouseX), (int) Math.round(pMouseY))) {
-                    System.out.println(String.format("clicked a hoverable, %d books, %d floors!", cachedBookshelvesInRange.length, cachedFloorBlocksInRange.length));
                     BookRarityProperties properties = hoverable.bookProperties;
 
                     if (!floorRequirementsMet(properties, cachedFloorBlocksInRange) && !bookshelfRequirementsMet(properties, cachedBookshelvesInRange) && !lapisRequirementsMet(properties)) {
-                        // Just play sound, don't close TODO: ADD PROPER SOUND LIKE MOD HAS.
                         level.playSound(null, player.getOnPos(), ModSounds.ENCHANTED_BOOK_FAIL.get(), SoundSource.PLAYERS, 10f, 1f);
                         break;
                     }
@@ -243,6 +242,17 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
                     ModPackets.sentToServer(new PurchaseEnchantedBookC2SPacket(hoverable.propertiesIndex, menu.blockEntity.getBlockPos()));
                     hoverable.updateTooltipLines();
                     return true;
+                }
+            }
+        }
+        else if (pButton == 1) {
+
+            // On right click, open loot table display screen.
+            for (HoverableEnchantedBookItemRenderable hoverable : hoverables) {
+                if (hoverable.isMouseOverlapped((int) Math.round(pMouseX), (int) Math.round(pMouseY))) {
+
+                    // Need to open from server so that menu info is based on server.
+                    ModPackets.sentToServer(new OpenEnchantTableLootPoolScreenC2SPacket(hoverable.propertiesIndex, menu.blockEntity.getBlockPos()));
                 }
             }
         }

@@ -36,8 +36,6 @@ public class RechantmentTableMenu extends AbstractContainerMenu {
     public final RechantmentTableBlockEntity blockEntity;
     private final Level level;
 
-    private static final int slotCount = 5;
-
     public RechantmentTableMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
         this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()));
     }
