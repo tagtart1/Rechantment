@@ -15,10 +15,10 @@ public class InquisitiveEnchantment extends Enchantment {
     }
 
     private final List<Float> InquisitiveMultipliers = Arrays.asList(
-            1.25f, // Level 1
-            1.50f, // Level 2
-            1.75f, // Level 3
-            2.00f  // Level 4
+            1.50f, // Level 1
+            1.75f, // Level 2
+            2.00f, // Level 3
+            2.25f  // Level 4
     );
 
     public float getExpMultiplier(int level) {
