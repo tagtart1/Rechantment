@@ -77,7 +77,10 @@ public class EnchantedBookItem extends Item {
 
     @Override
     public Component getName(ItemStack pStack) {
+        System.out.println("GET TAG:" + pStack.hasTag());
+        if (!pStack.hasTag()) return Component.literal("Empty book!");
         CompoundTag rootTag = pStack.getTag();
+        if (rootTag == null) return Component.literal("Empty book!");
         CompoundTag enchantmentTag = rootTag.getCompound("Enchantment");
         String enchantmentRaw = enchantmentTag.getString("id");
         String[] enchantmentInfo = enchantmentRaw.split(":");
@@ -106,9 +109,11 @@ public class EnchantedBookItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
-        assert pStack.getTag() != null;
-        // maybe delete this line later \/
         super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+        if (!pStack.hasTag()) return;
+        if (pStack.getTag() == null) return;
+
+
         int maxWidthTooltip = 165;
         int successRate = pStack.getTag().getInt("SuccessRate");
         CompoundTag enchantmentTag = pStack.getTag().getCompound("Enchantment");
@@ -139,7 +144,7 @@ public class EnchantedBookItem extends Item {
         ResourceLocation resourceLocation = new ResourceLocation(enchantmentRaw);
         Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(resourceLocation);
 
-        assert enchantment != null;
+        if (enchantment == null) return;
 
         pTooltipComponents.add(getApplicableIcons(enchantment));
 
@@ -166,13 +171,13 @@ public class EnchantedBookItem extends Item {
                 Level level = pPlayer.level();
 
 
-
+                if (bookStack.getTag() == null) return false;
                 CompoundTag enchantmentTag = bookStack.getTag().getCompound("Enchantment");
                 int enchantmentLevel = enchantmentTag.getInt("lvl");
                 String enchantmentRaw = enchantmentTag.getString("id");
                 ResourceLocation resourceLocation = new ResourceLocation(enchantmentRaw);
                 Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(resourceLocation);
-                assert enchantment != null;
+                if (enchantment == null) return false;
                 boolean canEnchantGeneral = enchantment.canEnchant(itemToEnchantStack);
 
                 Map<Enchantment, Integer> otherStackEnchantmentsInfo = EnchantmentHelper.getEnchantments(itemToEnchantStack);
@@ -240,7 +245,7 @@ public class EnchantedBookItem extends Item {
 
 
     private void applyEnchantsSafely(Map<Enchantment, Integer> enchants, ItemStack item, Player pPlayer, Level level, ItemStack enchantedBook) {
-        assert enchantedBook.getTag() != null;
+        if (enchantedBook.getTag() == null) return;
         int slotIndex = pPlayer.getInventory().findSlotMatchingItem(item);
         int successRate = enchantedBook.getTag().getInt("SuccessRate");
         if (isSuccessfulEnchant(successRate)) {

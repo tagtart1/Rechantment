@@ -14,7 +14,8 @@ public class ModItemProperties {
                 (itemStack, clientLevel, livingEntity, i) -> {
                     CompoundTag nbt = itemStack.getTag();
                     float rarity = 0f;
-                    assert nbt != null;
+                    if (nbt == null) {return rarity;}
+
                     CompoundTag enchantmentTag = nbt.getCompound("Enchantment");
                     String enchantment = enchantmentTag.getString("id");
 
