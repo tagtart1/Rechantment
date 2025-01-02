@@ -208,13 +208,11 @@ public class ModEvents {
             if (veinMinerEnchantment != null && event.getState().is(Tags.Blocks.ORES)) {
                 BlockPos[] oresToDestroy = UtilFunctions.BFSLevelForBlocks(level, Tags.Blocks.ORES, event.getPos(), 10, true);
                 destroyBulkBlocks(event, oresToDestroy, level, handItem, (telepathyEnchantment != null) ? telepathyEnchantment.getA() : null, fortuneEnchantmentLevel);
-                event.setCanceled(true);
             }
 
             else if (timberEnchantment != null && event.getState().is(BlockTags.LOGS)) {
                 BlockPos[] woodToDestroy = UtilFunctions.BFSLevelForBlocks(level, BlockTags.LOGS, event.getPos(), 10, true);
                 destroyBulkBlocks(event, woodToDestroy, level, handItem, (telepathyEnchantment != null) ? telepathyEnchantment.getA() : null, fortuneEnchantmentLevel);
-                event.setCanceled(true);
             }
 
             // Telepathy check. Only happens when destroying a single block normally here
@@ -237,7 +235,7 @@ public class ModEvents {
 
                 level.removeBlock(blockPos, false);
                 // Fetch the block drops without tool
-               List<ItemStack> drops = Block.getDrops(event.getState(), level, event.getPos(), null);
+                List<ItemStack> drops = Block.getDrops(event.getState(), level, event.getPos(), null);
                // Pop exp
                int expToPop = blockState.getExpDrop(level, RandomSource.create(), blockPos, 0, 0);
                if (wisdomEnchantment != null) {
@@ -248,6 +246,8 @@ public class ModEvents {
 
 
                applyNerfedFortune(drops, fortuneEnchantmentLevel);
+               Block.popResource(level, event.getPos(), ItemStack.EMPTY);
+
 
                // Pop the resource with nerfed fortune
                 for(ItemStack drop : drops) {
@@ -255,8 +255,6 @@ public class ModEvents {
                 }
 
                 handItem.hurt(1, level.random, (ServerPlayer)event.getPlayer());
-
-               event.setCanceled(true);
 
             }
 
@@ -382,6 +380,8 @@ public class ModEvents {
                             && blockState.is(Tags.Blocks.ORES)) {
                         itemsToDrop = Block.getDrops(blockState, level, blockPos, null);
                         applyNerfedFortune(itemsToDrop, fortuneEnchantmentLevel);
+
+                        Block.popResource(level, event.getPos(), ItemStack.EMPTY);
                     }
 
                     // Normal drops based off the tool in hand
