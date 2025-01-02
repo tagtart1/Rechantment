@@ -111,6 +111,7 @@ public class ModEvents {
                   );
                   player.addEffect(speedEffect);
             }
+
         }
 
         @SubscribeEvent
@@ -495,7 +496,7 @@ public class ModEvents {
                         player.setHealth(player.getMaxHealth());
                     }
                     // Make sure this plays
-                    player.level().playSound(null, player.getOnPos(), SoundEvents.TRIDENT_RETURN, SoundSource.PLAYERS, 1.25f, 1f);
+                    player.level().playSound(null, player.getOnPos(), SoundEvents.TRIDENT_RETURN, SoundSource.PLAYERS, 1.15f, 1f);
                 }
 
             } else {
