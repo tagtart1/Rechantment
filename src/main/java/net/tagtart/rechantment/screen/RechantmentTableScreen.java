@@ -84,6 +84,9 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
     protected void init() {
         super.init();
 
+        this.cachedBookshelvesInRange = new BlockState[0];
+        this.cachedFloorBlocksInRange = new BlockState[0];
+
         this.inventoryLabelY = 10000;
         this.titleLabelY = 10000;
 

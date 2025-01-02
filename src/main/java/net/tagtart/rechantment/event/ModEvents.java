@@ -299,8 +299,7 @@ public class ModEvents {
             BlockState blockState = level.getBlockState(blockPos);
 
             // Cancelling event prevents the block from doing its drops
-            event.setCanceled(true);
-
+            Block.popResource(level, event.getPos(), ItemStack.EMPTY);
 
             // checking if the state is an ore makes fortune with axe on melon and mushrooms not work but whatever, who really does that?
             if (RechantmentCommonConfigs.FORTUNE_NERF_ENABLED.get()
