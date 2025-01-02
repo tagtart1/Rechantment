@@ -298,7 +298,7 @@ public class ModEvents {
             List<ItemStack> drops = Collections.emptyList();
             BlockState blockState = level.getBlockState(blockPos);
 
-            // Cancelling event prevents the block from doing its drops
+            // Prevents block from dropping a resource at this pos
             Block.popResource(level, event.getPos(), ItemStack.EMPTY);
 
             // checking if the state is an ore makes fortune with axe on melon and mushrooms not work but whatever, who really does that?
@@ -495,7 +495,7 @@ public class ModEvents {
                         player.setHealth(player.getMaxHealth());
                     }
                     // Make sure this plays
-                    player.level().playSound(null, player.getOnPos(), SoundEvents.TRIDENT_RETURN, SoundSource.PLAYERS, 1f, 1f);
+                    player.level().playSound(null, player.getOnPos(), SoundEvents.TRIDENT_RETURN, SoundSource.PLAYERS, 1.25f, 1f);
                 }
 
             } else {
