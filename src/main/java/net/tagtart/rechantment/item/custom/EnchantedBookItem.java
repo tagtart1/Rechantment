@@ -77,7 +77,6 @@ public class EnchantedBookItem extends Item {
 
     @Override
     public Component getName(ItemStack pStack) {
-        System.out.println("GET TAG:" + pStack.hasTag());
         if (!pStack.hasTag()) return Component.literal("Empty book!");
         CompoundTag rootTag = pStack.getTag();
         if (rootTag == null) return Component.literal("Empty book!");

@@ -449,7 +449,7 @@ public class ModEvents {
         @SubscribeEvent
         public static void onExpDropFromHostile(LivingExperienceDropEvent event) {
             MobCategory mobCategory = event.getEntity().getType().getCategory();
-
+            if (event.getAttackingPlayer() == null) return;
             ItemStack weapon = event.getAttackingPlayer().getMainHandItem();
             Pair<InquisitiveEnchantment, Integer> inquisitiveEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:inquisitive", weapon, InquisitiveEnchantment.class);
             Pair<TelepathyEnchantment, Integer> telepathyEnchantment = UtilFunctions.getEnchantmentFromItem("rechantment:telepathy", weapon, TelepathyEnchantment.class);
@@ -457,7 +457,7 @@ public class ModEvents {
 
             int expToDrop = event.getDroppedExperience();
 
-            if (inquisitiveEnchantment != null && mobCategory == MobCategory.MONSTER && event.getAttackingPlayer() != null) {
+            if (inquisitiveEnchantment != null && mobCategory == MobCategory.MONSTER) {
                 InquisitiveEnchantment inquisitiveEnchantInstance = inquisitiveEnchantment.getA();
                 int enchantLevel = inquisitiveEnchantment.getB();
                 expToDrop = (int)((float) expToDrop * inquisitiveEnchantInstance.getExpMultiplier(enchantLevel));
