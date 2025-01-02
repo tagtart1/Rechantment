@@ -15,10 +15,14 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.BiomeSources;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.world.BiomeModifier;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -28,31 +32,50 @@ public class ThunderStrikeEnchantment extends Enchantment {
         super(pRarity, pCategory, pApplicableSlots);
     }
 
-    private float LIGHTNING_DAMAGE = 5.0f;
+    private final float LIGHTNING_DAMAGE = 5.0f;
+    private final float LIGHTNING_RADIUS = 2.0f;
+    private final float LIGHTNING_KNOCKBACK = 1.10f;
+    private final float LIGHTNING_Y_KNOCKBACK = 0.3f;
   // Maps enchantment level to a success rate of spawning lightning
-   private final Map<Integer, Integer> successMapping = Map.of(
-           1, 15,
-           2, 20
+   private final List<Float> successRates = Arrays.asList(
+          0.10f,    // Level 1
+          0.15f     // Level 2
    );
 
-
-
-    @Override
-    public void doPostAttack(LivingEntity pAttacker, Entity pTarget, int pLevel) {
-
-        if (!pAttacker.level().isClientSide()) {
+    public float rollLightningStrike(LivingEntity pAttacker, Entity mainTarget, int level) {
+        if (isSuccess(level)) {
             ServerLevel world = ((ServerLevel) pAttacker.level());
-            BlockPos targetPosition = pTarget.blockPosition();
+            LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, world);
+            lightningBolt.moveTo(Vec3.atBottomCenterOf(mainTarget.blockPosition()));
+            lightningBolt.setVisualOnly(true);
+            world.addFreshEntity(lightningBolt);
 
-            if (isSuccess(pLevel)) {
-                LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, world);
-                lightningBolt.moveTo(Vec3.atBottomCenterOf(targetPosition));
-                lightningBolt.setVisualOnly(true);
-                world.addFreshEntity(lightningBolt);
+            AABB area = new AABB(
+                    mainTarget.getX() - LIGHTNING_RADIUS, mainTarget.getY() - LIGHTNING_RADIUS, mainTarget.getZ() - LIGHTNING_RADIUS,
+                    mainTarget.getX() + LIGHTNING_RADIUS, mainTarget.getY() + LIGHTNING_RADIUS, mainTarget.getZ() + LIGHTNING_RADIUS
+            );
 
-                pTarget.hurt(pTarget.damageSources().lightningBolt(), LIGHTNING_DAMAGE);
-            }
+            world.getEntities(mainTarget, area, e -> e instanceof LivingEntity).forEach(entity -> {
+                LivingEntity target = (LivingEntity) entity;
+                if (target == pAttacker) return;
+                // Now do the mff damage
+                target.hurt(target.damageSources().lightningBolt(), LIGHTNING_DAMAGE);
+
+                double d0 = target.getX() - mainTarget.getX();
+                double d1 = target.getZ() - mainTarget.getZ();
+                Vec2 toAttacker = new Vec2((float)d0, (float)d1);
+                toAttacker = toAttacker.normalized();
+                toAttacker = toAttacker.scale(LIGHTNING_KNOCKBACK);
+
+
+                if (target.isPushable()) {
+                    target.push(toAttacker.x, LIGHTNING_Y_KNOCKBACK, toAttacker.y);
+                }
+            });
+
+            return LIGHTNING_DAMAGE;
         }
+        return 0f;
     }
 
     @Override
@@ -65,8 +88,8 @@ public class ThunderStrikeEnchantment extends Enchantment {
     }
 
     private boolean isSuccess(int level) {
-          int successRate =   successMapping.get(level);
+          float successRate =  successRates.get(level - 1);
             Random random = new Random();
-            return random.nextInt(100) < successRate;
+            return random.nextFloat() < successRate;
     }
 }

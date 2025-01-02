@@ -161,6 +161,11 @@ public class ModEvents {
                                 weapon,
                                 BerserkEnchantment.class);
 
+                Pair<ThunderStrikeEnchantment, Integer> thunderStrikeEnchantment = UtilFunctions
+                        .getEnchantmentFromItem("rechantment:thunder_strike",
+                                weapon,
+                                ThunderStrikeEnchantment.class);
+
                 ResourceLocation targetId = ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType());
                 if (targetId == null) return;
                 String targetIdString = targetId.toString();
@@ -176,6 +181,14 @@ public class ModEvents {
                 if (berserkEnchantment != null) {
                     int enchantmentOnWeaponLevel = berserkEnchantment.getB();
                     bonusDamage += berserkEnchantment.getA().getDamageBonus(player, enchantmentOnWeaponLevel);
+                }
+
+                if (thunderStrikeEnchantment != null) {
+                    int enchantmentOnWeaponLevel = thunderStrikeEnchantment.getB();
+                    bonusDamage += thunderStrikeEnchantment.getA().rollLightningStrike(
+                            player,
+                            event.getEntity(),
+                            enchantmentOnWeaponLevel);
                 }
 
                 // Apply the damage effects
