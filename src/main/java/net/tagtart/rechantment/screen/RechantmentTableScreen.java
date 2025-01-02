@@ -15,7 +15,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.networking.ModPackets;
@@ -30,9 +29,6 @@ import oshi.util.tuples.Pair;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 
 public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentTableMenu> {
 
@@ -62,7 +58,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
     private static final ResourceLocation TEXTURE =
             new ResourceLocation(Rechantment.MOD_ID, "textures/gui/enchantment_table.png");
 
-    private ArrayList<HoverableEnchantedBookItemRenderable> hoverables;
+    private ArrayList<HoverableEnchantedBookGuiRenderable> hoverables;
 
     public Inventory playerInventory;
 
@@ -98,11 +94,11 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         this.topPos = (height - imageHeight) / 2;
 
         hoverables = new ArrayList<>();
-        hoverables.add(new HoverableEnchantedBookItemRenderable(this, 0, SIMPLE_LOCATION, leftPos + 10, topPos + 44));
-        hoverables.add(new HoverableEnchantedBookItemRenderable(this, 1, UNIQUE_LOCATION,  leftPos + 150, topPos + 44));
-        hoverables.add(new HoverableEnchantedBookItemRenderable(this,  2, ELITE_LOCATION,leftPos + 43,  topPos + 41));
-        hoverables.add(new HoverableEnchantedBookItemRenderable(this, 3, ULTIMATE_LOCATION, leftPos + 116, topPos + 41));
-        hoverables.add(new HoverableEnchantedBookItemRenderable(this, 4, LEGENDARY_LOCATION, leftPos + 79, topPos + 38));
+        hoverables.add(new HoverableEnchantedBookGuiRenderable(this, 0, SIMPLE_LOCATION, leftPos + 10, topPos + 44));
+        hoverables.add(new HoverableEnchantedBookGuiRenderable(this, 1, UNIQUE_LOCATION,  leftPos + 150, topPos + 44));
+        hoverables.add(new HoverableEnchantedBookGuiRenderable(this,  2, ELITE_LOCATION,leftPos + 43,  topPos + 41));
+        hoverables.add(new HoverableEnchantedBookGuiRenderable(this, 3, ULTIMATE_LOCATION, leftPos + 116, topPos + 41));
+        hoverables.add(new HoverableEnchantedBookGuiRenderable(this, 4, LEGENDARY_LOCATION, leftPos + 79, topPos + 38));
 
         // Diffuse textures for line shader effect.
         // Indices are offset by 1 for efficiency; empty/no effect is index zero.
@@ -114,28 +110,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         this.shaderEffectsByBookID[4] = ULTIMATE_LINE_LOCATION;
         this.shaderEffectsByBookID[5] = LEGENDARY_LINE_LOCATION;
 
-        this.lineShader = loadShader(LINE_SHADER_LOCATION);
-    }
-
-    @Nullable
-    protected ShaderInstance loadShader(ResourceLocation shaderLocation) {
-        try {
-            return new ShaderInstance(Minecraft.getInstance().getResourceManager(), shaderLocation, DefaultVertexFormat.POSITION_TEX);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private void fakeInnerBlit(GuiGraphics guiGraphics, int pX1, int pX2, int pY1, int pY2, int pBlitOffset, float pMinU, float pMaxU, float pMinV, float pMaxV) {
-        Matrix4f matrix4f = guiGraphics.pose().last().pose();
-        BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
-        bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferbuilder.vertex(matrix4f, (float)pX1, (float)pY1, (float)pBlitOffset).uv(pMinU, pMinV).endVertex();
-        bufferbuilder.vertex(matrix4f, (float)pX1, (float)pY2, (float)pBlitOffset).uv(pMinU, pMaxV).endVertex();
-        bufferbuilder.vertex(matrix4f, (float)pX2, (float)pY2, (float)pBlitOffset).uv(pMaxU, pMaxV).endVertex();
-        bufferbuilder.vertex(matrix4f, (float)pX2, (float)pY1, (float)pBlitOffset).uv(pMaxU, pMinV).endVertex();
-        BufferUploader.drawWithShader(bufferbuilder.end());
+        this.lineShader = UtilFunctions.loadShader(LINE_SHADER_LOCATION);
     }
 
     @Override
@@ -166,7 +141,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
                 // Update tooltip line if it's being hovered over currently as well
                 // This will account for destroyed blocks shortly after destroyed if user is still hovering for tooltip.
                 if (i < hoverables.size()) {
-                    HoverableEnchantedBookItemRenderable hoverable = hoverables.get(i);
+                    HoverableEnchantedBookGuiRenderable hoverable = hoverables.get(i);
                     if (hoverable.isMouseOverlapped(pMouseX, pMouseY)) {
                         hoverable.updateTooltipLines();
                     }
@@ -189,7 +164,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
 
         lineShader.apply();
 
-        fakeInnerBlit(guiGraphics, this.leftPos, this.leftPos + imageWidth, this.topPos, this.topPos + imageHeight, 0,
+        UtilFunctions.fakeInnerBlit(guiGraphics, this.leftPos, this.leftPos + imageWidth, this.topPos, this.topPos + imageHeight, 0,
                 0.0f, 1.0f, 0.0f, 1.0f);
     }
 
@@ -201,7 +176,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         super.render(guiGraphics, mouseX, mouseY, delta);
 
         // Render all hoverables. They will handle tooltip rendering as well.
-        for (HoverableItemRenderable hoverable : hoverables) {
+        for (HoverableGuiRenderable hoverable : hoverables) {
             hoverable.render(guiGraphics, mouseX, mouseY, delta);
         }
 
@@ -213,12 +188,11 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
 
         // If mouse overlaps a custom Hoverable and was left-clicked:
         if (pButton == 0) {
-            System.out.println("click occurred!");
             Player player = playerInventory.player;
             Level level = player.level();
 
-            for (HoverableEnchantedBookItemRenderable hoverable : hoverables) {
-                if (hoverable.isMouseOverlapped((int) Math.round(pMouseX), (int) Math.round(pMouseY))) {
+            for (HoverableEnchantedBookGuiRenderable hoverable : hoverables) {
+                if (hoverable.tryClickMouse(pMouseX, pMouseY, pButton)) {
                     BookRarityProperties properties = hoverable.bookProperties;
 
                     if (!floorRequirementsMet(properties, cachedFloorBlocksInRange) && !bookshelfRequirementsMet(properties, cachedBookshelvesInRange) && !lapisRequirementsMet(properties)) {
@@ -258,8 +232,8 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         else if (pButton == 1) {
 
             // On right click, open loot table display screen.
-            for (HoverableEnchantedBookItemRenderable hoverable : hoverables) {
-                if (hoverable.isMouseOverlapped((int) Math.round(pMouseX), (int) Math.round(pMouseY))) {
+            for (HoverableEnchantedBookGuiRenderable hoverable : hoverables) {
+                if (hoverable.tryClickMouse(pMouseX, pMouseY, pButton)) {
 
                     // Need to open from server so that menu info is based on server.
                     ModPackets.sentToServer(new OpenEnchantTableLootPoolScreenC2SPacket(hoverable.propertiesIndex, menu.blockEntity.getBlockPos()));
@@ -267,8 +241,6 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
             }
         }
 
-        // else if right-clicked:
-        // display pools? might have to have pool display code contained in this class too.
         return super.mouseClicked(pMouseX, pMouseY, pButton);
     }
 

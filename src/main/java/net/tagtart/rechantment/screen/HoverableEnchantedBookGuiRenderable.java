@@ -4,9 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.EnchantmentTableBlockEntity;
 import net.tagtart.rechantment.util.BookRarityProperties;
 
-import java.awt.print.Book;
-
-public class HoverableEnchantedBookItemRenderable extends HoverableItemRenderable {
+public class HoverableEnchantedBookGuiRenderable extends HoverableGuiRenderable {
 
     public BookRarityProperties bookProperties;
     public int propertiesIndex;
@@ -15,8 +13,8 @@ public class HoverableEnchantedBookItemRenderable extends HoverableItemRenderabl
 
     protected EnchantmentTableBlockEntity enchantmentTable;
 
-    public HoverableEnchantedBookItemRenderable(RechantmentTableScreen pScreen, int pPropertiesIndex, ResourceLocation textureResource, int posX, int posY) {
-        super(pScreen.playerInventory, textureResource, posX, posY);
+    public HoverableEnchantedBookGuiRenderable(RechantmentTableScreen pScreen, int pPropertiesIndex, ResourceLocation textureResource, int posX, int posY) {
+        super(textureResource, "book" + pPropertiesIndex, posX, posY);
         propertiesIndex = pPropertiesIndex;
         bookProperties = BookRarityProperties.getAllProperties()[propertiesIndex];
         screen = pScreen;

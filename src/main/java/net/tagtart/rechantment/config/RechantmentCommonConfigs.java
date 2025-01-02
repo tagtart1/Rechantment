@@ -176,7 +176,6 @@ public class RechantmentCommonConfigs {
         rarity_1_default_enchantments.add("minecraft:respiration|1|1-3|3,2,1");
         rarity_1_default_enchantments.add("minecraft:blast_protection|1|4|1");
         rarity_1_default_enchantments.add("minecraft:impaling|1|3-4|2,1");
-        rarity_1_default_enchantments.add("rechantment:wisdom|1|1|1");
         RARITY_1_ENCHANTMENTS = BUILDER.defineList("enchantments", rarity_1_default_enchantments, s -> s instanceof String);
 
         BUILDER.pop();
