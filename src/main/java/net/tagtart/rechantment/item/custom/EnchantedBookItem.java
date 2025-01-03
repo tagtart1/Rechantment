@@ -11,6 +11,7 @@ import net.tagtart.rechantment.networking.ModPackets;
 import net.tagtart.rechantment.networking.packet.EnchantItemC2SPacket;
 import net.tagtart.rechantment.networking.packet.SyncEnchantItemS2CPacket;
 import net.tagtart.rechantment.sound.ModSounds;
+import net.tagtart.rechantment.util.BookRarityProperties;
 import net.tagtart.rechantment.util.UtilFunctions;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -85,11 +86,11 @@ public class EnchantedBookItem extends Item {
         String[] enchantmentInfo = enchantmentRaw.split(":");
         String enchantmentSource = enchantmentInfo[0];
         String enchantmentName = enchantmentInfo[1];
-        Pair<String, Style> enchantRarityInfo = UtilFunctions.getRarityInfo(enchantmentRaw);
+        BookRarityProperties enchantRarityInfo = UtilFunctions.getPropertiesFromEnchantment(enchantmentRaw);
 
         ResourceLocation resourceLocation = new ResourceLocation(enchantmentRaw);
         Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(resourceLocation);
-        if (enchantment == null)
+        if (enchantment == null || enchantRarityInfo == null)
             return Component.literal("Invalid enchantment!");
         int enchantmentLvl = enchantmentTag.getInt("lvl");
         String romanLevel ="";
@@ -98,11 +99,11 @@ public class EnchantedBookItem extends Item {
             romanLevel = Component.translatable("enchantment.level." + enchantmentLvl).getString();
 
         String enchantFormattedName = Component.translatable("enchantment." + enchantmentSource + "." + enchantmentName).getString();
-        String rarityIcon = Component.translatable("enchantment.rarity." + enchantRarityInfo.getA()).getString();
+        String rarityIcon = Component.translatable("enchantment.rarity." + enchantRarityInfo.key).getString();
 
         return Component.literal(rarityIcon + " ")
                 .append(Component.literal(enchantFormattedName + " " + romanLevel)
-                        .withStyle(enchantRarityInfo.getB()));
+                        .withStyle(Style.EMPTY.withColor(enchantRarityInfo.color)));
 
     }
 
