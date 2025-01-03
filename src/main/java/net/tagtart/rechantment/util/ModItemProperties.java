@@ -19,6 +19,11 @@ public class ModItemProperties {
                     CompoundTag enchantmentTag = nbt.getCompound("Enchantment");
                     String enchantment = enchantmentTag.getString("id");
 
+                    if (nbt.getBoolean("IconOnly")) {
+                        rarity = 5f;
+                        return rarity;
+                    }
+
                     for (BookRarityProperties bookProperties : BookRarityProperties.getAllProperties()) {
                         if (bookProperties.isEnchantmentInPool(enchantment)) {
                             rarity = bookProperties.rarity;

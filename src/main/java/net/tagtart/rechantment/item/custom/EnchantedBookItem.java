@@ -164,7 +164,12 @@ public class EnchantedBookItem extends Item {
     public boolean overrideStackedOnOther(@NotNull ItemStack bookStack, Slot pSlot, @NotNull ClickAction pAction, @NotNull Player pPlayer) {
 
         ItemStack itemToEnchantStack = pSlot.getItem();
+
         if (pAction == ClickAction.PRIMARY && (itemToEnchantStack.isEnchanted() || itemToEnchantStack.isEnchantable())) {
+            if (pPlayer.getAbilities().instabuild) {
+                pPlayer.sendSystemMessage(Component.literal("Books cannot be applied in creative mode!").withStyle(ChatFormatting.RED));
+                return true;
+            }
             if (!pPlayer.level().isClientSide()) {
                 // Server stuff here
 
