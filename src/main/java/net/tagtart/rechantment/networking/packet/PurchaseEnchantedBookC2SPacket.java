@@ -133,7 +133,7 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
                     ArrayList<Integer> remainingBlocksIterable = new ArrayList<>(remainingBlocks);
                     int randomBlock = underTableIndex;
                     if (!remainingBlocksIterable.isEmpty())
-                        randomBlock = random.nextInt(remainingBlocksIterable.size());
+                        randomBlock = remainingBlocksIterable.get(random.nextInt(remainingBlocksIterable.size()));
 
                     BlockPos position = floorPositions[randomBlock];
                     level.destroyBlock(position, false);
