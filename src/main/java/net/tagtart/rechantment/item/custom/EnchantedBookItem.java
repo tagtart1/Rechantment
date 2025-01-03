@@ -1,23 +1,11 @@
 package net.tagtart.rechantment.item.custom;
 
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.context.UseOnContext;
-import net.tagtart.rechantment.config.RechantmentCommonConfigs;
-import net.tagtart.rechantment.networking.ModPackets;
-import net.tagtart.rechantment.networking.packet.EnchantItemC2SPacket;
-import net.tagtart.rechantment.networking.packet.SyncEnchantItemS2CPacket;
 import net.tagtart.rechantment.sound.ModSounds;
 import net.tagtart.rechantment.util.BookRarityProperties;
 import net.tagtart.rechantment.util.UtilFunctions;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
@@ -31,21 +19,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.event.RenderItemInFrameEvent;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.internal.TextComponentMessageFormatHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import oshi.util.tuples.Pair;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.function.Consumer;
@@ -54,7 +34,7 @@ public class EnchantedBookItem extends Item {
 
 
     // Holds the item names for each icon on the tooltip
-    private String[] baseIconItems = {
+    public static final String[] BASE_ICON_ITEMS = {
             "minecraft:iron_helmet",
             "minecraft:iron_chestplate",
             "minecraft:iron_leggings",
@@ -276,13 +256,13 @@ public class EnchantedBookItem extends Item {
         return random.nextInt(100) < successRate;
     }
 
-    private Component getApplicableIcons(Enchantment enchantment) {
+    public static Component getApplicableIcons(Enchantment enchantment) {
         if (enchantment == null) {
             return Component.literal("");
         }
 
         MutableComponent text = Component.translatable("");
-        for (String itemName : baseIconItems) {
+        for (String itemName : BASE_ICON_ITEMS) {
             ItemStack item = UtilFunctions.getItemStackFromString(itemName);
             if (enchantment.canEnchant(item)) {
                 // Breaks up the itemname to only get the identify string for the icon

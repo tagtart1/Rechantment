@@ -15,10 +15,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkHooks;
 import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.block.entity.RechantmentTableBlockEntity;
+import net.tagtart.rechantment.enchantment.ModEnchantments;
+import net.tagtart.rechantment.item.custom.EnchantedBookItem;
 import net.tagtart.rechantment.networking.ModPackets;
 import net.tagtart.rechantment.networking.packet.OpenEnchantTableScreenC2SPacket;
 import net.tagtart.rechantment.util.BookRarityProperties;
@@ -51,6 +54,12 @@ public class RechantmentTablePoolDisplayScreen extends AbstractContainerScreen<R
     private HoverableButtonGuiRenderable backArrow;
     private HoverableEnchantedBookGuiRenderable bookIcon;
 
+    private ArrayList<HoverableLootTablePoolEntryRenderable> entry_hoverables;
+    private static int VISIBLE_HEIGHT = 165;
+    private static int VISIBLE_WIDTH = 144;
+    private int entry_base_posX;
+    private int entry_base_posY;
+
     public static final Style PINK_COLOR_STYLE = Style.EMPTY.withColor(0xFCB4B4);
     public static final Style MID_GRAY_COLOR_STYLE = Style.EMPTY.withColor(0xA8A8A8);
 
@@ -71,12 +80,16 @@ public class RechantmentTablePoolDisplayScreen extends AbstractContainerScreen<R
         this.inventoryLabelY = 10000;
         this.titleLabelY = 10000;
 
-        this.imageWidth = 180;
+        this.imageWidth = 182;
         this.imageHeight = 222;
 
         this.leftPos = (width - imageWidth) / 2;
         this.topPos = (height - imageHeight) / 2;
 
+        this.entry_base_posX = this.leftPos + 9;
+        this.entry_base_posY = this.topPos + 48;
+
+        // Main hoverables/buttons in gui
         hoverables = new ArrayList<>();
         leftArrow = new HoverableButtonGuiRenderable(LEFT_ARROW_LOCATION, leftPos + 17, topPos + 26);
         leftArrow.onClickMouseEvent = this::onClickLeftArrowEvent;
@@ -93,6 +106,15 @@ public class RechantmentTablePoolDisplayScreen extends AbstractContainerScreen<R
         bookIcon = new HoverableEnchantedBookGuiRenderable(this::getBookTooltipLines, viewingPropertyIndex, leftPos + 73, topPos + 23);
         bookIcon.onClickMouseEvent = this::onClickBookIconEvent;
         hoverables.add(bookIcon);
+
+        // Hoverables that represent a loot table entry.
+        entry_hoverables = new ArrayList<>();
+        entry_hoverables.add(new HoverableLootTablePoolEntryRenderable(this.font, viewingPropertyIndex, entry_base_posX, entry_base_posY));
+        entry_hoverables.add(new HoverableLootTablePoolEntryRenderable(this.font, viewingPropertyIndex, entry_base_posX, entry_base_posY + 51));
+        entry_hoverables.add(new HoverableLootTablePoolEntryRenderable(this.font, viewingPropertyIndex, entry_base_posX, entry_base_posY + (51 * 2)));
+        entry_hoverables.add(new HoverableLootTablePoolEntryRenderable(this.font, viewingPropertyIndex, entry_base_posX, entry_base_posY + (51 * 3)));
+        entry_hoverables.add(new HoverableLootTablePoolEntryRenderable(this.font, viewingPropertyIndex, entry_base_posX, entry_base_posY + (51 * 4)));
+        entry_hoverables.add(new HoverableLootTablePoolEntryRenderable(this.font, viewingPropertyIndex, entry_base_posX, entry_base_posY + (51 * 5)));
 
         this.shaderEffectsByBookID = new ResourceLocation[5];
         this.shaderEffectsByBookID[0] = SIMPLE_LINE_LOCATION;
@@ -112,9 +134,15 @@ public class RechantmentTablePoolDisplayScreen extends AbstractContainerScreen<R
         guiGraphics.blit(TEXTURE, this.leftPos, this.topPos, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
         renderBGShaderEffect(guiGraphics);
 
-        // Render a slice of list inside where list display is on main GUI texture.
+        int scissorX = entry_base_posX;
+        int scissorY = entry_base_posY;
 
-        this.font.drawInBatch("Fart", 20, 20, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
+        guiGraphics.enableScissor(scissorX, scissorY, scissorX + VISIBLE_WIDTH, scissorY + VISIBLE_HEIGHT);
+        for (HoverableLootTablePoolEntryRenderable table_entry : entry_hoverables) {
+            table_entry.render(guiGraphics, pMouseX, pMouseY, pPartialTick);
+        }
+
+        guiGraphics.disableScissor();
     }
 
     protected void renderBGShaderEffect(GuiGraphics guiGraphics) {
@@ -295,5 +323,11 @@ public class RechantmentTablePoolDisplayScreen extends AbstractContainerScreen<R
         return BookRarityProperties.getAllProperties()[viewingPropertyIndex];
     }
 
+    private void enableScissor(int x, int y, int width, int height) {
+        RenderSystem.enableScissor(x, this.height - y, width, height);
+    }
 
+    private void disableScissor() {
+        RenderSystem.disableScissor();
+    }
 }

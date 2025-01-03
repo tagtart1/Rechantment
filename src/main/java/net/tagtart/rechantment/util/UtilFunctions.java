@@ -271,4 +271,24 @@ public class UtilFunctions {
             return 18.05556 + Math.sqrt(0.22223 * (experience - 752.98611));
         }
     }
+
+    // Mapping of Roman numerals to values.
+    // Can't lie this entirely 100% copy-pasted from ChatGPT because I'm a slob
+    private static final int[] ROMAN_VALUES = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+    private static final String[] ROMAN_SYMBOLS = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+    public static String intToRoman(int num) {
+        if (num < 1 || num > 3999) {
+            throw new IllegalArgumentException("Input must be between 1 and 3999");
+        }
+
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < ROMAN_VALUES.length; i++) {
+            while (num >= ROMAN_VALUES[i]) {
+                result.append(ROMAN_SYMBOLS[i]);
+                num -= ROMAN_VALUES[i];
+            }
+        }
+
+        return result.toString();
+    }
 }

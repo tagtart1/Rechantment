@@ -22,12 +22,12 @@ public class HoverableGuiRenderable implements Renderable {
     protected int imageWidth = 16;
     protected int imageHeight = 16;
 
-    protected int imageViewWidth = imageWidth;
-    protected int imageViewHeight = imageHeight;
+    protected int imageViewWidth;
+    protected int imageViewHeight;
 
     // Offset positions relative to parent gui origin.
-    protected int renderOffsetPosX = 0;
-    protected int renderOffsetPosY = 0;
+    protected int renderOffsetPosX;
+    protected int renderOffsetPosY;
 
     // UV offset for rendering
     protected int renderUVOffsetU = 0;
@@ -47,9 +47,13 @@ public class HoverableGuiRenderable implements Renderable {
     public TriConsumer<Double, Double, Integer> onClickMouseEvent;
     public TriConsumer<Double, Double, Integer> onReleaseMouseEvent;
 
+    protected boolean renderDefaultTexture = true;
+
     public HoverableGuiRenderable(ResourceLocation textureResource, int posX, int posY) {
         renderOffsetPosX = posX;
         renderOffsetPosY = posY;
+        imageViewWidth = imageWidth;
+        imageViewHeight = imageHeight;
         renderTexture = textureResource;
 
         customTooltipLines = new ArrayList<>();
@@ -62,7 +66,8 @@ public class HoverableGuiRenderable implements Renderable {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, renderTexture);
 
-        guiGraphics.blit(renderTexture, renderOffsetPosX, renderOffsetPosY, renderUVOffsetU, renderUVOffsetV, imageViewWidth, imageViewHeight, imageWidth, imageHeight);
+        if (renderDefaultTexture)
+            guiGraphics.blit(renderTexture, renderOffsetPosX, renderOffsetPosY, renderUVOffsetU, renderUVOffsetV, imageViewWidth, imageViewHeight, imageWidth, imageHeight);
 
         hoveredThisFrame = isMouseOverlapped(mouseX, mouseY);
         if (hoveredThisFrame) {
