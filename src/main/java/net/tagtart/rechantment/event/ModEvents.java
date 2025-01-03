@@ -52,7 +52,9 @@ import net.tagtart.rechantment.block.entity.RechantmentTableBlockEntity;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.enchantment.*;
 import net.tagtart.rechantment.sound.ModSounds;
+import net.tagtart.rechantment.util.BookRarityProperties;
 import net.tagtart.rechantment.util.UtilFunctions;
+import oshi.util.Util;
 import oshi.util.tuples.Pair;
 
 import javax.annotation.Nullable;
@@ -120,20 +122,48 @@ public class ModEvents {
             List<Component> tooltip = event.getToolTip();
 
             if (stack.isEnchanted()) {
+                List<String> sortedEnchantStrings = new ArrayList<>();
                 for (Map.Entry<Enchantment, Integer> entry : EnchantmentHelper.getEnchantments(stack).entrySet()) {
                     Enchantment enchantment = entry.getKey();
                     int level = entry.getValue();
-                    String enchantmentRaw = ForgeRegistries.ENCHANTMENTS.getKey(enchantment).toString();
-                    // Create the modified enchantment tooltip with color change
-                    String enchantmentText = enchantment.getFullname(level).getString();
-                    Component modifiedText = Component.literal(enchantmentText).withStyle(UtilFunctions.getRarityInfo(enchantmentRaw).getB());  // Change to any color you prefer
 
-                    for(int i = 0; i < tooltip.size(); i++) {
-                        Component tooltipLine = tooltip.get(i);
-                        if (tooltipLine.getString().contains(enchantmentText)) {
-                            tooltip.set(i, modifiedText);
-                        }
+                  // Change to any color you prefer
+
+
+                    String humanReadable = enchantment.getFullname(level).getString();
+
+                    sortedEnchantStrings.add(ForgeRegistries.ENCHANTMENTS.getKey(enchantment).toString() + "~" + humanReadable);
+                }
+
+                sortedEnchantStrings.sort((component1, component2) -> {
+                    String enchantmentRaw1 = component1.split("~")[0];
+                    String enchantmentRaw2 = component2.split("~")[0];
+
+                    BookRarityProperties rarity1 = UtilFunctions.getPropertiesFromEnchantment(enchantmentRaw1);
+                    BookRarityProperties rarity2 = UtilFunctions.getPropertiesFromEnchantment(enchantmentRaw2);
+
+                    float rarityValue1 = (rarity1 == null) ? 99 : rarity1.rarity;
+                    float rarityValue2 = (rarity2 == null) ? 99 : rarity2.rarity;
+
+                    return Float.compare(rarityValue2, rarityValue1);
+                });
+
+                for(int i = 1; i <= sortedEnchantStrings.size(); i++) {
+                    String[] splitEnchantment = sortedEnchantStrings.get(i - 1).split("~");
+                    String enchantmentRaw = splitEnchantment[0];
+
+                    BookRarityProperties rarityProperties = UtilFunctions.getPropertiesFromEnchantment(enchantmentRaw);
+
+                    Style style = Style.EMPTY;
+                    if (Objects.equals(enchantmentRaw, "minecraft:vanishing_curse") || Objects.equals(enchantmentRaw, "minecraft:binding_curse")) {
+                        style = Style.EMPTY.withColor(ChatFormatting.RED);
                     }
+                    else if (rarityProperties != null) {
+                        style = Style.EMPTY.withColor(rarityProperties.color);
+                    }
+                    Component modifiedText = Component.literal(splitEnchantment[1]).withStyle(style);
+
+                    tooltip.set(i, modifiedText);
                 }
             }
 
