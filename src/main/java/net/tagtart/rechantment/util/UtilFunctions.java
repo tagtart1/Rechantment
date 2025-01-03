@@ -60,24 +60,6 @@ public class UtilFunctions {
         return new ItemStack(item);
     }
 
-    public static Pair<String, Style> getRarityInfo(String enchantmentRaw) {
-
-        Style formatting = Style.EMPTY.withColor(11184810);
-        String key = "simple";
-        for (BookRarityProperties bookProperties : BookRarityProperties.getAllProperties()) {
-            if (bookProperties.isEnchantmentInPool(enchantmentRaw)) {
-                formatting = Style.EMPTY.withColor(bookProperties.color);
-                key = bookProperties.key;
-            }
-
-            // Makes the curse enchants red unless they are specified in the pools
-            else if (Objects.equals(enchantmentRaw, "minecraft:vanishing_curse") || Objects.equals(enchantmentRaw, "minecraft:binding_curse")) {
-                formatting = Style.EMPTY.withColor(ChatFormatting.RED);
-            }
-        }
-        return new Pair<>(key, formatting);
-    }
-
     @Nullable
     public static BookRarityProperties getPropertiesFromEnchantment(String enchantmentRaw) {
         for (BookRarityProperties bookProperties : BookRarityProperties.getAllProperties()) {
