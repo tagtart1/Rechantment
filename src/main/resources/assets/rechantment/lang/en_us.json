@@ -42,6 +42,8 @@
   "enchantment.icon.sword": "瞖",
   "enchantment.icon.trident": "瞗",
 
+  "creative.rechantment.title": "Rechantment",
+
   "item.rechantment.chance_gem": "Gem of Chance",
   "item.rechantment.chance_gem.description": "Randomizes the success rate on an enchanted book.",
 
