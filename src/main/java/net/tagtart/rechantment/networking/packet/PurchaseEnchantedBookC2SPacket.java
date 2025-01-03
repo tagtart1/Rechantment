@@ -1,16 +1,24 @@
 package net.tagtart.rechantment.networking.packet;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.block.entity.RechantmentTableBlockEntity;
 import net.tagtart.rechantment.item.ModItems;
 import net.tagtart.rechantment.networking.PurchaseBookResultCase;
@@ -87,6 +95,7 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
             // At this point, should be good to go. Can destroy blocks and reward the book.
             else
             {
+                SoundEvent soundToPlay = SoundEvents.EXPERIENCE_ORB_PICKUP;
                 Random random = new Random();
 
                 // Destroy block at that position if rolls to do it. Also don't check more than
@@ -150,14 +159,15 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
 
                 CompoundTag enchantmentTag = new CompoundTag();
                 EnchantmentPoolEntry randomEnchantment = bookProperties.getRandomEnchantmentWeighted();
-
-                enchantmentTag.putInt("lvl", randomEnchantment.getRandomEnchantLevelWeighted());
+                int randomEnchantmentLevel = randomEnchantment.getRandomEnchantLevelWeighted();
+                enchantmentTag.putInt("lvl", randomEnchantmentLevel);
                 enchantmentTag.putString("id", randomEnchantment.enchantment);
 
                 int successRate = random.nextInt(bookProperties.minSuccess, bookProperties.maxSuccess);
                 IntTag successTag = IntTag.valueOf(successRate);
                 rootTag.put("Enchantment", enchantmentTag);
                 rootTag.put("SuccessRate", successTag);
+
 
 
                 // Give enchanted book
@@ -169,10 +179,26 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
 
                     // Play sound effects, send a message
                     ItemStack chanceGemToGive = new ItemStack(ModItems.CHANCE_GEM.get());
+                    soundToPlay = SoundEvents.PLAYER_LEVELUP;
+                    player.sendSystemMessage(Component.literal("You found a Gem of Chance!").withStyle(ChatFormatting.GREEN));
                     if(!player.addItem(chanceGemToGive)) {
                         player.drop(chanceGemToGive, false);
                     }
                 }
+
+                if (UtilFunctions.shouldAnnounceDrop(randomEnchantment.enchantment, randomEnchantmentLevel)) {
+                    String enchantmentFormatted = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(randomEnchantment.enchantment)).getFullname(randomEnchantmentLevel).getString();
+                    Component announceMessage = Component.literal(player.getName().getString() + " found ")
+                            .append(Component.literal(enchantmentFormatted).withStyle(Style.EMPTY.withColor(bookProperties.color)))
+                            .append(" at ")
+                            .append(Component.literal(successRate + "%").withStyle(Style.EMPTY.withColor(bookProperties.color)))
+                            .append("!");
+                    for (ServerPlayer otherPlayer: level.players()) {
+                        otherPlayer.sendSystemMessage(announceMessage);
+                    }
+                }
+
+                level.playSound(null, enchantTablePos, soundToPlay, SoundSource.BLOCKS, 1f, 1f);
             }
 
             sendEnchantResultPlayerMessage(player, failCase);

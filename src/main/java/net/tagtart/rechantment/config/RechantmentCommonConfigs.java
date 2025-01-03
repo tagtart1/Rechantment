@@ -97,6 +97,8 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.DoubleValue                         RARITY_4_REROLL_GEM_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> RARITY_4_ENCHANTMENTS;
 
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ANNOUNCEMENT_ENCHANTMENTS;
+
     // Fortune nerf configs
     public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      FORTUNE_NERF_ENABLED;
     public static final ForgeConfigSpec.DoubleValue                         FORTUNE_1_CHANCE;
@@ -274,6 +276,18 @@ public class RechantmentCommonConfigs {
 
 
         BUILDER.pop();
+        BUILDER.pop();
+
+        BUILDER.push("Announce Rare Drop List");
+        BUILDER.comment("The game will broadcast a message to all players if a player gets any listed enchantments at the specific level to drop from the enchantment table",
+                "Format: <enchantment>|<level-range>",
+                "Example: minecraft:unbreaking|1-3");
+        ArrayList<String> announce_enchantments = new ArrayList<>();
+        announce_enchantments.add("rechantment:overload|3");
+        announce_enchantments.add("rechantment:thunder_strike|2");
+        announce_enchantments.add("minecraft:fortune|3");
+        ANNOUNCEMENT_ENCHANTMENTS = BUILDER.defineList("announce_enchantments", announce_enchantments, s -> s instanceof String);
+
         BUILDER.pop();
 
         BUILDER.push("Fortune Nerf");

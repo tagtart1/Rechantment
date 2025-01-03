@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import org.joml.Matrix4f;
 import oshi.util.tuples.Pair;
 
@@ -73,6 +74,27 @@ public class UtilFunctions {
         }
 
         return null;
+    }
+
+    public static boolean shouldAnnounceDrop(String enchantmentRaw, int enchantmentLevel) {
+        List<? extends String> enchantmentsList = RechantmentCommonConfigs.ANNOUNCEMENT_ENCHANTMENTS.get();
+         for (String enchantmentRawConfig : enchantmentsList) {
+             String[] parts = enchantmentRawConfig.split("\\|");
+             String[] range = parts[1].split("-");
+
+
+             int lowerBound = Integer.parseInt(range[0]);
+             int upperBound = lowerBound;
+             if (range.length > 1) {
+                  upperBound = Integer.parseInt(range[1]);
+             }
+
+             if (enchantmentLevel >= lowerBound &&enchantmentLevel <= upperBound && Objects.equals(parts[0], enchantmentRaw))
+             {
+                 return true;
+             }
+         }
+        return false;
     }
 
     // Forms a bounding box around the provided position by offsetting the corners by the provided offset values,
