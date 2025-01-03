@@ -19,6 +19,7 @@ import net.tagtart.rechantment.util.EnchantmentPoolEntry;
 import net.tagtart.rechantment.util.UtilFunctions;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.function.Supplier;
@@ -89,9 +90,16 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
                 Random random = new Random();
 
                 // Destroy block at that position if rolls to do it. Also don't check more than
-                // the number of shelves that are actually required just in case they all roll to break somehow
-                for (int i = 0; i < bookshelves.getB().length || i < bookProperties.requiredBookShelves; ++i) {
-                    BlockPos position = bookshelves.getB()[i];
+                // the number of shelves that are actually required just in case they all roll to break somehow.
+                // Check via random indices as well.
+                ArrayList<Integer> randomIndices = new ArrayList<>();
+                for (int i = 0; i < bookshelves.getB().length; ++i) {
+                    randomIndices.add(i);
+                }
+                Collections.shuffle(randomIndices);
+                for (int i = 0; i < bookshelves.getB().length && i < bookProperties.requiredBookShelves; ++i) {
+                    int bookIndex = randomIndices.get(i);
+                    BlockPos position = bookshelves.getB()[bookIndex];
                     if (random.nextFloat() < bookProperties.bookBreakChance)
                         level.destroyBlock(position, false);
                 }
