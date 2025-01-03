@@ -7,9 +7,11 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class HoverableGuiRenderable implements Renderable {
 
@@ -37,13 +39,18 @@ public class HoverableGuiRenderable implements Renderable {
     protected boolean leftMouseClicked  = false;    // True if left mouse is currently clicked and is on top of renderable.
     protected boolean rightMouseClicked = false;    // True if right mouse is currently clicked and is on top of renderable.
 
-    public final String identifier;
+    public Runnable onHoverStartEvent;
+    public Runnable onHoverEndEvent;
 
-    public HoverableGuiRenderable(ResourceLocation textureResource, String pIdentifier, int posX, int posY) {
+    // Events/Function to run to mouse is clicked/released while on top of this renderable.
+    // Double: pMouseX, Double: pMouseY, Integer: pMouseButton
+    public TriConsumer<Double, Double, Integer> onClickMouseEvent;
+    public TriConsumer<Double, Double, Integer> onReleaseMouseEvent;
+
+    public HoverableGuiRenderable(ResourceLocation textureResource, int posX, int posY) {
         renderOffsetPosX = posX;
         renderOffsetPosY = posY;
         renderTexture = textureResource;
-        identifier = pIdentifier;
 
         customTooltipLines = new ArrayList<>();
     }
@@ -74,22 +81,26 @@ public class HoverableGuiRenderable implements Renderable {
     }
 
     protected void onHoverStart() {
-
+        if (onHoverStartEvent != null)
+            onHoverStartEvent.run();
     }
 
     protected void onHoverEnd() {
-
+        if (onHoverEndEvent != null)
+            onHoverEndEvent.run();
     }
 
-    protected void onClickMouse() {
-
+    protected void onClickMouse(double pMouseX, double pMouseY, int pButton) {
+        if (onClickMouseEvent != null)
+            onClickMouseEvent.accept(pMouseX, pMouseY, pButton);
     }
 
-    protected void onReleaseMouse() {
-
+    protected void onReleaseMouse(double pMouseX, double pMouseY, int pButton) {
+        if (onReleaseMouseEvent != null)
+            onReleaseMouseEvent.accept(pMouseX, pMouseY, pButton);
     }
 
-    private void onClickMouse(int pButton) {
+    private void clickMouse(double pMouseX, double pMouseY, int pButton) {
         if (pButton == 0 && !leftMouseClicked) {
             leftMouseClicked = true;
         }
@@ -97,10 +108,10 @@ public class HoverableGuiRenderable implements Renderable {
             rightMouseClicked = true;
         }
 
-        onClickMouse();
+        onClickMouse(pMouseX, pMouseY, pButton);
     }
 
-    private void onReleaseMouse(int pButton) {
+    private void releaseMouse(double pMouseX, double pMouseY, int pButton) {
         if (pButton == 0 && leftMouseClicked) {
             leftMouseClicked = false;
         }
@@ -108,13 +119,13 @@ public class HoverableGuiRenderable implements Renderable {
             rightMouseClicked = false;
         }
 
-        onReleaseMouse();
+        onReleaseMouse(pMouseX, pMouseY, pButton);
     }
 
 
     public boolean tryClickMouse(double pMouseX, double pMouseY, int pButton) {
         if (isMouseOverlapped((int)Math.round(pMouseX), (int)Math.round(pMouseY))) {
-            onClickMouse(pButton);
+            clickMouse(pMouseX, pMouseY, pButton);
             return true;
         }
 
@@ -122,8 +133,8 @@ public class HoverableGuiRenderable implements Renderable {
     }
 
     public boolean tryReleaseMouse(double pMouseX, double pMouseY, int pButton) {
-        if (isMouseOverlapped((int)Math.round(pMouseX), (int)Math.round(pMouseY))) {
-            onReleaseMouse(pButton);
+        if ((pButton == 0 && leftMouseClicked) || (pButton == 1 && rightMouseClicked)) {
+            releaseMouse(pMouseX, pMouseY, pButton);
             return true;
         }
 

@@ -1,7 +1,6 @@
 package net.tagtart.rechantment.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -18,15 +17,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.networking.ModPackets;
-import net.tagtart.rechantment.networking.packet.OpenEnchantTableLootPoolScreenC2SPacket;
+import net.tagtart.rechantment.networking.packet.OpenEnchantTableScreenC2SPacket;
 import net.tagtart.rechantment.networking.packet.PurchaseEnchantedBookC2SPacket;
 import net.tagtart.rechantment.sound.ModSounds;
 import net.tagtart.rechantment.util.BookRarityProperties;
 import net.tagtart.rechantment.util.UtilFunctions;
-import org.joml.Matrix4f;
 import oshi.util.tuples.Pair;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,12 +41,6 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
 
     public static final Style PINK_COLOR_STYLE = Style.EMPTY.withColor(0xFCB4B4);
     public static final Style MID_GRAY_COLOR_STYLE = Style.EMPTY.withColor(0xA8A8A8);
-
-    public static final ResourceLocation SIMPLE_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/item/simple.png");
-    public static final ResourceLocation UNIQUE_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/item/unique.png");
-    public static final ResourceLocation ELITE_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/item/elite.png");
-    public static final ResourceLocation ULTIMATE_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/item/ultimate.png");
-    public static final ResourceLocation LEGENDARY_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/item/legendary.png");
 
     private static final Component grayHyphen = Component.literal("- ").withStyle(MID_GRAY_COLOR_STYLE);
     private static final Component whiteArrow = Component.literal("→ ").withStyle(ChatFormatting.WHITE);
@@ -94,11 +85,12 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         this.topPos = (height - imageHeight) / 2;
 
         hoverables = new ArrayList<>();
-        hoverables.add(new HoverableEnchantedBookGuiRenderable(this, 0, SIMPLE_LOCATION, leftPos + 10, topPos + 44));
-        hoverables.add(new HoverableEnchantedBookGuiRenderable(this, 1, UNIQUE_LOCATION,  leftPos + 150, topPos + 44));
-        hoverables.add(new HoverableEnchantedBookGuiRenderable(this,  2, ELITE_LOCATION,leftPos + 43,  topPos + 41));
-        hoverables.add(new HoverableEnchantedBookGuiRenderable(this, 3, ULTIMATE_LOCATION, leftPos + 116, topPos + 41));
-        hoverables.add(new HoverableEnchantedBookGuiRenderable(this, 4, LEGENDARY_LOCATION, leftPos + 79, topPos + 38));
+
+        hoverables.add(new HoverableEnchantedBookGuiRenderable(() -> getEnchantTableTooltipLines(0), 0, leftPos + 10, topPos + 44));
+        hoverables.add(new HoverableEnchantedBookGuiRenderable(() -> getEnchantTableTooltipLines(1),1,leftPos + 150, topPos + 44));
+        hoverables.add(new HoverableEnchantedBookGuiRenderable(() -> getEnchantTableTooltipLines(2),2, leftPos + 43,  topPos + 41));
+        hoverables.add(new HoverableEnchantedBookGuiRenderable(() -> getEnchantTableTooltipLines(3),3, leftPos + 116, topPos + 41));
+        hoverables.add(new HoverableEnchantedBookGuiRenderable(() -> getEnchantTableTooltipLines(4),4,  leftPos + 79, topPos + 38));
 
         // Diffuse textures for line shader effect.
         // Indices are offset by 1 for efficiency; empty/no effect is index zero.
@@ -193,7 +185,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
 
             for (HoverableEnchantedBookGuiRenderable hoverable : hoverables) {
                 if (hoverable.tryClickMouse(pMouseX, pMouseY, pButton)) {
-                    BookRarityProperties properties = hoverable.bookProperties;
+                    BookRarityProperties properties = BookRarityProperties.getAllProperties()[hoverable.propertiesIndex];
 
                     if (!floorRequirementsMet(properties, cachedFloorBlocksInRange) && !bookshelfRequirementsMet(properties, cachedBookshelvesInRange) && !lapisRequirementsMet(properties)) {
                         level.playSound(null, player.getOnPos(), ModSounds.ENCHANTED_BOOK_FAIL.get(), SoundSource.PLAYERS, 10f, 1f);
@@ -236,7 +228,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
                 if (hoverable.tryClickMouse(pMouseX, pMouseY, pButton)) {
 
                     // Need to open from server so that menu info is based on server.
-                    ModPackets.sentToServer(new OpenEnchantTableLootPoolScreenC2SPacket(hoverable.propertiesIndex, menu.blockEntity.getBlockPos()));
+                    ModPackets.sentToServer(new OpenEnchantTableScreenC2SPacket(1, hoverable.propertiesIndex, menu.blockEntity.getBlockPos()));
                 }
             }
         }
@@ -249,7 +241,8 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         return false;
     }
 
-    public ArrayList<Component> getEnchantTableTooltipLines(BookRarityProperties properties) {
+    public ArrayList<Component> getEnchantTableTooltipLines(int propertiesIndex) {
+        BookRarityProperties properties = BookRarityProperties.getAllProperties()[propertiesIndex];
 
         // VERY IMPORTANT to note. On client side, we only recompute if requirements are valid when tooltip is refreshed,
         // which only happens when a new item is initially hovered in this case. Server-side checks are in PurchaseEnchantedBookC2SPacket.

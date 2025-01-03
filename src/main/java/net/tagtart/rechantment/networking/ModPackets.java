@@ -8,7 +8,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.networking.packet.EnchantItemC2SPacket;
-import net.tagtart.rechantment.networking.packet.OpenEnchantTableLootPoolScreenC2SPacket;
+import net.tagtart.rechantment.networking.packet.OpenEnchantTableScreenC2SPacket;
 import net.tagtart.rechantment.networking.packet.PurchaseEnchantedBookC2SPacket;
 import net.tagtart.rechantment.networking.packet.SyncEnchantItemS2CPacket;
 
@@ -50,10 +50,10 @@ public class ModPackets {
                 .consumerMainThread(PurchaseEnchantedBookC2SPacket::handle)
                 .add();
 
-        net.messageBuilder(OpenEnchantTableLootPoolScreenC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(OpenEnchantTableLootPoolScreenC2SPacket::new)
-                .encoder(OpenEnchantTableLootPoolScreenC2SPacket::toBytes)
-                .consumerMainThread(OpenEnchantTableLootPoolScreenC2SPacket::handle)
+        net.messageBuilder(OpenEnchantTableScreenC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(OpenEnchantTableScreenC2SPacket::new)
+                .encoder(OpenEnchantTableScreenC2SPacket::toBytes)
+                .consumerMainThread(OpenEnchantTableScreenC2SPacket::handle)
                 .add();
     }
 

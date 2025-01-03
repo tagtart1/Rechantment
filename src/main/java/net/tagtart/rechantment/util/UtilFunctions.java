@@ -275,4 +275,18 @@ public class UtilFunctions {
         bufferbuilder.vertex(matrix4f, (float)pX2, (float)pY1, (float)pBlitOffset).uv(pMaxU, pMinV).endVertex();
         BufferUploader.drawWithShader(bufferbuilder.end());
     }
+
+    // Derived from inverse equations for total EXP level from here:
+    // https://minecraft.fandom.com/wiki/Experience#Formulas_and_Tables
+    public static double getTotalLevelFromEXP(int experience) {
+        if (experience < 352) {
+            return Math.sqrt(experience + 9.0) - 3.0;
+        }
+        else if (experience < 1507) {
+            return 8.1 + Math.sqrt(0.4 * (experience - 195.975));
+        }
+        else {
+            return 18.05556 + Math.sqrt(0.22223 * (experience - 752.98611));
+        }
+    }
 }

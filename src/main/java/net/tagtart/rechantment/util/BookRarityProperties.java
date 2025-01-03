@@ -4,6 +4,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 
 import java.util.Arrays;
@@ -29,6 +30,7 @@ public class BookRarityProperties {
     public double rerollGemChance;
     public List<EnchantmentPoolEntry> enchantmentPool;
     public int enchantmentPoolTotalWeights;
+    public ResourceLocation iconResourceLocation;
 
     private BookRarityProperties()
     {
@@ -128,6 +130,7 @@ public class BookRarityProperties {
         simpleProperties.rerollGemChance =      RechantmentCommonConfigs.RARITY_0_REROLL_GEM_CHANCE.get();
         simpleProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_0_ENCHANTMENTS.get());
         simpleProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(simpleProperties.enchantmentPool);
+        simpleProperties.iconResourceLocation = new ResourceLocation(Rechantment.MOD_ID, "textures/item/simple.png");
 
         ResourceLocation blockLocation = new ResourceLocation(RechantmentCommonConfigs.RARITY_0_FLOOR_BLOCK_TYPE.get());
         simpleProperties.floorBlock = ForgeRegistries.BLOCKS.getValue(blockLocation);
@@ -149,6 +152,8 @@ public class BookRarityProperties {
         uniqueProperties.rerollGemChance =      RechantmentCommonConfigs.RARITY_1_REROLL_GEM_CHANCE.get();
         uniqueProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_1_ENCHANTMENTS.get());
         uniqueProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(uniqueProperties.enchantmentPool);
+        uniqueProperties.iconResourceLocation = new ResourceLocation(Rechantment.MOD_ID, "textures/item/unique.png");
+
 
 
         blockLocation = new ResourceLocation(RechantmentCommonConfigs.RARITY_1_FLOOR_BLOCK_TYPE.get());
@@ -171,6 +176,7 @@ public class BookRarityProperties {
         eliteProperties.rerollGemChance =      RechantmentCommonConfigs.RARITY_2_REROLL_GEM_CHANCE.get();
         eliteProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_2_ENCHANTMENTS.get());
         eliteProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(eliteProperties.enchantmentPool);
+        eliteProperties.iconResourceLocation = new ResourceLocation(Rechantment.MOD_ID, "textures/item/elite.png");
 
         blockLocation = new ResourceLocation(RechantmentCommonConfigs.RARITY_2_FLOOR_BLOCK_TYPE.get());
         eliteProperties.floorBlock = ForgeRegistries.BLOCKS.getValue(blockLocation);
@@ -192,6 +198,8 @@ public class BookRarityProperties {
         ultimateProperties.rerollGemChance =      RechantmentCommonConfigs.RARITY_3_REROLL_GEM_CHANCE.get();
         ultimateProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_3_ENCHANTMENTS.get());
         ultimateProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(ultimateProperties.enchantmentPool);
+        ultimateProperties.iconResourceLocation = new ResourceLocation(Rechantment.MOD_ID, "textures/item/ultimate.png");
+
 
         blockLocation = new ResourceLocation(RechantmentCommonConfigs.RARITY_3_FLOOR_BLOCK_TYPE.get());
         ultimateProperties.floorBlock = ForgeRegistries.BLOCKS.getValue(blockLocation);
@@ -213,6 +221,7 @@ public class BookRarityProperties {
         legendaryProperties.rerollGemChance =      RechantmentCommonConfigs.RARITY_4_REROLL_GEM_CHANCE.get();
         legendaryProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_4_ENCHANTMENTS.get());
         legendaryProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(legendaryProperties.enchantmentPool);
+        legendaryProperties.iconResourceLocation = new ResourceLocation(Rechantment.MOD_ID, "textures/item/legendary.png");
 
         blockLocation = new ResourceLocation(RechantmentCommonConfigs.RARITY_4_FLOOR_BLOCK_TYPE.get());
         legendaryProperties.floorBlock = ForgeRegistries.BLOCKS.getValue(blockLocation);

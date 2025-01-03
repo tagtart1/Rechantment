@@ -16,13 +16,13 @@ import java.awt.print.Book;
 
 public class RechantmentTablePoolDisplayMenu extends AbstractContainerMenu {
 
-    private final RechantmentTableBlockEntity blockEntity;
-    private final Level level;
+    public final RechantmentTableBlockEntity blockEntity;
+    public final Level level;
 
-    private BookRarityProperties bookProperties;
+    public final int startingPropertiesIndex;
 
     public RechantmentTablePoolDisplayMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
-        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), 0); // Default to first properites index
+        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), extraData.readInt()); // Default to first properties index
     }
 
     public RechantmentTablePoolDisplayMenu(int pContainerId, Inventory inv, BlockEntity entity, int bookPropertiesIndex) {
@@ -30,7 +30,7 @@ public class RechantmentTablePoolDisplayMenu extends AbstractContainerMenu {
 
         blockEntity = ((RechantmentTableBlockEntity) entity);
         level = inv.player.level();
-        bookProperties = BookRarityProperties.getAllProperties()[bookPropertiesIndex];
+        startingPropertiesIndex = bookPropertiesIndex % BookRarityProperties.getAllProperties().length;
     }
 
     @Override

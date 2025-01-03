@@ -5,8 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 public class HoverableButtonGuiRenderable extends HoverableGuiRenderable{
-    public HoverableButtonGuiRenderable(ResourceLocation textureResource, String identifier, int posX, int posY) {
-        super(textureResource, identifier, posX, posY);
+    public HoverableButtonGuiRenderable(ResourceLocation textureResource, int posX, int posY) {
+        super(textureResource, posX, posY);
         imageWidth = 48;
         imageHeight = 16;
 
@@ -34,6 +34,12 @@ public class HoverableButtonGuiRenderable extends HoverableGuiRenderable{
     @Override
     protected void onHoverEnd() {
         super.onHoverEnd();
+        renderUVOffsetU = 16;
+    }
+
+    @Override
+    protected void onReleaseMouse(double pMouseX, double pMouseY, int pButton) {
+        super.onReleaseMouse(pMouseX, pMouseY, pButton);
         renderUVOffsetU = 16;
     }
 }

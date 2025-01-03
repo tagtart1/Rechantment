@@ -1,6 +1,5 @@
 #version 150
 
-uniform sampler2D MainDiffuse;
 uniform sampler2D LineEffectMap;
 
 uniform vec3 ColorModulator;
@@ -106,7 +105,6 @@ float stepped(float noiseSample) {
 }
 
 void main() {
-    vec4 mainDiffuseColor = texture(MainDiffuse, texCoord);
     vec4 lineBaseColor = texture(LineEffectMap, texCoord);
     vec2 pixelCoords = texCoord * Resolution;
     pixelCoords = pixelCoords - fract(pixelCoords);

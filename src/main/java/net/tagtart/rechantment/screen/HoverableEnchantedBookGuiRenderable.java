@@ -1,23 +1,22 @@
 package net.tagtart.rechantment.screen;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.EnchantmentTableBlockEntity;
 import net.tagtart.rechantment.util.BookRarityProperties;
 
+import java.util.ArrayList;
+import java.util.function.Supplier;
+
 public class HoverableEnchantedBookGuiRenderable extends HoverableGuiRenderable {
 
-    public BookRarityProperties bookProperties;
     public int propertiesIndex;
+    public Supplier<ArrayList<Component>> tooltipSupplier; // So that a screen can supply a custom tooltip and change how it does that.
 
-    protected RechantmentTableScreen screen;
-
-    protected EnchantmentTableBlockEntity enchantmentTable;
-
-    public HoverableEnchantedBookGuiRenderable(RechantmentTableScreen pScreen, int pPropertiesIndex, ResourceLocation textureResource, int posX, int posY) {
-        super(textureResource, "book" + pPropertiesIndex, posX, posY);
+    public HoverableEnchantedBookGuiRenderable(Supplier<ArrayList<Component>> pTooltipSupplier, int pPropertiesIndex, int posX, int posY) {
+        super(BookRarityProperties.getAllProperties()[pPropertiesIndex].iconResourceLocation, posX, posY);
         propertiesIndex = pPropertiesIndex;
-        bookProperties = BookRarityProperties.getAllProperties()[propertiesIndex];
-        screen = pScreen;
+        tooltipSupplier = pTooltipSupplier;
     }
 
     @Override
@@ -32,6 +31,6 @@ public class HoverableEnchantedBookGuiRenderable extends HoverableGuiRenderable 
 
     public void updateTooltipLines() {
         // If we just hovered over this object, create tooltip info (ensure it's updated if info, like exp, changed at any point)
-        customTooltipLines = screen.getEnchantTableTooltipLines(bookProperties);
+        customTooltipLines = tooltipSupplier.get();
     }
 }
