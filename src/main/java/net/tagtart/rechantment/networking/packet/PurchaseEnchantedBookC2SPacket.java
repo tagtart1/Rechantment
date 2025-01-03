@@ -1,6 +1,7 @@
 package net.tagtart.rechantment.networking.packet;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
@@ -185,6 +186,7 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
                         player.drop(chanceGemToGive, false);
                     }
                 }
+
 
                 if (UtilFunctions.shouldAnnounceDrop(randomEnchantment.enchantment, randomEnchantmentLevel)) {
                     String enchantmentFormatted = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(randomEnchantment.enchantment)).getFullname(randomEnchantmentLevel).getString();

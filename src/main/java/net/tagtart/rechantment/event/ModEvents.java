@@ -1,7 +1,10 @@
 package net.tagtart.rechantment.event;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -51,6 +54,7 @@ import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.block.entity.RechantmentTableBlockEntity;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.enchantment.*;
+import net.tagtart.rechantment.networking.ModPackets;
 import net.tagtart.rechantment.sound.ModSounds;
 import net.tagtart.rechantment.util.BookRarityProperties;
 import net.tagtart.rechantment.util.UtilFunctions;
@@ -79,7 +83,11 @@ public class ModEvents {
             DamageSource source = event.getDamageSource();
             Entity attacker = source.getEntity();
             ItemStack shield = player.getUseItem();
-
+            //TODO: remove this
+            //Minecraft.getInstance().gameRenderer.displayItemActivation(shield);
+            if (player.level() instanceof ServerLevel serverLevel) {
+                serverLevel.sendParticles(ParticleTypes.TOTEM_OF_UNDYING, player.getX(), player.getY() + 1, player.getZ(), 100, 1, 1.0 ,1, 0.1);
+            }
             if(!(shield.getItem() instanceof ShieldItem)) return;
 
             ResourceLocation bashResource = new ResourceLocation("rechantment:bash");
@@ -123,6 +131,8 @@ public class ModEvents {
 
             if (stack.isEnchanted()) {
                 List<String> sortedEnchantStrings = new ArrayList<>();
+                // TODO: make this use the List<EntrySet<Enchantment, Integer>> and then sort it, then set the tooltip that way
+                // This current solution is poop
                 for (Map.Entry<Enchantment, Integer> entry : EnchantmentHelper.getEnchantments(stack).entrySet()) {
                     Enchantment enchantment = entry.getKey();
                     int level = entry.getValue();
@@ -177,6 +187,7 @@ public class ModEvents {
             // Check if attacker is player
             if (event.getSource().getEntity() instanceof LivingEntity player) {
                 ItemStack weapon = player.getMainHandItem();
+
                 float bonusDamage = 0;
                 Pair<VoidsBaneEnchantment, Integer> voidsBaneEnchantment = UtilFunctions
                         .getEnchantmentFromItem("rechantment:voids_bane",

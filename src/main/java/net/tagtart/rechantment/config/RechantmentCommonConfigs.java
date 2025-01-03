@@ -279,7 +279,7 @@ public class RechantmentCommonConfigs {
         BUILDER.pop();
 
         BUILDER.push("Announce Rare Drop List");
-        BUILDER.comment("The game will broadcast a message to all players if a player gets any listed enchantments at the specific level to drop from the enchantment table",
+        BUILDER.comment("The game will broadcast a message to all players if a player gets any listed enchantments within the level range to drop from the enchantment table",
                 "Format: <enchantment>|<level-range>",
                 "Example: minecraft:unbreaking|1-3");
         ArrayList<String> announce_enchantments = new ArrayList<>();
