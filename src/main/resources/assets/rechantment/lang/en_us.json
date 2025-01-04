@@ -126,5 +126,6 @@
   "enchantment.minecraft.mending.description": "Repairs the item when gaining XP orbs.",
   "enchantment.minecraft.vanishing_curse.description": "Item is forever destroyed upon death.",
 
-  "sounds.rechantment.enchanted_book_fail": "Book failed to enchant item sound"
+  "sounds.rechantment.enchanted_book_fail": "Book failed to enchant item sound",
+  "sounds.rechantment.rebirth_item": "Item reborn sound"
 }
