@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -87,14 +88,7 @@ public class ModEvents {
             DamageSource source = event.getDamageSource();
             Entity attacker = source.getEntity();
             ItemStack shield = player.getUseItem();
-            //TODO: remove this
-            //Minecraft.getInstance().gameRenderer.displayItemActivation(shield);
-            if (player.level() instanceof ServerLevel serverLevel) {
 
-
-                ParticleEmitter.emitParticlesOverTime((Player)player, serverLevel, 90, 50);
-            }
-           // player.level().playSound(null, player.blockPosition(), ModSounds.REBIRTH_ITEM.get(), SoundSource.PLAYERS, 0.7F, 1.0F);
             if(!(shield.getItem() instanceof ShieldItem)) return;
 
             ResourceLocation bashResource = new ResourceLocation("rechantment:bash");
@@ -249,7 +243,16 @@ public class ModEvents {
         // Telepathy, Vein Miner, Timber, Wisdom Enchantments - Blocks
         @SubscribeEvent
         public static void onBlockBreak(BlockEvent.BreakEvent event) {
+            SimpleParticleType[] particlesArray = new SimpleParticleType[] {
+                    ParticleTypes.SOUL_FIRE_FLAME,
+                    ParticleTypes.FIREWORK,
+                    ParticleTypes.ENCHANT,
+                    ParticleTypes.ENCHANTED_HIT,
 
+            };
+            ParticleEmitter.emitParticlesOverTime(event.getPlayer(),(ServerLevel) event.getPlayer().level(), 100, 60, particlesArray);
+            Minecraft.getInstance().gameRenderer.displayItemActivation(event.getPlayer().getMainHandItem());
+            // event.getPlayer().level().playSound(null,  event.getPlayer().blockPosition(), ModSounds.REBIRTH_ITEM.get(), SoundSource.PLAYERS, 0.7F, 1.0F);
             if (event.getPlayer().level().isClientSide()) return;
 
             // For enchantment table replacement inventory, this is necessary since it isn't tied to a custom block, just an entity.
