@@ -83,6 +83,11 @@ public class ModEnchantments {
                     Enchantment.Rarity.VERY_RARE, EnchantmentCategory.BREAKABLE, EquipmentSlot.MAINHAND
             ));
 
+    public static RegistryObject<Enchantment> REBORN =
+            ENCHANTMENTS.register("reborn", () -> new RebornEnchantment(
+                    Enchantment.Rarity.VERY_RARE, EnchantmentCategory.BREAKABLE, EquipmentSlot.MAINHAND
+            ));
+
     public static void register(IEventBus eventBus) {
         ENCHANTMENTS.register(eventBus);
     }
