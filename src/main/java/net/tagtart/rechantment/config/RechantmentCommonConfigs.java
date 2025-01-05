@@ -99,6 +99,10 @@ public class RechantmentCommonConfigs {
 
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ANNOUNCEMENT_ENCHANTMENTS;
 
+    public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      REMOVE_MENDING_ENABLED;
+
+    public static  final ForgeConfigSpec.ConfigValue<? extends Boolean>     CLEAR_ENCHANTED_LOOT;
+
     // Fortune nerf configs
     public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      FORTUNE_NERF_ENABLED;
     public static final ForgeConfigSpec.DoubleValue                         FORTUNE_1_CHANCE;
@@ -287,7 +291,21 @@ public class RechantmentCommonConfigs {
         announce_enchantments.add("rechantment:overload|3");
         announce_enchantments.add("rechantment:thunder_strike|2");
         announce_enchantments.add("minecraft:fortune|3");
+        announce_enchantments.add("rechantment:rebirth|1-3");
         ANNOUNCEMENT_ENCHANTMENTS = BUILDER.defineList("announce_enchantments", announce_enchantments, s -> s instanceof String);
+
+        BUILDER.pop();
+
+        BUILDER.push("Remove Mending");
+        BUILDER.comment("Removes mending from found enchanted loot from generated world loot. Ex: end_city_treasure");
+        BUILDER.comment("Mending books can be found only if you have them set in a rarity pool. Vanilla books are off be default therefore you cannot village trade obtain them.");
+        REMOVE_MENDING_ENABLED = BUILDER.define("remove_mending", true);
+
+        BUILDER.pop();
+
+        BUILDER.push("Clear Generated Loot Enchantments");
+        BUILDER.comment("Clears enchantments from found generated loot resulting in blank pieces of gear");
+        CLEAR_ENCHANTED_LOOT = BUILDER.define("clear_enchanted_loot", false);
 
         BUILDER.pop();
 
