@@ -4,6 +4,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraftforge.common.data.GlobalLootModifierProvider;
 import net.tagtart.rechantment.Rechantment;
+import net.tagtart.rechantment.loot.ClearGeneratedEnchantsModifier;
 import net.tagtart.rechantment.loot.RemoveMendingModifier;
 import net.tagtart.rechantment.loot.ReplaceItemModifier;
 
@@ -18,6 +19,8 @@ public class ModGlobalLootModifierProvider extends GlobalLootModifierProvider {
         }));
 
         add("remove_mending_from_items", new RemoveMendingModifier(new LootItemCondition[]{}));
+
+        add("clear_enchants_from_items", new ClearGeneratedEnchantsModifier(new LootItemCondition[]{}));
 
         // Example implentation for implementing a new drop
 
