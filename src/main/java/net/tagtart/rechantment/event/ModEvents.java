@@ -2,6 +2,7 @@ package net.tagtart.rechantment.event;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.AccessibilityOnboardingScreen;
 import net.minecraft.client.particle.TotemParticle;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.core.BlockPos;
@@ -75,9 +76,6 @@ public class ModEvents {
 
     @Mod.EventBusSubscriber(modid = Rechantment.MOD_ID)
     public static class ForgeEvents {
-
-
-
         @SubscribeEvent
         public static void onShieldBlock(ShieldBlockEvent event) {
 
@@ -85,7 +83,7 @@ public class ModEvents {
             float SHIELD_BASH_KNOCKBACK_Y = 0.4f;
             int SHIELD_COURAGE_SPEED_DURATION = 40; // Speed in ticks
 
-            LivingEntity player = event.getEntity();
+            Player player = (Player) event.getEntity();
             DamageSource source = event.getDamageSource();
             Entity attacker = source.getEntity();
             ItemStack shield = player.getUseItem();
@@ -97,19 +95,17 @@ public class ModEvents {
             Map<Enchantment, Integer> shieldEnchants = EnchantmentHelper.getEnchantments(shield);
             // Handle bash enchantment
             if (shieldEnchants.containsKey(ForgeRegistries.ENCHANTMENTS.getValue(bashResource))) {
-                if (source.getDirectEntity() instanceof Projectile) {
-                    return;
-                }
-
-                double d0 = attacker.getX() - player.getX();
-                double d1 = attacker.getZ() - player.getZ();
-                Vec2 toAttacker = new Vec2((float)d0, (float)d1);
-                toAttacker = toAttacker.normalized();
-                toAttacker = toAttacker.scale(SHIELD_BASH_KNOCKBACK);
+                if (!(source.getDirectEntity() instanceof Projectile)) {
+                    double d0 = attacker.getX() - player.getX();
+                    double d1 = attacker.getZ() - player.getZ();
+                    Vec2 toAttacker = new Vec2((float) d0, (float) d1);
+                    toAttacker = toAttacker.normalized();
+                    toAttacker = toAttacker.scale(SHIELD_BASH_KNOCKBACK);
 
 
-                if (attacker.isPushable()) {
-                    attacker.push(toAttacker.x, SHIELD_BASH_KNOCKBACK_Y, toAttacker.y);
+                    if (attacker.isPushable()) {
+                        attacker.push(toAttacker.x, SHIELD_BASH_KNOCKBACK_Y, toAttacker.y);
+                    }
                 }
             }
 
@@ -122,6 +118,31 @@ public class ModEvents {
                           enchantmentLevel - 1
                   );
                   player.addEffect(speedEffect);
+            }
+
+
+            // Handle Rebirth effects
+            if (event.getBlockedDamage() + shield.getDamageValue() > shield.getMaxDamage()) {
+                Pair<RebirthEnchantment, Integer> rebirthEnchantmentPair = UtilFunctions.getEnchantmentFromItem("rechantment:rebirth", shield, RebirthEnchantment.class);
+                if (rebirthEnchantmentPair != null) {
+                    RebirthEnchantment rebirthEnchantment = rebirthEnchantmentPair.getA();
+                    if (rebirthEnchantment.shouldBeReborn(rebirthEnchantmentPair.getB())) {
+                        event.setShieldTakesDamage(false);
+                        shield.setDamageValue(0);
+                        shield.removeTagKey("RepairCost");
+
+                        Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(shield);
+                        enchantments.remove(rebirthEnchantment);
+                        enchantments.put(ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation("rechantment:reborn")), 1);
+                        EnchantmentHelper.setEnchantments(enchantments, shield);
+
+                        UtilFunctions.triggerRebirthClientEffects(player, (ServerLevel) player.level(), shield);
+                    } else {
+                        player.sendSystemMessage(Component.literal("Your item failed to be reborn!").withStyle(ChatFormatting.RED));
+                    }
+                }
+
+
             }
 
         }
@@ -592,29 +613,41 @@ public class ModEvents {
         @SubscribeEvent
         public static void onItemBreak(PlayerDestroyItemEvent event) {
             Player player = event.getEntity();
-            ItemStack brokenItem = event.getOriginal();
+
+            ItemStack brokenItem = event.getOriginal().copy();
+
+
+            System.out.println("Broken item: " + brokenItem);
+            System.out.println("Broken item tag: " + brokenItem.getTag());
+
             Pair<RebirthEnchantment, Integer> rebirthEnchantmentPair = UtilFunctions.getEnchantmentFromItem("rechantment:rebirth", brokenItem, RebirthEnchantment.class);
 
-            if (rebirthEnchantmentPair == null) return;
+            if (rebirthEnchantmentPair == null || brokenItem.getItem() instanceof ShieldItem) return;
             RebirthEnchantment rebirthEnchantment = rebirthEnchantmentPair.getA();
 
             // Item is reborn
             if (rebirthEnchantment.shouldBeReborn(rebirthEnchantmentPair.getB())) {
-                brokenItem.removeTagKey("Damage");
+                if (brokenItem.getTag() != null)
+                    brokenItem.getTag().putInt("Damage", 0);
                 brokenItem.removeTagKey("RepairCost");
 
                 Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(brokenItem);
                 enchantments.remove(rebirthEnchantment);
                 enchantments.put(ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation("rechantment:reborn")), 1);
                 EnchantmentHelper.setEnchantments(enchantments, brokenItem);
-                UtilFunctions.triggerRebirthClientEffects(player,(ServerLevel) player.level(), brokenItem);
 
-                int slot = player.getInventory().selected;
-                if (player.getInventory().getItem(slot).isEmpty()) {
-                    player.getInventory().setItem(slot, brokenItem);
+
+                int selectedSlot = player.getInventory().selected;
+
+
+                if (player.getInventory().getItem(selectedSlot).isEmpty()) {
+                    player.getInventory().setItem(selectedSlot, brokenItem);
                 } else {
                     player.drop(brokenItem, false); // Drop the item if the slot is occupied
                 }
+
+
+                UtilFunctions.triggerRebirthClientEffects(player,(ServerLevel) player.level(), brokenItem);
             }
 
             // Send fail message
@@ -622,5 +655,6 @@ public class ModEvents {
                 player.sendSystemMessage(Component.literal("Your item failed to be reborn!").withStyle(ChatFormatting.RED));
             }
         }
+
     }
 }
