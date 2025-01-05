@@ -539,12 +539,34 @@ public class ModEvents {
             }
         }
 
+        // TODO: make armor work with rebirth, have no idea how
+        // Maybe by checking if the durability of armor is less than 1
+        @SubscribeEvent
+        public static void onArmorBreak(LivingDamageEvent event) {
+
+            if (event.getEntity() instanceof Player player) {
+
+                for (ItemStack armorPiece : player.getArmorSlots()) { // Armor slots are 0 to 3
+                    System.out.println(armorPiece);
+                    if (!armorPiece.isEmpty() && armorPiece.getMaxDamage() > 0) {
+                        System.out.println("Found armor!");
+                        // Check if the armor piece is broken or nearly broken
+                        if (armorPiece.getDamageValue() >= armorPiece.getMaxDamage()) {
+                            System.out.println("Armor piece in slot"+ " is broken!");
+                            // Handle logic for when the armor breaks (e.g., trigger effects, drop item)
+                        }
+                    }
+                }
+            }
+        }
+
         @SubscribeEvent
         public static void onArmorEquip(LivingEquipmentChangeEvent event) {
             if (event.getSlot().getType() != EquipmentSlot.Type.ARMOR) return;
             if (!(event.getEntity() instanceof  Player player)) return;
 
             ItemStack newArmor = event.getTo();
+            ItemStack oldArmor = event.getFrom();
             Pair<OverloadEnchantment, Integer> overloadEnchantment = UtilFunctions.getEnchantmentFromItem(
                     "rechantment:overload",
                     newArmor,
