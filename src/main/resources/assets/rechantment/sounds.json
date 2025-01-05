@@ -4,5 +4,12 @@
     "sounds": [
         "rechantment:enchanted_book_fail"
     ]
+  },
+
+  "rebirth_item": {
+    "subtitles": "sounds.rechantment.rebirth_item",
+    "sounds": [
+      "rechantment:rebirth_item"
+    ]
   }
 }

@@ -8,8 +8,12 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -22,11 +26,17 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
+import net.tagtart.rechantment.event.ParticleEmitter;
+import net.tagtart.rechantment.sound.ModSounds;
 import org.joml.Matrix4f;
 import oshi.util.tuples.Pair;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class UtilFunctions {
     // Utility method to wrap text into lines
@@ -313,6 +323,23 @@ public class UtilFunctions {
 
         return result.toString();
     }
+
+
+    // TODO: needs to account for whatever item breaks, not main hand item.
+    public static void triggerRebirthClientEffects(Player player, ServerLevel level, ItemStack itemToActivate) {
+        SimpleParticleType[] particlesArray = new SimpleParticleType[] {
+                ParticleTypes.SOUL_FIRE_FLAME,
+                ParticleTypes.FIREWORK,
+                ParticleTypes.ENCHANT,
+                ParticleTypes.ENCHANTED_HIT,
+
+        };
+        ParticleEmitter.emitParticlesOverTime(player, level, 100, 60, particlesArray);
+        Minecraft.getInstance().gameRenderer.displayItemActivation(itemToActivate);
+        level.playSound(null,  player.blockPosition(), ModSounds.REBIRTH_ITEM.get(), SoundSource.PLAYERS, 0.7F, 1.0F);
+    }
+
+
 
     public static double clamp(double value, double min, double max) {
         return Math.max(min, Math.min(value, max));

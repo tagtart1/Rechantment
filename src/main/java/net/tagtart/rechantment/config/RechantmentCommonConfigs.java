@@ -272,6 +272,7 @@ public class RechantmentCommonConfigs {
         rarity_4_default_enchantments.add("rechantment:overload|1|1-3|4,2,1");
         rarity_4_default_enchantments.add("minecraft:mending|1|1|1");
         rarity_4_default_enchantments.add("rechantment:thunder_strike|1|1-2|2,1");
+        rarity_4_default_enchantments.add("rechantment:rebirth|1|1-3|1,1,1");
         RARITY_4_ENCHANTMENTS = BUILDER.defineList("enchantments", rarity_4_default_enchantments, s -> s instanceof String);
 
 
@@ -279,7 +280,7 @@ public class RechantmentCommonConfigs {
         BUILDER.pop();
 
         BUILDER.push("Announce Rare Drop List");
-        BUILDER.comment("The game will broadcast a message to all players if a player gets any listed enchantments at the specific level to drop from the enchantment table",
+        BUILDER.comment("The game will broadcast a message to all players if a player gets any listed enchantments within the level range to drop from the enchantment table",
                 "Format: <enchantment>|<level-range>",
                 "Example: minecraft:unbreaking|1-3");
         ArrayList<String> announce_enchantments = new ArrayList<>();

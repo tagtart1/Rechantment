@@ -10,6 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -189,14 +190,14 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
                     BookRarityProperties properties = BookRarityProperties.getAllProperties()[i];
 
                     if (!floorRequirementsMet(properties, cachedFloorBlocksInRange) && !bookshelfRequirementsMet(properties, cachedBookshelvesInRange) && !lapisRequirementsMet(properties)) {
-                        level.playSound(null, player.getOnPos(), ModSounds.ENCHANTED_BOOK_FAIL.get(), SoundSource.PLAYERS, 10f, 1f);
+                        player.playSound(ModSounds.ENCHANTED_BOOK_FAIL.get(), 10f, 1f);
                         break;
                     }
 
                     if (playerInventory.getFreeSlot() == -1) {
                         // Send warning message to player, and close screen.
                         player.closeContainer();
-                        level.playSound(null, player.getOnPos(), ModSounds.ENCHANTED_BOOK_FAIL.get(), SoundSource.PLAYERS, 10f, 1f);
+                        player.playSound(ModSounds.ENCHANTED_BOOK_FAIL.get(), 10f, 1f);
 
                         Component translatedMsg = Component.translatable("message.rechantment.inventory_full").withStyle(ChatFormatting.RED);
                         player.sendSystemMessage(translatedMsg);
@@ -206,7 +207,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
                     if (!expRequirementMet(properties)) {
                         // Also send warning message to player, and close screen.
                         player.closeContainer();
-                        level.playSound(null, player.getOnPos(), ModSounds.ENCHANTED_BOOK_FAIL.get(), SoundSource.PLAYERS, 10f, 1f);
+                        player.playSound(ModSounds.ENCHANTED_BOOK_FAIL.get(), 10f, 1f);
 
                         String translatedMsg = Component.translatable("message.rechantment.insufficient_exp").getString();
                         String argsAdded = String.format(translatedMsg, player.totalExperience, properties.requiredExp);

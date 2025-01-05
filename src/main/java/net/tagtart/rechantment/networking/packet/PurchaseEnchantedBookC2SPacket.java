@@ -1,6 +1,7 @@
 package net.tagtart.rechantment.networking.packet;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
@@ -22,6 +23,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.block.entity.RechantmentTableBlockEntity;
 import net.tagtart.rechantment.item.ModItems;
 import net.tagtart.rechantment.networking.PurchaseBookResultCase;
+import net.tagtart.rechantment.sound.ModSounds;
 import net.tagtart.rechantment.util.BookRarityProperties;
 import net.tagtart.rechantment.util.EnchantmentPoolEntry;
 import net.tagtart.rechantment.util.UtilFunctions;
@@ -185,6 +187,7 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
                         player.drop(chanceGemToGive, false);
                     }
                 }
+
 
                 if (UtilFunctions.shouldAnnounceDrop(randomEnchantment.enchantment, randomEnchantmentLevel)) {
                     String enchantmentFormatted = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(randomEnchantment.enchantment)).getFullname(randomEnchantmentLevel).getString();

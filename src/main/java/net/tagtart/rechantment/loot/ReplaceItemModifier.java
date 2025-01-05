@@ -7,10 +7,12 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.common.loot.LootModifier;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.item.ModItems;
 import net.tagtart.rechantment.util.BookRarityProperties;
 import net.tagtart.rechantment.util.EnchantmentPoolEntry;
@@ -39,6 +41,7 @@ public class ReplaceItemModifier extends LootModifier {
                 CompoundTag rootTag = replacementBook.getOrCreateTag();
                 CompoundTag enchantmentTag = new CompoundTag();
 
+
                 enchantmentTag.putString("id", randomEnchantment.enchantment);
                 enchantmentTag.putInt("lvl", enchantmentLevel);
 
@@ -50,6 +53,9 @@ public class ReplaceItemModifier extends LootModifier {
 
                 generatedLoot.set(i, replacementBook);
             }
+
+            //EnchantmentHelper.getItemEnchantmentLevel(ForgeRegistries.ENCHANTMENTS.)
+            // check if the item has mending, remove it, and set back its enchants using the config, make a new file and config the setting
         }
         return generatedLoot;
     }

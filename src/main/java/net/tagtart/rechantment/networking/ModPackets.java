@@ -10,7 +10,7 @@ import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.networking.packet.EnchantItemC2SPacket;
 import net.tagtart.rechantment.networking.packet.OpenEnchantTableScreenC2SPacket;
 import net.tagtart.rechantment.networking.packet.PurchaseEnchantedBookC2SPacket;
-import net.tagtart.rechantment.networking.packet.SyncEnchantItemS2CPacket;
+import net.tagtart.rechantment.networking.packet.ActivateItemS2CPacket;
 
 // EVERYTHING IN HERE IS NOT USED CURRENTLY, JUST BOILERPLATE
 public class ModPackets {
@@ -38,10 +38,10 @@ public class ModPackets {
                 .consumerMainThread(EnchantItemC2SPacket::handle)
                 .add();
 
-        net.messageBuilder(SyncEnchantItemS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(SyncEnchantItemS2CPacket::new)
-                .encoder(SyncEnchantItemS2CPacket::toBytes)
-                .consumerMainThread(SyncEnchantItemS2CPacket::handle)
+        net.messageBuilder(ActivateItemS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(ActivateItemS2CPacket::new)
+                .encoder(ActivateItemS2CPacket::toBytes)
+                .consumerMainThread(ActivateItemS2CPacket::handle)
                 .add();
 
         net.messageBuilder(PurchaseEnchantedBookC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
