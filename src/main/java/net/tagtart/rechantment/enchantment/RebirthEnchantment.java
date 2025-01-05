@@ -26,6 +26,8 @@ public class RebirthEnchantment extends Enchantment {
         return 3;
     }
 
+
+
     public boolean shouldBeReborn(int level) {
         return isSuccess(level);
     }

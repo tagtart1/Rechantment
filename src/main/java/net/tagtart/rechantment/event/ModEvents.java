@@ -49,6 +49,8 @@ import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -243,16 +245,6 @@ public class ModEvents {
         // Telepathy, Vein Miner, Timber, Wisdom Enchantments - Blocks
         @SubscribeEvent
         public static void onBlockBreak(BlockEvent.BreakEvent event) {
-            SimpleParticleType[] particlesArray = new SimpleParticleType[] {
-                    ParticleTypes.SOUL_FIRE_FLAME,
-                    ParticleTypes.FIREWORK,
-                    ParticleTypes.ENCHANT,
-                    ParticleTypes.ENCHANTED_HIT,
-
-            };
-            ParticleEmitter.emitParticlesOverTime(event.getPlayer(),(ServerLevel) event.getPlayer().level(), 100, 60, particlesArray);
-            Minecraft.getInstance().gameRenderer.displayItemActivation(event.getPlayer().getMainHandItem());
-            // event.getPlayer().level().playSound(null,  event.getPlayer().blockPosition(), ModSounds.REBIRTH_ITEM.get(), SoundSource.PLAYERS, 0.7F, 1.0F);
             if (event.getPlayer().level().isClientSide()) return;
 
             // For enchantment table replacement inventory, this is necessary since it isn't tied to a custom block, just an entity.
@@ -581,6 +573,40 @@ public class ModEvents {
             // Turn off vanilla enchanted book from applying
             if (left.getItem() instanceof EnchantedBookItem || right.getItem() instanceof EnchantedBookItem) {
                 event.setCanceled(true);
+            }
+        }
+
+        @SubscribeEvent
+        public static void onItemBreak(PlayerDestroyItemEvent event) {
+            Player player = event.getEntity();
+            ItemStack brokenItem = event.getOriginal();
+            Pair<RebirthEnchantment, Integer> rebirthEnchantmentPair = UtilFunctions.getEnchantmentFromItem("rechantment:rebirth", brokenItem, RebirthEnchantment.class);
+
+            if (rebirthEnchantmentPair == null) return;
+            RebirthEnchantment rebirthEnchantment = rebirthEnchantmentPair.getA();
+
+            // Item is reborn
+            if (rebirthEnchantment.shouldBeReborn(rebirthEnchantmentPair.getB())) {
+                brokenItem.removeTagKey("Damage");
+                brokenItem.removeTagKey("RepairCost");
+                brokenItem.getOrCreateTag().putBoolean("Reborn", true);
+
+                Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(brokenItem);
+                enchantments.remove(rebirthEnchantment);
+                EnchantmentHelper.setEnchantments(enchantments, brokenItem);
+                UtilFunctions.triggerRebirthClientEffects(player,(ServerLevel) player.level());
+
+                int slot = player.getInventory().selected;
+                if (player.getInventory().getItem(slot).isEmpty()) {
+                    player.getInventory().setItem(slot, brokenItem);
+                } else {
+                    player.drop(brokenItem, false); // Drop the item if the slot is occupied
+                }
+            }
+
+            // Send fail message
+            else {
+                player.sendSystemMessage(Component.literal("Your item failed to be reborn!").withStyle(ChatFormatting.RED));
             }
         }
     }

@@ -272,6 +272,7 @@ public class RechantmentCommonConfigs {
         rarity_4_default_enchantments.add("rechantment:overload|1|1-3|4,2,1");
         rarity_4_default_enchantments.add("minecraft:mending|1|1|1");
         rarity_4_default_enchantments.add("rechantment:thunder_strike|1|1-2|2,1");
+        rarity_4_default_enchantments.add("rechantment:rebirth|1|1-3|1,1,1");
         RARITY_4_ENCHANTMENTS = BUILDER.defineList("enchantments", rarity_4_default_enchantments, s -> s instanceof String);
 
 
