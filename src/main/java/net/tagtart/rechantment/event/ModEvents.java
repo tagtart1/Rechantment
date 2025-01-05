@@ -120,31 +120,6 @@ public class ModEvents {
                   player.addEffect(speedEffect);
             }
 
-
-            // Handle Rebirth effects
-            if (event.getBlockedDamage() + shield.getDamageValue() > shield.getMaxDamage()) {
-                Pair<RebirthEnchantment, Integer> rebirthEnchantmentPair = UtilFunctions.getEnchantmentFromItem("rechantment:rebirth", shield, RebirthEnchantment.class);
-                if (rebirthEnchantmentPair != null) {
-                    RebirthEnchantment rebirthEnchantment = rebirthEnchantmentPair.getA();
-                    if (rebirthEnchantment.shouldBeReborn(rebirthEnchantmentPair.getB())) {
-                        event.setShieldTakesDamage(false);
-                        shield.setDamageValue(0);
-                        shield.removeTagKey("RepairCost");
-
-                        Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(shield);
-                        enchantments.remove(rebirthEnchantment);
-                        enchantments.put(ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation("rechantment:reborn")), 1);
-                        EnchantmentHelper.setEnchantments(enchantments, shield);
-
-                        UtilFunctions.triggerRebirthClientEffects(player, (ServerLevel) player.level(), shield);
-                    } else {
-                        player.sendSystemMessage(Component.literal("Your item failed to be reborn!").withStyle(ChatFormatting.RED));
-                    }
-                }
-
-
-            }
-
         }
 
         @SubscribeEvent
@@ -576,6 +551,8 @@ public class ModEvents {
                     OverloadEnchantment.class
             );
 
+
+
             if (overloadEnchantment != null) {
 
                 float newMaxHealth =  overloadEnchantment.getA().getMaxHealthTier(overloadEnchantment.getB());
@@ -614,19 +591,16 @@ public class ModEvents {
         public static void onItemBreak(PlayerDestroyItemEvent event) {
             Player player = event.getEntity();
 
-            ItemStack brokenItem = event.getOriginal().copy();
-
-
-            System.out.println("Broken item: " + brokenItem);
-            System.out.println("Broken item tag: " + brokenItem.getTag());
+            ItemStack brokenItem = event.getOriginal();
 
             Pair<RebirthEnchantment, Integer> rebirthEnchantmentPair = UtilFunctions.getEnchantmentFromItem("rechantment:rebirth", brokenItem, RebirthEnchantment.class);
 
-            if (rebirthEnchantmentPair == null || brokenItem.getItem() instanceof ShieldItem) return;
+            if (rebirthEnchantmentPair == null)  return;
             RebirthEnchantment rebirthEnchantment = rebirthEnchantmentPair.getA();
 
             // Item is reborn
             if (rebirthEnchantment.shouldBeReborn(rebirthEnchantmentPair.getB())) {
+
                 if (brokenItem.getTag() != null)
                     brokenItem.getTag().putInt("Damage", 0);
                 brokenItem.removeTagKey("RepairCost");
@@ -639,15 +613,24 @@ public class ModEvents {
 
                 int selectedSlot = player.getInventory().selected;
 
-
-                if (player.getInventory().getItem(selectedSlot).isEmpty()) {
-                    player.getInventory().setItem(selectedSlot, brokenItem);
+                if (brokenItem.getItem() instanceof ShieldItem) {
+                    if(!player.addItem(brokenItem)) {
+                        player.drop(brokenItem, false);
+                    }
+                    ItemStack enchantedShield = new ItemStack(Items.SHIELD);
+                    enchantedShield.enchant(Enchantments.UNBREAKING, 1);
+                    UtilFunctions.triggerRebirthClientEffects(player,(ServerLevel) player.level(), enchantedShield);
                 } else {
-                    player.drop(brokenItem, false); // Drop the item if the slot is occupied
+
+                    if (player.getInventory().getItem(selectedSlot).isEmpty()) {
+                        player.getInventory().setItem(selectedSlot, brokenItem);
+                    } else {
+                        player.drop(brokenItem, false); // Drop the item if the slot is occupied
+                    }
+                    UtilFunctions.triggerRebirthClientEffects(player,(ServerLevel) player.level(), brokenItem);
                 }
 
 
-                UtilFunctions.triggerRebirthClientEffects(player,(ServerLevel) player.level(), brokenItem);
             }
 
             // Send fail message
@@ -655,6 +638,5 @@ public class ModEvents {
                 player.sendSystemMessage(Component.literal("Your item failed to be reborn!").withStyle(ChatFormatting.RED));
             }
         }
-
     }
 }

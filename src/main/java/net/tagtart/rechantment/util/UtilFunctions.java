@@ -325,7 +325,6 @@ public class UtilFunctions {
     }
 
 
-    // TODO: needs to account for whatever item breaks, not main hand item.
     public static void triggerRebirthClientEffects(Player player, ServerLevel level, ItemStack itemToActivate) {
         SimpleParticleType[] particlesArray = new SimpleParticleType[] {
                 ParticleTypes.SOUL_FIRE_FLAME,
