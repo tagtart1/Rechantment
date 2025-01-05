@@ -313,4 +313,30 @@ public class UtilFunctions {
 
         return result.toString();
     }
+
+    public static double clamp(double value, double min, double max) {
+        return Math.max(min, Math.min(value, max));
+    }
+
+    public static float inverseLerp(float a, float b, float value) {
+        if (a == b) {
+            return 0.0f;
+        }
+        return (value - a) / (b - a);
+    }
+
+    public static double inverseLerp(double a, double b, double value) {
+        if (a == b) {
+            return 0.0f;
+        }
+        return (value - a) / (b - a);
+    }
+
+    public static float lerp(float min, float max, float t) {
+        return min + (max - min) * t;
+    }
+
+    public static double lerp(double min, double max, double t) {
+        return min + (max - min) * t;
+    }
 }

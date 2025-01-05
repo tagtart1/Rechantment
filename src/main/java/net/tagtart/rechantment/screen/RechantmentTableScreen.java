@@ -49,7 +49,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
     private static final ResourceLocation TEXTURE =
             new ResourceLocation(Rechantment.MOD_ID, "textures/gui/enchantment_table.png");
 
-    private ArrayList<HoverableEnchantedBookGuiRenderable> hoverables;
+    private ArrayList<HoverableWithTooltipGuiRenderable> hoverables;
 
     public Inventory playerInventory;
 
@@ -86,11 +86,11 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
 
         hoverables = new ArrayList<>();
 
-        hoverables.add(new HoverableEnchantedBookGuiRenderable(() -> getEnchantTableTooltipLines(0), 0, leftPos + 10, topPos + 44));
-        hoverables.add(new HoverableEnchantedBookGuiRenderable(() -> getEnchantTableTooltipLines(1),1,leftPos + 150, topPos + 44));
-        hoverables.add(new HoverableEnchantedBookGuiRenderable(() -> getEnchantTableTooltipLines(2),2, leftPos + 43,  topPos + 41));
-        hoverables.add(new HoverableEnchantedBookGuiRenderable(() -> getEnchantTableTooltipLines(3),3, leftPos + 116, topPos + 41));
-        hoverables.add(new HoverableEnchantedBookGuiRenderable(() -> getEnchantTableTooltipLines(4),4,  leftPos + 79, topPos + 38));
+        hoverables.add(new HoverableWithTooltipGuiRenderable(() -> getEnchantTableTooltipLines(0), BookRarityProperties.getAllProperties()[0].iconResourceLocation, leftPos + 10, topPos + 44));
+        hoverables.add(new HoverableWithTooltipGuiRenderable(() -> getEnchantTableTooltipLines(1),BookRarityProperties.getAllProperties()[1].iconResourceLocation,leftPos + 150, topPos + 44));
+        hoverables.add(new HoverableWithTooltipGuiRenderable(() -> getEnchantTableTooltipLines(2),BookRarityProperties.getAllProperties()[2].iconResourceLocation, leftPos + 43,  topPos + 41));
+        hoverables.add(new HoverableWithTooltipGuiRenderable(() -> getEnchantTableTooltipLines(3),BookRarityProperties.getAllProperties()[3].iconResourceLocation, leftPos + 116, topPos + 41));
+        hoverables.add(new HoverableWithTooltipGuiRenderable(() -> getEnchantTableTooltipLines(4),BookRarityProperties.getAllProperties()[4].iconResourceLocation,  leftPos + 79, topPos + 38));
 
         // Diffuse textures for line shader effect.
         // Indices are offset by 1 for efficiency; empty/no effect is index zero.
@@ -133,7 +133,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
                 // Update tooltip line if it's being hovered over currently as well
                 // This will account for destroyed blocks shortly after destroyed if user is still hovering for tooltip.
                 if (i < hoverables.size()) {
-                    HoverableEnchantedBookGuiRenderable hoverable = hoverables.get(i);
+                    HoverableWithTooltipGuiRenderable hoverable = hoverables.get(i);
                     if (hoverable.isMouseOverlapped(pMouseX, pMouseY)) {
                         hoverable.updateTooltipLines();
                     }
@@ -183,9 +183,10 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
             Player player = playerInventory.player;
             Level level = player.level();
 
-            for (HoverableEnchantedBookGuiRenderable hoverable : hoverables) {
+            for (int i = 0; i < hoverables.size(); ++i) {
+                HoverableWithTooltipGuiRenderable hoverable = hoverables.get(i);
                 if (hoverable.tryClickMouse(pMouseX, pMouseY, pButton)) {
-                    BookRarityProperties properties = BookRarityProperties.getAllProperties()[hoverable.propertiesIndex];
+                    BookRarityProperties properties = BookRarityProperties.getAllProperties()[i];
 
                     if (!floorRequirementsMet(properties, cachedFloorBlocksInRange) && !bookshelfRequirementsMet(properties, cachedBookshelvesInRange) && !lapisRequirementsMet(properties)) {
                         level.playSound(null, player.getOnPos(), ModSounds.ENCHANTED_BOOK_FAIL.get(), SoundSource.PLAYERS, 10f, 1f);
@@ -215,7 +216,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
                     }
 
                     // At this point, they meet the requirements. Can try to send a packet to server!
-                    ModPackets.sentToServer(new PurchaseEnchantedBookC2SPacket(hoverable.propertiesIndex, menu.blockEntity.getBlockPos()));
+                    ModPackets.sentToServer(new PurchaseEnchantedBookC2SPacket(i, menu.blockEntity.getBlockPos()));
                     hoverable.updateTooltipLines();
                     return true;
                 }
@@ -224,11 +225,12 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         else if (pButton == 1) {
 
             // On right click, open loot table display screen.
-            for (HoverableEnchantedBookGuiRenderable hoverable : hoverables) {
+            for (int i = 0; i < hoverables.size(); ++i) {
+                HoverableWithTooltipGuiRenderable hoverable = hoverables.get(i);
                 if (hoverable.tryClickMouse(pMouseX, pMouseY, pButton)) {
 
                     // Need to open from server so that menu info is based on server.
-                    ModPackets.sentToServer(new OpenEnchantTableScreenC2SPacket(1, hoverable.propertiesIndex, menu.blockEntity.getBlockPos()));
+                    ModPackets.sentToServer(new OpenEnchantTableScreenC2SPacket(1, i, menu.blockEntity.getBlockPos()));
                 }
             }
         }

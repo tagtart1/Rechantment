@@ -33,6 +33,9 @@ public class HoverableGuiRenderable implements Renderable {
     protected int renderUVOffsetU = 0;
     protected int renderUVOffsetV = 0;
 
+    // A uniform scale factor in all axes
+    public float scaleFac = 1.0f;
+
     protected ArrayList<Component> customTooltipLines;
     protected boolean hoveredLastFrame  = false;
     protected boolean hoveredThisFrame  = false;
@@ -66,15 +69,19 @@ public class HoverableGuiRenderable implements Renderable {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, renderTexture);
 
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().scale(scaleFac, scaleFac, scaleFac);
+
         if (renderDefaultTexture)
             guiGraphics.blit(renderTexture, renderOffsetPosX, renderOffsetPosY, renderUVOffsetU, renderUVOffsetV, imageViewWidth, imageViewHeight, imageWidth, imageHeight);
+
+        guiGraphics.pose().popPose();
 
         hoveredThisFrame = isMouseOverlapped(mouseX, mouseY);
         if (hoveredThisFrame) {
             if (!hoveredLastFrame) {
                 onHoverStart();
             }
-            renderCustomTooltip(guiGraphics, mouseX, mouseY);
         }
         else {
             if (hoveredLastFrame) {
@@ -146,18 +153,12 @@ public class HoverableGuiRenderable implements Renderable {
         return false;
     }
 
-    protected void renderCustomTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (!customTooltipLines.isEmpty()) {
-            guiGraphics.renderTooltip(Minecraft.getInstance().font, customTooltipLines, Optional.empty(), mouseX, mouseY);
-        }
-    }
-
     // Uses point intersection with 2D AABB to determine if mouse is over the renderable.
     public boolean isMouseOverlapped(int mouseX, int mouseY) {
-        int minX = renderOffsetPosX;
-        int minY = renderOffsetPosY;
-        int maxX = renderOffsetPosX + imageViewHeight;
-        int maxY = renderOffsetPosY + imageViewWidth;
+        float minX = renderOffsetPosX * scaleFac;
+        float minY = renderOffsetPosY * scaleFac;
+        float maxX = (renderOffsetPosX + imageViewHeight) * scaleFac;
+        float maxY = (renderOffsetPosY + imageViewWidth) * scaleFac;
 
         return minX <= mouseX && maxX >= mouseX && minY <= mouseY && maxY >= mouseY;
     }

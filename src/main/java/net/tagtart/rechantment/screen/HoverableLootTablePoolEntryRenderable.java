@@ -3,68 +3,173 @@ package net.tagtart.rechantment.screen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.item.custom.EnchantedBookItem;
+import net.tagtart.rechantment.util.BookRarityProperties;
+import net.tagtart.rechantment.util.EnchantmentPoolEntry;
+import net.tagtart.rechantment.util.UtilFunctions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HoverableLootTablePoolEntryRenderable extends HoverableGuiRenderable{
 
     private static final ResourceLocation TABLE_ENTRY_BOX_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/gui/enchant_table_loot_pool_entry_box.png");
+    private static final ResourceLocation INFO_ICON_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/gui/info_button.png");
 
     private final int enchantmentInfoOffsetY = 13;
+    private HoverableWithTooltipGuiRenderable nestedInfoHoverable;
 
-    private int propertiesIndex = 0;
+    private int propertiesIndex;
+    private RechantmentTablePoolDisplayScreen screen;
+    private EnchantmentPoolEntry poolEntry;
     private Font renderFont;
 
-    public HoverableLootTablePoolEntryRenderable(Font pRenderFont, int pPropertiesIndex, int posX, int posY) {
+    // All these strings are cached for rendering pool info:
+    private Enchantment enchantment;
+    private String iconList;
+    private String enchantmentName;
+    private String enchantmentDropRate;
+    private ArrayList<String> levelDropRates;
+
+    public int scrollOffset = 0;
+
+    public HoverableLootTablePoolEntryRenderable(RechantmentTablePoolDisplayScreen pScreen, Font pFont, EnchantmentPoolEntry pPoolEntry, int pPropertiesIndex, int posX, int posY) {
         super(TABLE_ENTRY_BOX_LOCATION, posX, posY);
         propertiesIndex = pPropertiesIndex;
-        renderFont = pRenderFont;
+        screen = pScreen;
+        renderFont = pFont;
+        poolEntry = pPoolEntry;
 
         imageWidth = 144;
         imageHeight = 51;
         imageViewWidth = imageWidth;
         imageViewHeight = imageHeight;
-        renderDefaultTexture = true;
+        renderDefaultTexture = false;
+
+        // Position of this adjusts with text
+        nestedInfoHoverable = new HoverableWithTooltipGuiRenderable(this::infoIconTooltip, INFO_ICON_LOCATION, renderOffsetPosX, getEntryLabelOffsetY());
+        nestedInfoHoverable.imageWidth = 9;
+        nestedInfoHoverable.imageHeight = 9;
+        nestedInfoHoverable.imageViewWidth = 9;
+        nestedInfoHoverable.imageViewHeight = 9;
+        nestedInfoHoverable.tooltipEnabled = false;  // Manually rendering tooltip later due to scissoring conflicts.
+
+        levelDropRates = new ArrayList<>();
+        generatePoolEntryInfo();
     }
+
+    protected ArrayList<Component> infoIconTooltip() {
+        ArrayList<Component> retVal = new ArrayList<>();
+
+        String[] enchantmentInfo = poolEntry.enchantment.split(":");
+        Component translatable = Component.translatable("enchantment." + enchantmentInfo[0] + "." + enchantmentInfo[1] + ".description");
+        String resolvedText = translatable.getString();
+        List<String> splitText = UtilFunctions.wrapText(resolvedText, 165);
+        for (String line : splitText) {
+            retVal.add(Component.literal(line.trim()));
+        }
+
+        return retVal;
+    }
+
+    protected void generatePoolEntryInfo() {
+        enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(poolEntry.enchantment));
+        if (enchantment == null) {
+            iconList = "";
+            enchantmentName = "Invalid:Enchantment!";
+            enchantmentDropRate = "-";
+            levelDropRates.add("-");
+            return;
+        }
+        String nameID = enchantment.getDescriptionId();
+        enchantmentName = Component.translatable(nameID).getString();
+        enchantmentDropRate = String.format("%6.2f%%", ((float)poolEntry.weight / getBookProperties().enchantmentPoolTotalWeights) * 100.0f);
+        iconList = EnchantedBookItem.getApplicableIcons(enchantment).getString();
+        for (int i = 0; i < poolEntry.levelWeights.size(); ++i) {
+            levelDropRates.add(String.format("%6.2f%%", ((float)poolEntry.levelWeights.get(i) / poolEntry.levelWeightsSum) * 100.0f));
+        }
+    }
+
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         super.render(guiGraphics, mouseX, mouseY, delta);
 
+        guiGraphics.blitNineSlicedSized(renderTexture, renderOffsetPosX, renderOffsetPosY - scrollOffset, imageWidth, getEntryLabelBottomY(), 2, imageWidth, imageHeight, 0, 0, imageWidth, imageHeight);
+
         guiGraphics.pose().pushPose();
         float scaleFac = 0.75f;
         float invScaleFac = 1.0f / scaleFac;
         guiGraphics.pose().scale(scaleFac, scaleFac, scaleFac);
-        guiGraphics.drawString(renderFont, "Thunder Strike", (renderOffsetPosX + 3) * invScaleFac, (getEntryLabelOffsetY()) * invScaleFac, 0xFFFFFF, true);
-        renderFont.drawInBatch("Thunder Strike", (renderOffsetPosX + 3) * invScaleFac, (getEntryLabelOffsetY()) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
-        renderFont.drawInBatch("10.0%", (renderOffsetPosX + 119) * invScaleFac, (getEntryLabelOffsetY()) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
-        renderFont.drawInBatch("______________________________", (renderOffsetPosX + 3) * invScaleFac, (renderOffsetPosY + 15) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
-        renderFont.drawInBatch("______________________________", (renderOffsetPosX + 4) * invScaleFac, (renderOffsetPosY + 15) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
-        renderFont.drawInBatch(EnchantedBookItem.getApplicableIcons(Enchantments.UNBREAKING), (renderOffsetPosX + 3) * invScaleFac, (renderOffsetPosY + 5) * invScaleFac, 0x222222, false, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
-        renderFont.drawInBatch(EnchantedBookItem.getApplicableIcons(Enchantments.UNBREAKING), (renderOffsetPosX + 2) * invScaleFac, (renderOffsetPosY + 4) * invScaleFac, 0xFFFFFF, false, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
+
+        int extraNameOffset = 0;
+        if (displayShortenedVersion()) {
+            extraNameOffset = 2;
+        }
+        guiGraphics.drawString(renderFont, enchantmentName, (renderOffsetPosX + 3) * invScaleFac, (getEntryLabelOffsetY() + extraNameOffset) * invScaleFac, 0xFFFFFF, true);
+        renderFont.drawInBatch(enchantmentName, (renderOffsetPosX + 3) * invScaleFac, (getEntryLabelOffsetY() + extraNameOffset) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
+
+        renderFont.drawInBatch(enchantmentDropRate, (renderOffsetPosX + 114) * invScaleFac, (getEntryLabelOffsetY() + extraNameOffset) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
+        if (!displayShortenedVersion()) {
+            renderFont.drawInBatch("______________________________", (renderOffsetPosX + 3) * invScaleFac, (getEntryLabelOffsetY() + 2) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
+            renderFont.drawInBatch("______________________________", (renderOffsetPosX + 4) * invScaleFac, (getEntryLabelOffsetY() + 2) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
+        }
+        renderFont.drawInBatch(iconList, (renderOffsetPosX + 2.7f) * invScaleFac, (getEntryLabelOffsetY() - 8) * invScaleFac, 0x222222, false, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
+        renderFont.drawInBatch(iconList, (renderOffsetPosX + 2.2f) * invScaleFac, (getEntryLabelOffsetY() - 9) * invScaleFac, 0xFFFFFF, false, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
         guiGraphics.pose().popPose();
 
-        guiGraphics.pose().pushPose();
+
         scaleFac = 0.5f;
         invScaleFac = 1.0f / scaleFac;
-        guiGraphics.pose().scale(scaleFac, scaleFac, scaleFac);
-        renderFont.drawInBatch("I:", (renderOffsetPosX + 5) * invScaleFac, (getEntryLabelOffsetY() + 10) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
-        renderFont.drawInBatch("25.0%", (renderOffsetPosX + 124) * invScaleFac, (getEntryLabelOffsetY() + 10) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
-        renderFont.drawInBatch("II:", (renderOffsetPosX + 5) * invScaleFac, (getEntryLabelOffsetY() + 15) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
-        renderFont.drawInBatch("25.0%", (renderOffsetPosX + 124) * invScaleFac, (getEntryLabelOffsetY() + 15) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
-        renderFont.drawInBatch("III:", (renderOffsetPosX + 5) * invScaleFac, (getEntryLabelOffsetY() + 20) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
-        renderFont.drawInBatch("25.0%", (renderOffsetPosX + 124) * invScaleFac, (getEntryLabelOffsetY() + 20) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
-        renderFont.drawInBatch("IV:", (renderOffsetPosX + 5) * invScaleFac, (getEntryLabelOffsetY() + 25) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
-        renderFont.drawInBatch("25.0%", (renderOffsetPosX + 124) * invScaleFac, (getEntryLabelOffsetY() + 25) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
-        renderFont.drawInBatch("V:", (renderOffsetPosX + 5) * invScaleFac, (getEntryLabelOffsetY() + 30) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
-        renderFont.drawInBatch("25.0%", (renderOffsetPosX + 124) * invScaleFac, (getEntryLabelOffsetY() + 30) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
+        if (!displayShortenedVersion()) {
 
-        guiGraphics.pose().popPose();
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().scale(scaleFac, scaleFac, scaleFac);
+            for (int i = 0; i < levelDropRates.size(); ++i) {
+
+                String roman = UtilFunctions.intToRoman(poolEntry.potentialLevels.get(i)) + ":";
+                renderFont.drawInBatch(roman, (renderOffsetPosX + 5) * invScaleFac, (getEntryLabelOffsetY() + ((i + 2) * 5)) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
+                renderFont.drawInBatch(levelDropRates.get(i), (renderOffsetPosX + 121) * invScaleFac, (getEntryLabelOffsetY() + ((i  + 2) * 5)) * invScaleFac, 0xFFFFFF, true, guiGraphics.pose().last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL, 0, 0xF000F0);
+            }
+            guiGraphics.pose().popPose();
+        }
+        guiGraphics.flush();
+
+        guiGraphics.disableScissor();
+        float infoIconOffset = renderFont.width(enchantmentName) * 0.75f;
+        nestedInfoHoverable.scaleFac = scaleFac;
+        nestedInfoHoverable.renderOffsetPosX = (int)((renderOffsetPosX + infoIconOffset + 4) * invScaleFac);
+        nestedInfoHoverable.renderOffsetPosY = (int)((getEntryLabelOffsetY() + extraNameOffset) * invScaleFac);
+        nestedInfoHoverable.renderCustomTooltip(guiGraphics, mouseX, mouseY);
+        guiGraphics.flush();
+        guiGraphics.enableScissor(screen.getScissorMinX(), screen.getScissorMinY(), screen.getScissorMaxX(), screen.getScissorMaxY());
+        nestedInfoHoverable.render(guiGraphics, mouseX, mouseY, delta);
+    }
+
+    private boolean displayShortenedVersion() {
+        return levelDropRates.size() <= 1 && enchantment.getMaxLevel() <= 1;
+    }
+
+    public int getEntryLabelBottomY() {
+        int baseOffset = 25;// Based on position after where underlines "_______" are rendered.
+        if (displayShortenedVersion())
+            baseOffset -= 6;
+
+        // Give 5 extra pixels for each potential level.
+        return (baseOffset) + (levelDropRates.size() * 5);
     }
 
     private int getEntryLabelOffsetY() {
-        return enchantmentInfoOffsetY + renderOffsetPosY;
+        return (enchantmentInfoOffsetY + renderOffsetPosY) - scrollOffset;
     }
+
+    private BookRarityProperties getBookProperties() {
+        return BookRarityProperties.getAllProperties()[propertiesIndex];
+    }
+
 }
