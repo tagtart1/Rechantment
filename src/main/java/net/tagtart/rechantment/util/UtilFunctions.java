@@ -326,7 +326,7 @@ public class UtilFunctions {
 
 
     // TODO: needs to account for whatever item breaks, not main hand item.
-    public static void triggerRebirthClientEffects(Player player, ServerLevel level ) {
+    public static void triggerRebirthClientEffects(Player player, ServerLevel level, ItemStack itemToActivate) {
         SimpleParticleType[] particlesArray = new SimpleParticleType[] {
                 ParticleTypes.SOUL_FIRE_FLAME,
                 ParticleTypes.FIREWORK,
@@ -335,7 +335,7 @@ public class UtilFunctions {
 
         };
         ParticleEmitter.emitParticlesOverTime(player, level, 100, 60, particlesArray);
-        Minecraft.getInstance().gameRenderer.displayItemActivation(player.getMainHandItem());
+        Minecraft.getInstance().gameRenderer.displayItemActivation(itemToActivate);
         level.playSound(null,  player.blockPosition(), ModSounds.REBIRTH_ITEM.get(), SoundSource.PLAYERS, 0.7F, 1.0F);
     }
 

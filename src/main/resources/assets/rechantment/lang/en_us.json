@@ -89,6 +89,9 @@
   "enchantment.rechantment.rebirth": "Rebirth",
   "enchantment.rechantment.rebirth.description": "Chance to bring your item back from death.",
 
+  "enchantment.rechantment.reborn": "Reborn",
+  "enchantment.rechantment.reborn.description": "Prevents an item from being reborn again.",
+
   "enchantment.minecraft.protection.description": "Reduces most types of damage by increasing amounts.",
   "enchantment.minecraft.fire_protection.description": "Reduces damage and burn time when lit on fire.",
   "enchantment.minecraft.feather_falling.description": "Reduces the damage dealt from falling.",

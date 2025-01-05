@@ -133,48 +133,64 @@ public class ModEvents {
             List<Component> tooltip = event.getToolTip();
 
             if (stack.isEnchanted()) {
-                List<String> sortedEnchantStrings = new ArrayList<>();
+
                 // TODO: make this use the List<EntrySet<Enchantment, Integer>> and then sort it, then set the tooltip that way
                 // This current solution is poop
-                for (Map.Entry<Enchantment, Integer> entry : EnchantmentHelper.getEnchantments(stack).entrySet()) {
-                    Enchantment enchantment = entry.getKey();
-                    int level = entry.getValue();
+                List<Map.Entry<Enchantment, Integer>> enchantsSorted = new ArrayList<>(EnchantmentHelper.getEnchantments(stack).entrySet());
 
-                  // Change to any color you prefer
-
-
-                    String humanReadable = enchantment.getFullname(level).getString();
-
-                    sortedEnchantStrings.add(ForgeRegistries.ENCHANTMENTS.getKey(enchantment).toString() + "~" + humanReadable);
-                }
-
-                sortedEnchantStrings.sort((component1, component2) -> {
-                    String enchantmentRaw1 = component1.split("~")[0];
-                    String enchantmentRaw2 = component2.split("~")[0];
+                enchantsSorted.sort((component1, component2) -> {
+                    String enchantmentRaw1 = ForgeRegistries.ENCHANTMENTS.getKey(component1.getKey()).toString();
+                    String enchantmentRaw2 = ForgeRegistries.ENCHANTMENTS.getKey(component2.getKey()).toString();
 
                     BookRarityProperties rarity1 = UtilFunctions.getPropertiesFromEnchantment(enchantmentRaw1);
                     BookRarityProperties rarity2 = UtilFunctions.getPropertiesFromEnchantment(enchantmentRaw2);
 
-                    float rarityValue1 = (rarity1 == null) ? 99 : rarity1.rarity;
-                    float rarityValue2 = (rarity2 == null) ? 99 : rarity2.rarity;
+                    float rarityValue1 = 0f;
+                    float rarityValue2 = 0f;
+
+                    if (rarity1 == null && component1.getKey().isCurse()) {
+                        rarityValue1 = 99f;
+                    } else if (rarity1 == null && component1.getKey() instanceof RebornEnchantment) {
+                        rarityValue1 = 100f;
+                    } else if (rarity1 != null) {
+                        rarityValue1 = rarity1.rarity;
+                    }
+
+                    if (rarity2 == null && component1.getKey().isCurse()) {
+                        rarityValue2 = 99f;
+                    } else if (rarity2 == null && component1.getKey() instanceof RebornEnchantment) {
+                        rarityValue2 = 100f;
+                    } else if (rarity2 != null) {
+                        rarityValue2 = rarity2.rarity;
+                    }
 
                     return Float.compare(rarityValue2, rarityValue1);
                 });
 
-                for(int i = 1; i <= sortedEnchantStrings.size(); i++) {
-                    String[] splitEnchantment = sortedEnchantStrings.get(i - 1).split("~");
-                    String enchantmentRaw = splitEnchantment[0];
+                for(int i = 1; i <= enchantsSorted.size(); i++) {
+
+                    Map.Entry<Enchantment, Integer> entry = enchantsSorted.get(i - 1);
+
+                    String enchantmentRaw = ForgeRegistries.ENCHANTMENTS.getKey(entry.getKey()).toString();
 
                     BookRarityProperties rarityProperties = UtilFunctions.getPropertiesFromEnchantment(enchantmentRaw);
 
                     Style style = Style.EMPTY;
-                    if (Objects.equals(enchantmentRaw, "minecraft:vanishing_curse") || Objects.equals(enchantmentRaw, "minecraft:binding_curse")) {
+                    if (entry.getKey().isCurse()) {
                         style = Style.EMPTY.withColor(ChatFormatting.RED);
                     }
+
+                    else if (entry.getKey() instanceof RebornEnchantment) {
+                        style = Style.EMPTY.withColor(ChatFormatting.WHITE).withBold(true);
+                    }
+
                     else if (rarityProperties != null) {
                         style = Style.EMPTY.withColor(rarityProperties.color);
                     }
-                    Component modifiedText = Component.literal(splitEnchantment[1]).withStyle(style);
+
+                    String fullEnchantName = entry.getKey().getFullname(entry.getValue()).getString();
+
+                    Component modifiedText = Component.literal(fullEnchantName).withStyle(style);
 
                     tooltip.set(i, modifiedText);
                 }
@@ -589,12 +605,12 @@ public class ModEvents {
             if (rebirthEnchantment.shouldBeReborn(rebirthEnchantmentPair.getB())) {
                 brokenItem.removeTagKey("Damage");
                 brokenItem.removeTagKey("RepairCost");
-                brokenItem.getOrCreateTag().putBoolean("Reborn", true);
 
                 Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(brokenItem);
                 enchantments.remove(rebirthEnchantment);
+                enchantments.put(ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation("rechantment:reborn")), 1);
                 EnchantmentHelper.setEnchantments(enchantments, brokenItem);
-                UtilFunctions.triggerRebirthClientEffects(player,(ServerLevel) player.level());
+                UtilFunctions.triggerRebirthClientEffects(player,(ServerLevel) player.level(), brokenItem);
 
                 int slot = player.getInventory().selected;
                 if (player.getInventory().getItem(slot).isEmpty()) {
