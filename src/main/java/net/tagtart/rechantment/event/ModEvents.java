@@ -142,20 +142,21 @@ public class ModEvents {
                     float rarityValue2 = 0f;
 
                     if (rarity1 == null && component1.getKey().isCurse()) {
-                        rarityValue1 = 99f;
+                        rarityValue1 = 99.0f;
                     } else if (rarity1 == null && component1.getKey() instanceof RebornEnchantment) {
                         rarityValue1 = 100f;
                     } else if (rarity1 != null) {
                         rarityValue1 = rarity1.rarity;
                     }
 
-                    if (rarity2 == null && component1.getKey().isCurse()) {
-                        rarityValue2 = 99f;
-                    } else if (rarity2 == null && component1.getKey() instanceof RebornEnchantment) {
+                    if (rarity2 == null && component2.getKey().isCurse()) {
+                        rarityValue2 = 99.0f;
+                    } else if (rarity2 == null && component2.getKey() instanceof RebornEnchantment) {
                         rarityValue2 = 100f;
                     } else if (rarity2 != null) {
                         rarityValue2 = rarity2.rarity;
                     }
+
 
                     return Float.compare(rarityValue2, rarityValue1);
                 });
@@ -547,12 +548,12 @@ public class ModEvents {
             if (event.getEntity() instanceof Player player) {
 
                 for (ItemStack armorPiece : player.getArmorSlots()) { // Armor slots are 0 to 3
-                    System.out.println(armorPiece);
+                   // System.out.println(armorPiece);
                     if (!armorPiece.isEmpty() && armorPiece.getMaxDamage() > 0) {
-                        System.out.println("Found armor!");
+                      //  System.out.println("Found armor!");
                         // Check if the armor piece is broken or nearly broken
                         if (armorPiece.getDamageValue() >= armorPiece.getMaxDamage()) {
-                            System.out.println("Armor piece in slot"+ " is broken!");
+                         //   System.out.println("Armor piece in slot"+ " is broken!");
                             // Handle logic for when the armor breaks (e.g., trigger effects, drop item)
                         }
                     }
