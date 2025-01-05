@@ -46,19 +46,19 @@ public class ParticleEmitter {
     }
 
     private static void spawnParticlesOnPlayer(Player player, ServerLevel level, SimpleParticleType[] particles) {
-        double speedX = (Math.random() - 0.5) * 2.0; // Random between -1.0 and 1.0
-        double speedY = Math.random() * 1.25;         // Random Y direction between 0 and 1 (you can adjust)
-        double speedZ = (Math.random() - 0.5) * 2.0; // Random between -1.0 and 1.0
+        double speedX = (Math.random() - 0.5) * 2.0;
+        double speedY = Math.random() * 1.25;
+        double speedZ = (Math.random() - 0.5) * 2.0;
         for (ServerPlayer otherPlayer : level.players()) {
             for (SimpleParticleType particle : particles) {
                 level.sendParticles(
                         otherPlayer,
-                        particle,  // Particle type (this one has gravity by default)
+                        particle,  // Particle type
                         true,
-                        player.getX(),                   // X position
+                        player.getX(),
                         player.getY() + 1 ,               // Y position (just above the player)
-                        player.getZ(),                   // Z position
-                        1,                               // Number of particles per spawn (1 per iteration)
+                        player.getZ(),
+                        1,                             // Number of particles per spawn (1 per iteration)
                         speedX,                          // Random speed in X
                         speedY,                          // Random speed in Y
                         speedZ,                          // Random speed in Z

@@ -287,6 +287,7 @@ public class RechantmentCommonConfigs {
         announce_enchantments.add("rechantment:overload|3");
         announce_enchantments.add("rechantment:thunder_strike|2");
         announce_enchantments.add("minecraft:fortune|3");
+        announce_enchantments.add("rechantment:rebirth|1-3");
         ANNOUNCEMENT_ENCHANTMENTS = BUILDER.defineList("announce_enchantments", announce_enchantments, s -> s instanceof String);
 
         BUILDER.pop();

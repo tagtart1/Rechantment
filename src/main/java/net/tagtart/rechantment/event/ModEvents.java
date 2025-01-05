@@ -76,16 +76,15 @@ public class ModEvents {
     @Mod.EventBusSubscriber(modid = Rechantment.MOD_ID)
     public static class ForgeEvents {
 
-        public static float SHIELD_BASH_KNOCKBACK = 1.15f;
-        public static float SHIELD_BASH_KNOCKBACK_Y = 0.4f;
 
-        public static int SHIELD_COURAGE_SPEED_DURATION = 40; // Speed in ticks
-
-        // class to totem particle incase  need to copy
-        //new TotemParticle()
 
         @SubscribeEvent
         public static void onShieldBlock(ShieldBlockEvent event) {
+
+            float SHIELD_BASH_KNOCKBACK = 1.15f;
+            float SHIELD_BASH_KNOCKBACK_Y = 0.4f;
+            int SHIELD_COURAGE_SPEED_DURATION = 40; // Speed in ticks
+
             LivingEntity player = event.getEntity();
             DamageSource source = event.getDamageSource();
             Entity attacker = source.getEntity();
@@ -134,8 +133,6 @@ public class ModEvents {
 
             if (stack.isEnchanted()) {
 
-                // TODO: make this use the List<EntrySet<Enchantment, Integer>> and then sort it, then set the tooltip that way
-                // This current solution is poop
                 List<Map.Entry<Enchantment, Integer>> enchantsSorted = new ArrayList<>(EnchantmentHelper.getEnchantments(stack).entrySet());
 
                 enchantsSorted.sort((component1, component2) -> {
