@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.networking.ModPackets;
@@ -245,18 +246,22 @@ public class RechantmentTablePoolDisplayScreen extends AbstractContainerScreen<R
     private void onClickLeftArrowEvent(double pMouseX, double pMouseY, int pButton) {
         if (pButton == 0) {
             setViewingPropertyIndex(viewingPropertyIndex - 1);
+            Minecraft.getInstance().player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 0.5F, (float)UtilFunctions.remap(0.0, 1.0, 0.8, 1.2, viewingPropertyIndex / 5.0));
         }
     }
 
     private void onClickRightArrowEvent(double pMouseX, double pMouseY, int pButton) {
         if (pButton == 0) {
             setViewingPropertyIndex(viewingPropertyIndex + 1);
+            Minecraft.getInstance().player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 0.5F, (float)UtilFunctions.remap(0.0, 1.0, 0.8, 1.2, viewingPropertyIndex / 5.0));
         }
     }
 
     private void onReleaseBackArrowEvent(double pMouseX, double pMouseY, int pButton) {
         if (pButton == 0 && backArrow.isMouseOverlapped((int)Math.round(pMouseX), (int)Math.round(pMouseY))) {
             ModPackets.sentToServer(new OpenEnchantTableScreenC2SPacket(0, 0, menu.blockEntity.getBlockPos()));
+            Minecraft.getInstance().player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 0.5F, 1.0f);
+
         }
     }
 

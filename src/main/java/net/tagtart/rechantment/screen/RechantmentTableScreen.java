@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -188,16 +189,17 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
                 HoverableWithTooltipGuiRenderable hoverable = hoverables.get(i);
                 if (hoverable.tryClickMouse(pMouseX, pMouseY, pButton)) {
                     BookRarityProperties properties = BookRarityProperties.getAllProperties()[i];
+                    BlockPos pos = menu.blockEntity.getBlockPos();
 
-                    if (!floorRequirementsMet(properties, cachedFloorBlocksInRange) && !bookshelfRequirementsMet(properties, cachedBookshelvesInRange) && !lapisRequirementsMet(properties)) {
-                        player.playSound(ModSounds.ENCHANTED_BOOK_FAIL.get(), 10f, 1f);
+                    if (!floorRequirementsMet(properties, cachedFloorBlocksInRange) || !bookshelfRequirementsMet(properties, cachedBookshelvesInRange) || !lapisRequirementsMet(properties)) {
+                        Minecraft.getInstance().player.playSound(ModSounds.ENCHANTED_BOOK_FAIL.get(), 0.5F, 1.0f);
                         break;
                     }
 
                     if (playerInventory.getFreeSlot() == -1) {
                         // Send warning message to player, and close screen.
                         player.closeContainer();
-                        player.playSound(ModSounds.ENCHANTED_BOOK_FAIL.get(), 10f, 1f);
+                        Minecraft.getInstance().player.playSound(ModSounds.ENCHANTED_BOOK_FAIL.get(), 0.5F, 1.0f);
 
                         Component translatedMsg = Component.translatable("message.rechantment.inventory_full").withStyle(ChatFormatting.RED);
                         player.sendSystemMessage(translatedMsg);
@@ -207,7 +209,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
                     if (!expRequirementMet(properties)) {
                         // Also send warning message to player, and close screen.
                         player.closeContainer();
-                        player.playSound(ModSounds.ENCHANTED_BOOK_FAIL.get(), 10f, 1f);
+                        Minecraft.getInstance().player.playSound(ModSounds.ENCHANTED_BOOK_FAIL.get(), 0.5F, 1.0f);
 
                         String translatedMsg = Component.translatable("message.rechantment.insufficient_exp").getString();
                         String argsAdded = String.format(translatedMsg, player.totalExperience, properties.requiredExp);

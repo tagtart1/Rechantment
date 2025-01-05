@@ -366,4 +366,8 @@ public class UtilFunctions {
     public static double lerp(double min, double max, double t) {
         return min + (max - min) * t;
     }
+
+    public static double remap(double fromMin, double fromMax, double toMin, double toMax, double value) {
+        return lerp(toMin, toMax, inverseLerp(fromMin, fromMax, value));
+    }
 }
