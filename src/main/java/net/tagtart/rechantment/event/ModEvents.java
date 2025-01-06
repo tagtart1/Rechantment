@@ -30,6 +30,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.*;
@@ -407,6 +408,7 @@ public class ModEvents {
                 }
             }
 
+
             // Teleports the exp orb to player
             if (expToDrop > 0) {
                 Player player = event.getPlayer();
@@ -636,7 +638,7 @@ public class ModEvents {
 
                 int selectedSlot = player.getInventory().selected;
 
-                if (brokenItem.getItem() instanceof ShieldItem) {
+                if (brokenItem.getItem() instanceof ShieldItem ) {
                     if(!player.addItem(brokenItem)) {
                         player.drop(brokenItem, false);
                     }
