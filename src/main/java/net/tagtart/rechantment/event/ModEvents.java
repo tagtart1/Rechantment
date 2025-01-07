@@ -266,7 +266,9 @@ public class ModEvents {
             // For enchantment table replacement inventory, this is necessary since it isn't tied to a custom block, just an entity.
             BlockEntity blockEntity = event.getPlayer().level().getBlockEntity(event.getPos());
             if (blockEntity instanceof RechantmentTableBlockEntity) {
-                ((RechantmentTableBlockEntity) blockEntity).dropInventory();
+                RechantmentTableBlockEntity rechantmentBE = (RechantmentTableBlockEntity)blockEntity;
+                rechantmentBE.onBreak();
+
             }
 
             ItemStack handItem = event.getPlayer().getMainHandItem();

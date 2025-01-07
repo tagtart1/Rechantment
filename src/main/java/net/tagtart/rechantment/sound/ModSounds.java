@@ -16,6 +16,11 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> ENCHANTED_BOOK_FAIL = registerSoundEvents("enchanted_book_fail");
 
     public static final RegistryObject<SoundEvent> REBIRTH_ITEM = registerSoundEvents("rebirth_item");
+    public static final RegistryObject<SoundEvent> ENCHANT_TABLE_AMBIENT = registerSoundEvents("enchant_table_ambient");
+    public static final RegistryObject<SoundEvent> ENCHANT_TABLE_CHARGE = registerSoundEvents("enchant_table_charge");
+    public static final RegistryObject<SoundEvent> ENCHANT_TABLE_DISCHARGE = registerSoundEvents("enchant_table_discharge");
+    public static final RegistryObject<SoundEvent> ENCHANT_TABLE_OPEN = registerSoundEvents("enchant_table_open");
+    public static final RegistryObject<SoundEvent> ENCHANT_TABLE_CLOSE = registerSoundEvents("enchant_table_close");
 
     private static RegistryObject<SoundEvent> registerSoundEvents(String name) {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(Rechantment.MOD_ID, name)));

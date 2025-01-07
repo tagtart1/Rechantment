@@ -53,12 +53,11 @@ public class BookRarityProperties {
 
     public EnchantmentPoolEntry getRandomEnchantmentWeighted() {
         Random rand = new Random();
-        int randVal = rand.nextInt(enchantmentPoolTotalWeights + 1);
-
+        int randVal = rand.nextInt(enchantmentPoolTotalWeights);
         int cumulativeWeight = 0;
         for (EnchantmentPoolEntry entry : enchantmentPool) {
             cumulativeWeight += entry.weight;
-            if (randVal <= cumulativeWeight) {
+            if (randVal < cumulativeWeight) {
                 return entry;
             }
         }

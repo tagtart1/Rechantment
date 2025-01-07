@@ -10,11 +10,16 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EnchantmentTableBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.EnchantmentTableBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.network.NetworkHooks;
+import net.tagtart.rechantment.block.entity.ModReplacementBlockEntities;
 import net.tagtart.rechantment.block.entity.RechantmentTableBlockEntity;
 import net.tagtart.rechantment.screen.RechantmentTableMenu;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,6 +29,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 @Mixin(EnchantmentTableBlock.class)
@@ -57,12 +63,35 @@ public class EnchantmentTableBlockMixin
 
     @Inject(method = "animateTick", at = @At("TAIL"), cancellable = false)
     public void animateTick(BlockState pState, Level pLevel, BlockPos pPos, RandomSource pRandom, CallbackInfo ci) {
-        for(BlockPos blockpos : BOOKSHELF_OFFSETS) {
-            if (pRandom.nextInt(16) == 0 && rechantment$isValidBookShelf(pLevel, pPos, blockpos)) {
-                pLevel.addParticle(ParticleTypes.ENCHANT, (double)pPos.getX() + (double)0.5F, (double)pPos.getY() + (double)2.0F, (double)pPos.getZ() + (double)0.5F, (double)((float)blockpos.getX() + pRandom.nextFloat()) - (double)0.5F, (double)((float)blockpos.getY() - pRandom.nextFloat() - 1.0F), (double)((float)blockpos.getZ() + pRandom.nextFloat()) - (double)0.5F);
+
+        BlockEntity be = pLevel.getBlockEntity(pPos);
+        if (be instanceof RechantmentTableBlockEntity && ((RechantmentTableBlockEntity) be).getIsCharged()) {
+            for(BlockPos blockpos : BOOKSHELF_OFFSETS) {
+                if (pRandom.nextInt(16) == 0 && rechantment$isValidBookShelf(pLevel, pPos, blockpos)) {
+                    pLevel.addParticle(ParticleTypes.ENCHANT, (double)pPos.getX() + (double)0.5F, (double)pPos.getY() + (double)2.0F, (double)pPos.getZ() + (double)0.5F, (double)((float)blockpos.getX() + pRandom.nextFloat()) - (double)0.5F, (double)((float)blockpos.getY() - pRandom.nextFloat() - 1.0F), (double)((float)blockpos.getZ() + pRandom.nextFloat()) - (double)0.5F);
+                }
             }
         }
     }
+
+    @Inject(method = "getTicker", at = @At("HEAD"), cancellable = true)
+    public <T extends BlockEntity> void getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType, CallbackInfoReturnable<BlockEntityTicker<T>> cir) {
+
+        // Enchantment table only ticks on client-side unlike a lot of other stuff
+        if(!pLevel.isClientSide()) {
+            cir.setReturnValue(null);
+        }
+        if (pState.getBlock() == Blocks.ENCHANTING_TABLE) {
+            BlockEntityTicker<RechantmentTableBlockEntity> ticker = (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1, pPos, pState1);
+            cir.setReturnValue((BlockEntityTicker<T>)ticker);
+        }
+    }
+
+    @Unique
+    private static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> pServerType, BlockEntityType<E> pClientType, BlockEntityTicker<? super E> pTicker) {
+        return pClientType == pServerType ? (BlockEntityTicker<A>) pTicker : null;
+    }
+
 
     @Unique
     private static boolean rechantment$isValidBookShelf(Level pLevel, BlockPos p_207911_, BlockPos p_207912_) {

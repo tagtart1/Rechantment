@@ -113,6 +113,7 @@ public class RechantmentTablePoolDisplayScreen extends AbstractContainerScreen<R
 
         // Hoverables that represent a loot table entry.
         entry_hoverables = new ArrayList<>();
+        Minecraft.getInstance().player.playSound(SoundEvents.BOOK_PAGE_TURN, 0.5F, (float)UtilFunctions.remap(0.0, 1.0, 0.85, 1.15, viewingPropertyIndex / 5.0));
         generateTableEntries();
 
         this.shaderEffectsByBookID = new ResourceLocation[5];
@@ -246,28 +247,26 @@ public class RechantmentTablePoolDisplayScreen extends AbstractContainerScreen<R
     private void onClickLeftArrowEvent(double pMouseX, double pMouseY, int pButton) {
         if (pButton == 0) {
             setViewingPropertyIndex(viewingPropertyIndex - 1);
-            Minecraft.getInstance().player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 0.5F, (float)UtilFunctions.remap(0.0, 1.0, 0.8, 1.2, viewingPropertyIndex / 5.0));
         }
     }
 
     private void onClickRightArrowEvent(double pMouseX, double pMouseY, int pButton) {
         if (pButton == 0) {
             setViewingPropertyIndex(viewingPropertyIndex + 1);
-            Minecraft.getInstance().player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 0.5F, (float)UtilFunctions.remap(0.0, 1.0, 0.8, 1.2, viewingPropertyIndex / 5.0));
         }
     }
 
     private void onReleaseBackArrowEvent(double pMouseX, double pMouseY, int pButton) {
         if (pButton == 0 && backArrow.isMouseOverlapped((int)Math.round(pMouseX), (int)Math.round(pMouseY))) {
             ModPackets.sentToServer(new OpenEnchantTableScreenC2SPacket(0, 0, menu.blockEntity.getBlockPos()));
-            Minecraft.getInstance().player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 0.5F, 1.0f);
-
+            Minecraft.getInstance().player.playSound(SoundEvents.BOOK_PUT, 0.5F, 1.0f);
         }
     }
 
     private void onClickBookIconEvent(double pMouseX, double pMouseY, int pButton) {
         if (pButton == 1 && bookIcon.isMouseOverlapped((int)Math.round(pMouseX), (int)Math.round(pMouseY))) {
             ModPackets.sentToServer(new OpenEnchantTableScreenC2SPacket(0, 0, menu.blockEntity.getBlockPos()));
+            Minecraft.getInstance().player.playSound(SoundEvents.BOOK_PUT, 0.5F, 1.0f);
         }
     }
 
@@ -380,6 +379,7 @@ public class RechantmentTablePoolDisplayScreen extends AbstractContainerScreen<R
         index = index % BookRarityProperties.getAllProperties().length;
         viewingPropertyIndex = index;
 
+        Minecraft.getInstance().player.playSound(SoundEvents.BOOK_PAGE_TURN, 0.5F, (float)UtilFunctions.remap(0.0, 1.0, 0.8, 1.2, viewingPropertyIndex / 5.0));
         bookIcon.renderTexture = BookRarityProperties.getAllProperties()[viewingPropertyIndex].iconResourceLocation;
         generateTableEntries();
     }
