@@ -101,8 +101,10 @@ public class RechantmentCommonConfigs {
 
     public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      REMOVE_MENDING_ENABLED;
 
-    public static  final ForgeConfigSpec.ConfigValue<? extends Boolean>     CLEAR_ENCHANTED_LOOT;
-
+    public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      CLEAR_ENCHANTED_LOOT;
+    public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      REPLACE_ENCHANTED_LOOT;
+    public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      EXCLUDE_LOWER_TIER_LOOT;
+    public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      EXCLUDE_FISHING_LOOT;
     // Fortune nerf configs
     public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      FORTUNE_NERF_ENABLED;
     public static final ForgeConfigSpec.DoubleValue                         FORTUNE_1_CHANCE;
@@ -303,9 +305,23 @@ public class RechantmentCommonConfigs {
 
         BUILDER.pop();
 
-        BUILDER.push("Clear Generated Loot Enchantments");
+        BUILDER.comment("Configurations for all things related to generated loot drops.");
+        BUILDER.push("Loot Table Enhancements");
         BUILDER.comment("Clears enchantments from found generated loot resulting in blank pieces of gear");
+        BUILDER.comment("Example: A chest plate found with enchants in the end city loot will be blank with no enchants");
         CLEAR_ENCHANTED_LOOT = BUILDER.define("clear_enchanted_loot", false);
+
+        BUILDER.comment("Replace all enchanted loot into Rechantment books");
+        BUILDER.comment("Example: A chest plate found with enchants will be replaced entirely with a rolled enchanted book based on the rarity configs");
+        REPLACE_ENCHANTED_LOOT = BUILDER.define("replace_enchanted_loot", false);
+
+        BUILDER.comment("Excludes gold, leather, stone, wood enchanted drops from being affected by the REPLACE_ENCHANTED_LOOT configuration");
+        BUILDER.comment("Example: Gold tools and armor from nether port ruins will remain and not be replaced by Rechantment books");
+        EXCLUDE_LOWER_TIER_LOOT = BUILDER.define("exclude_lower_tier_loot", false);
+
+        BUILDER.comment("Excludes fishing drops from being affected by the REPLACE_ENCHANTED_LOOT configuration");
+        BUILDER.comment("Example: Enchanted bows and fishing rods will not be replaced with Rechantment books");
+        EXCLUDE_FISHING_LOOT = BUILDER.define("exclude_fishing_loot", false);
 
         BUILDER.pop();
 

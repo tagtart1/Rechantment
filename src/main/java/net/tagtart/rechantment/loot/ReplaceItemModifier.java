@@ -9,10 +9,13 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraftforge.common.ForgeConfig;
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.common.loot.LootModifier;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.item.ModItems;
 import net.tagtart.rechantment.util.BookRarityProperties;
 import net.tagtart.rechantment.util.EnchantmentPoolEntry;
@@ -35,10 +38,11 @@ public class ReplaceItemModifier extends LootModifier {
             ItemStack stack = generatedLoot.get(i);
             // Replaces iron, diamond, and netherite enchanted gear with books
 
-            boolean testConfig = true;
-            boolean excludeLowerTiers = true;
+            boolean replaceEnchantedLoot = RechantmentCommonConfigs.REPLACE_ENCHANTED_LOOT.get();
+            boolean excludeLowerTiers = RechantmentCommonConfigs.EXCLUDE_LOWER_TIER_LOOT.get();
+            boolean excludeFishing = RechantmentCommonConfigs.EXCLUDE_FISHING_LOOT.get();
+            String lootTableId = lootContext.getQueriedLootTableId().toString();
 
-            System.out.println(lootContext.getQueriedLootTableId());
             // Removes vanilla enchanted books from loot pools
             // Happens by default - not configurable
             if (stack.getItem() instanceof EnchantedBookItem) {
@@ -48,10 +52,11 @@ public class ReplaceItemModifier extends LootModifier {
             }
 
 
-            // Gold, leather, chainmail tiers remain with their enchants
-            else if (testConfig && stack.isEnchanted()) {
-                Item item = stack.getItem();
 
+            // Gold, leather, chainmail tiers remain with their enchants
+            else if (replaceEnchantedLoot && stack.isEnchanted()) {
+                Item item = stack.getItem();
+                if ((lootTableId.contains("minecraft:gameplay/fishing") && excludeFishing)) continue;
                 if (excludeLowerTiers) {
                     // Excludes gold, leather, and chain armor
                     if (item instanceof ArmorItem armorItem) {
