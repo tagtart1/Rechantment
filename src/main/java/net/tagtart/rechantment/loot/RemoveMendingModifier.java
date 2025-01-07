@@ -35,7 +35,6 @@ public class RemoveMendingModifier extends LootModifier {
 
                 if (stack.isEnchanted()) {
                     Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(stack);
-                    System.out.println(enchantments);
                     if (enchantments.containsKey(Enchantments.MENDING)) {
                         enchantments.remove(Enchantments.MENDING);
                         EnchantmentHelper.setEnchantments(enchantments, stack);

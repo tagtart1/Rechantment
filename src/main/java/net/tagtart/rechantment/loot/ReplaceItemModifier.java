@@ -56,7 +56,10 @@ public class ReplaceItemModifier extends LootModifier {
             // Gold, leather, chainmail tiers remain with their enchants
             else if (replaceEnchantedLoot && stack.isEnchanted()) {
                 Item item = stack.getItem();
-                if ((lootTableId.contains("minecraft:gameplay/fishing") && excludeFishing)) continue;
+                if ((lootTableId.contains("minecraft:gameplay/fishing") && excludeFishing)) {
+                    stack.removeTagKey("Enchantments");
+                    continue;
+                }
                 if (excludeLowerTiers) {
                     // Excludes gold, leather, and chain armor
                     if (item instanceof ArmorItem armorItem) {
