@@ -33,7 +33,7 @@ public class ThunderStrikeEnchantment extends Enchantment {
     }
 
     private final float LIGHTNING_DAMAGE = 5.0f;
-    private final float LIGHTNING_RADIUS = 2.0f;
+    private final float LIGHTNING_RADIUS = 3.0f;
     private final float LIGHTNING_KNOCKBACK = 1.10f;
     private final float LIGHTNING_Y_KNOCKBACK = 0.3f;
   // Maps enchantment level to a success rate of spawning lightning

@@ -2,6 +2,7 @@ package net.tagtart.rechantment.event;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.AccessibilityOnboardingScreen;
 import net.minecraft.client.particle.TotemParticle;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.core.BlockPos;
@@ -29,6 +30,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.*;
@@ -75,18 +77,14 @@ public class ModEvents {
 
     @Mod.EventBusSubscriber(modid = Rechantment.MOD_ID)
     public static class ForgeEvents {
-
-        public static float SHIELD_BASH_KNOCKBACK = 1.15f;
-        public static float SHIELD_BASH_KNOCKBACK_Y = 0.4f;
-
-        public static int SHIELD_COURAGE_SPEED_DURATION = 40; // Speed in ticks
-
-        // class to totem particle incase  need to copy
-        //new TotemParticle()
-
         @SubscribeEvent
         public static void onShieldBlock(ShieldBlockEvent event) {
-            LivingEntity player = event.getEntity();
+
+            float SHIELD_BASH_KNOCKBACK = 1.15f;
+            float SHIELD_BASH_KNOCKBACK_Y = 0.4f;
+            int SHIELD_COURAGE_SPEED_DURATION = 40; // Speed in ticks
+
+            Player player = (Player) event.getEntity();
             DamageSource source = event.getDamageSource();
             Entity attacker = source.getEntity();
             ItemStack shield = player.getUseItem();
@@ -98,19 +96,17 @@ public class ModEvents {
             Map<Enchantment, Integer> shieldEnchants = EnchantmentHelper.getEnchantments(shield);
             // Handle bash enchantment
             if (shieldEnchants.containsKey(ForgeRegistries.ENCHANTMENTS.getValue(bashResource))) {
-                if (source.getDirectEntity() instanceof Projectile) {
-                    return;
-                }
-
-                double d0 = attacker.getX() - player.getX();
-                double d1 = attacker.getZ() - player.getZ();
-                Vec2 toAttacker = new Vec2((float)d0, (float)d1);
-                toAttacker = toAttacker.normalized();
-                toAttacker = toAttacker.scale(SHIELD_BASH_KNOCKBACK);
+                if (!(source.getDirectEntity() instanceof Projectile)) {
+                    double d0 = attacker.getX() - player.getX();
+                    double d1 = attacker.getZ() - player.getZ();
+                    Vec2 toAttacker = new Vec2((float) d0, (float) d1);
+                    toAttacker = toAttacker.normalized();
+                    toAttacker = toAttacker.scale(SHIELD_BASH_KNOCKBACK);
 
 
-                if (attacker.isPushable()) {
-                    attacker.push(toAttacker.x, SHIELD_BASH_KNOCKBACK_Y, toAttacker.y);
+                    if (attacker.isPushable()) {
+                        attacker.push(toAttacker.x, SHIELD_BASH_KNOCKBACK_Y, toAttacker.y);
+                    }
                 }
             }
 
@@ -134,8 +130,6 @@ public class ModEvents {
 
             if (stack.isEnchanted()) {
 
-                // TODO: make this use the List<EntrySet<Enchantment, Integer>> and then sort it, then set the tooltip that way
-                // This current solution is poop
                 List<Map.Entry<Enchantment, Integer>> enchantsSorted = new ArrayList<>(EnchantmentHelper.getEnchantments(stack).entrySet());
 
                 enchantsSorted.sort((component1, component2) -> {
@@ -149,20 +143,21 @@ public class ModEvents {
                     float rarityValue2 = 0f;
 
                     if (rarity1 == null && component1.getKey().isCurse()) {
-                        rarityValue1 = 99f;
+                        rarityValue1 = 99.0f;
                     } else if (rarity1 == null && component1.getKey() instanceof RebornEnchantment) {
                         rarityValue1 = 100f;
                     } else if (rarity1 != null) {
                         rarityValue1 = rarity1.rarity;
                     }
 
-                    if (rarity2 == null && component1.getKey().isCurse()) {
-                        rarityValue2 = 99f;
-                    } else if (rarity2 == null && component1.getKey() instanceof RebornEnchantment) {
+                    if (rarity2 == null && component2.getKey().isCurse()) {
+                        rarityValue2 = 99.0f;
+                    } else if (rarity2 == null && component2.getKey() instanceof RebornEnchantment) {
                         rarityValue2 = 100f;
                     } else if (rarity2 != null) {
                         rarityValue2 = rarity2.rarity;
                     }
+
 
                     return Float.compare(rarityValue2, rarityValue1);
                 });
@@ -415,6 +410,7 @@ public class ModEvents {
                 }
             }
 
+
             // Teleports the exp orb to player
             if (expToDrop > 0) {
                 Player player = event.getPlayer();
@@ -548,17 +544,41 @@ public class ModEvents {
             }
         }
 
+        // TODO: make armor work with rebirth, have no idea how
+        // Maybe by checking if the durability of armor is less than 1
+        @SubscribeEvent
+        public static void onArmorBreak(LivingDamageEvent event) {
+
+            if (event.getEntity() instanceof Player player) {
+
+                for (ItemStack armorPiece : player.getArmorSlots()) { // Armor slots are 0 to 3
+                   // System.out.println(armorPiece);
+                    if (!armorPiece.isEmpty() && armorPiece.getMaxDamage() > 0) {
+                      //  System.out.println("Found armor!");
+                        // Check if the armor piece is broken or nearly broken
+                        if (armorPiece.getDamageValue() >= armorPiece.getMaxDamage()) {
+                         //   System.out.println("Armor piece in slot"+ " is broken!");
+                            // Handle logic for when the armor breaks (e.g., trigger effects, drop item)
+                        }
+                    }
+                }
+            }
+        }
+
         @SubscribeEvent
         public static void onArmorEquip(LivingEquipmentChangeEvent event) {
             if (event.getSlot().getType() != EquipmentSlot.Type.ARMOR) return;
             if (!(event.getEntity() instanceof  Player player)) return;
 
             ItemStack newArmor = event.getTo();
+            ItemStack oldArmor = event.getFrom();
             Pair<OverloadEnchantment, Integer> overloadEnchantment = UtilFunctions.getEnchantmentFromItem(
                     "rechantment:overload",
                     newArmor,
                     OverloadEnchantment.class
             );
+
+
 
             if (overloadEnchantment != null) {
 
@@ -597,29 +617,47 @@ public class ModEvents {
         @SubscribeEvent
         public static void onItemBreak(PlayerDestroyItemEvent event) {
             Player player = event.getEntity();
+
             ItemStack brokenItem = event.getOriginal();
+
             Pair<RebirthEnchantment, Integer> rebirthEnchantmentPair = UtilFunctions.getEnchantmentFromItem("rechantment:rebirth", brokenItem, RebirthEnchantment.class);
 
-            if (rebirthEnchantmentPair == null) return;
+            if (rebirthEnchantmentPair == null)  return;
             RebirthEnchantment rebirthEnchantment = rebirthEnchantmentPair.getA();
 
             // Item is reborn
             if (rebirthEnchantment.shouldBeReborn(rebirthEnchantmentPair.getB())) {
-                brokenItem.removeTagKey("Damage");
+
+                if (brokenItem.getTag() != null)
+                    brokenItem.getTag().putInt("Damage", 0);
                 brokenItem.removeTagKey("RepairCost");
 
                 Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(brokenItem);
                 enchantments.remove(rebirthEnchantment);
                 enchantments.put(ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation("rechantment:reborn")), 1);
                 EnchantmentHelper.setEnchantments(enchantments, brokenItem);
-                UtilFunctions.triggerRebirthClientEffects(player,(ServerLevel) player.level(), brokenItem);
 
-                int slot = player.getInventory().selected;
-                if (player.getInventory().getItem(slot).isEmpty()) {
-                    player.getInventory().setItem(slot, brokenItem);
+
+                int selectedSlot = player.getInventory().selected;
+
+                if (brokenItem.getItem() instanceof ShieldItem ) {
+                    if(!player.addItem(brokenItem)) {
+                        player.drop(brokenItem, false);
+                    }
+                    ItemStack enchantedShield = new ItemStack(Items.SHIELD);
+                    enchantedShield.enchant(Enchantments.UNBREAKING, 1);
+                    UtilFunctions.triggerRebirthClientEffects(player,(ServerLevel) player.level(), enchantedShield);
                 } else {
-                    player.drop(brokenItem, false); // Drop the item if the slot is occupied
+
+                    if (player.getInventory().getItem(selectedSlot).isEmpty()) {
+                        player.getInventory().setItem(selectedSlot, brokenItem);
+                    } else {
+                        player.drop(brokenItem, false); // Drop the item if the slot is occupied
+                    }
+                    UtilFunctions.triggerRebirthClientEffects(player,(ServerLevel) player.level(), brokenItem);
                 }
+
+
             }
 
             // Send fail message

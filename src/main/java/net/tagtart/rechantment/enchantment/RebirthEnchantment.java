@@ -1,7 +1,10 @@
 package net.tagtart.rechantment.enchantment;
 
 import net.minecraft.client.renderer.ItemInHandRenderer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
 
@@ -26,7 +29,13 @@ public class RebirthEnchantment extends Enchantment {
         return 3;
     }
 
-
+    @Override
+    public void doPostHurt(LivingEntity pTarget, Entity pAttacker, int pLevel) {
+        if (pTarget instanceof Player) {
+            System.out.println(pAttacker);
+        }
+        super.doPostHurt(pTarget, pAttacker, pLevel);
+    }
 
     public boolean shouldBeReborn(int level) {
         return isSuccess(level);

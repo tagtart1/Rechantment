@@ -99,6 +99,12 @@ public class RechantmentCommonConfigs {
 
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ANNOUNCEMENT_ENCHANTMENTS;
 
+    public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      REMOVE_MENDING_ENABLED;
+
+    public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      CLEAR_ENCHANTED_LOOT;
+    public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      REPLACE_ENCHANTED_LOOT;
+    public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      EXCLUDE_LOWER_TIER_LOOT;
+    public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      EXCLUDE_FISHING_LOOT;
     // Fortune nerf configs
     public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      FORTUNE_NERF_ENABLED;
     public static final ForgeConfigSpec.DoubleValue                         FORTUNE_1_CHANCE;
@@ -119,7 +125,7 @@ public class RechantmentCommonConfigs {
         RARITY_0_KEY = BUILDER.define("key", "simple");
         RARITY_0_COLOR = BUILDER.defineInRange("color", 11184810, 0, Integer.MAX_VALUE);
         RARITY_0_EXP_COST = BUILDER.defineInRange("exp_cost", 100, 0, Integer.MAX_VALUE);
-        RARITY_0_WORLD_SPAWN_WEIGHT = BUILDER.defineInRange("spawn_weight", 40, 0, Integer.MAX_VALUE);
+        RARITY_0_WORLD_SPAWN_WEIGHT = BUILDER.defineInRange("world_spawn_weight", 40, 0, Integer.MAX_VALUE);
         RARITY_0_MIN_SUCCESS = BUILDER.defineInRange("min_success", 25, 0, 100);
         RARITY_0_MAX_SUCCESS = BUILDER.defineInRange("max_success", 90, 0, 100);
         RARITY_0_FORCED_BOOK_BREAKS = BUILDER.defineInRange("guaranteed_bookshelf_breaks", 0, 0, Integer.MAX_VALUE);
@@ -154,7 +160,7 @@ public class RechantmentCommonConfigs {
         RARITY_1_KEY = BUILDER.define("key", "unique");
         RARITY_1_COLOR = BUILDER.defineInRange("color", 5635925, 0, Integer.MAX_VALUE);
         RARITY_1_EXP_COST = BUILDER.defineInRange("exp_cost", 200, 0, Integer.MAX_VALUE);
-        RARITY_1_WORLD_SPAWN_WEIGHT = BUILDER.defineInRange("spawn_weight", 30, 0, Integer.MAX_VALUE);
+        RARITY_1_WORLD_SPAWN_WEIGHT = BUILDER.defineInRange("world_spawn_weight", 30, 0, Integer.MAX_VALUE);
         RARITY_1_MIN_SUCCESS = BUILDER.defineInRange("min_success", 25, 0, 100);
         RARITY_1_MAX_SUCCESS = BUILDER.defineInRange("max_success", 90, 0, 100);
         RARITY_1_FORCED_BOOK_BREAKS = BUILDER.defineInRange("guaranteed_bookshelf_breaks", 0, 0, Integer.MAX_VALUE);
@@ -186,7 +192,7 @@ public class RechantmentCommonConfigs {
         RARITY_2_KEY = BUILDER.define("key", "elite");
         RARITY_2_COLOR = BUILDER.defineInRange("color", 5636095, 0, Integer.MAX_VALUE);
         RARITY_2_EXP_COST = BUILDER.defineInRange("exp_cost", 400, 0, Integer.MAX_VALUE);
-        RARITY_2_WORLD_SPAWN_WEIGHT = BUILDER.defineInRange("spawn_weight", 15, 0, Integer.MAX_VALUE);
+        RARITY_2_WORLD_SPAWN_WEIGHT = BUILDER.defineInRange("world_spawn_weight", 15, 0, Integer.MAX_VALUE);
         RARITY_2_MIN_SUCCESS = BUILDER.defineInRange("min_success", 25, 0, 100);
         RARITY_2_MAX_SUCCESS = BUILDER.defineInRange("max_success", 90, 0, 100);
         RARITY_2_FORCED_BOOK_BREAKS = BUILDER.defineInRange("guaranteed_bookshelf_breaks", 0, 0, Integer.MAX_VALUE);
@@ -220,7 +226,7 @@ public class RechantmentCommonConfigs {
         RARITY_3_KEY = BUILDER.define("key", "ultimate");
         RARITY_3_COLOR = BUILDER.defineInRange("color", 16777045, 0, Integer.MAX_VALUE);
         RARITY_3_EXP_COST = BUILDER.defineInRange("exp_cost", 500, 0, Integer.MAX_VALUE);
-        RARITY_3_WORLD_SPAWN_WEIGHT = BUILDER.defineInRange("spawn_weight", 10, 0, Integer.MAX_VALUE);
+        RARITY_3_WORLD_SPAWN_WEIGHT = BUILDER.defineInRange("world_spawn_weight", 10, 0, Integer.MAX_VALUE);
         RARITY_3_MIN_SUCCESS = BUILDER.defineInRange("min_success", 30, 0, 100);
         RARITY_3_MAX_SUCCESS = BUILDER.defineInRange("max_success", 90, 0, 100);
         RARITY_3_FORCED_BOOK_BREAKS = BUILDER.defineInRange("guaranteed_bookshelf_breaks", 0, 0, Integer.MAX_VALUE);
@@ -254,7 +260,7 @@ public class RechantmentCommonConfigs {
         RARITY_4_KEY = BUILDER.define("key", "legendary");
         RARITY_4_COLOR = BUILDER.defineInRange("color", 16755200, 0, Integer.MAX_VALUE);
         RARITY_4_EXP_COST = BUILDER.defineInRange("exp_cost", 2000, 0, Integer.MAX_VALUE);
-        RARITY_4_WORLD_SPAWN_WEIGHT = BUILDER.defineInRange("spawn_weight", 5, 0, Integer.MAX_VALUE);
+        RARITY_4_WORLD_SPAWN_WEIGHT = BUILDER.defineInRange("world_spawn_weight", 5, 0, Integer.MAX_VALUE);
         RARITY_4_MIN_SUCCESS = BUILDER.defineInRange("min_success", 35, 0, 100);
         RARITY_4_MAX_SUCCESS = BUILDER.defineInRange("max_success", 90, 0, 100);
         RARITY_4_FORCED_BOOK_BREAKS = BUILDER.defineInRange("guaranteed_bookshelf_breaks", 0, 0, Integer.MAX_VALUE);
@@ -287,7 +293,39 @@ public class RechantmentCommonConfigs {
         announce_enchantments.add("rechantment:overload|3");
         announce_enchantments.add("rechantment:thunder_strike|2");
         announce_enchantments.add("minecraft:fortune|3");
+        announce_enchantments.add("rechantment:rebirth|1-3");
         ANNOUNCEMENT_ENCHANTMENTS = BUILDER.defineList("announce_enchantments", announce_enchantments, s -> s instanceof String);
+
+        BUILDER.pop();
+
+
+
+        BUILDER.comment("Configurations for all things related to generated loot drops. Ex: end_city_treasure");
+        BUILDER.push("Loot Table Enhancements");
+
+        BUILDER.comment("Clears enchantments from found generated loot resulting in blank pieces of gear");
+        BUILDER.comment("Example: A chest plate found with enchants in the end city loot will be blank with no enchants");
+        BUILDER.comment("Note: Having this and REPLACE_ENCHANTED_LOOT both set to true may cause issues!");
+        CLEAR_ENCHANTED_LOOT = BUILDER.define("clear_enchanted_loot", false);
+
+        BUILDER.comment("Replace all enchanted loot into Rechantment books (based on world_spawn_weight config from each rarity section");
+        BUILDER.comment("Example: A chest plate found with enchants will be replaced entirely with a rolled enchanted book based on the rarity configs");
+        BUILDER.comment("Note: Having this and CLEAR_ENCHANTED_LOOT both set to true may cause issues!");
+        REPLACE_ENCHANTED_LOOT = BUILDER.define("replace_enchanted_loot", false);
+
+        BUILDER.comment("Removes mending enchantment from found enchanted loot from generated world loot. Ex: end_city_treasure");
+        BUILDER.comment("Mending books can be found only in book form as long as you have minecraft:mending set in a rarity pool.");
+        BUILDER.comment("Having CLEAR_ENCHANTED_LOOT or REPLACE_ENCHANTED_LOOT set to true defaults this to true.");
+        REMOVE_MENDING_ENABLED = BUILDER.define("remove_mending", true);
+
+        BUILDER.comment("Excludes gold, leather, stone, wood enchanted drops from being affected by the REPLACE_ENCHANTED_LOOT and CLEAR_ENCHANTED_LOOT configurations");
+        BUILDER.comment("Example: Gold tools and armor from nether portal ruins will remain and not be replaced by Rechantment books");
+        EXCLUDE_LOWER_TIER_LOOT = BUILDER.define("exclude_lower_tier_loot", false);
+
+        BUILDER.comment("Excludes fishing drops from being affected by the REPLACE_ENCHANTED_LOOT and CLEAR_ENCHANTED_LOOT configurations");
+        BUILDER.comment("Example: Enchanted bows and fishing rods will not be replaced with Rechantment books BUT still wont have enchantments");
+        BUILDER.comment("This setting is recommended as the default behavior with REPLACE_ENCHANTED_LOOT causes book drops from fishing to be common, may cause inflation and removes the need of the cool enchantment table");
+        EXCLUDE_FISHING_LOOT = BUILDER.define("exclude_fishing_loot", false);
 
         BUILDER.pop();
 

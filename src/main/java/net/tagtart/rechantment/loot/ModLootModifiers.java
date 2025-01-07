@@ -18,8 +18,17 @@ public class ModLootModifiers {
     public static final RegistryObject<Codec<? extends IGlobalLootModifier>> ADD_ITEM =
             LOOT_MODIFIER_SERIALIZERS.register("add_item", AddItemModifier.CODEC);
 
+    public static final RegistryObject<Codec<? extends IGlobalLootModifier>> REMOVE_MENDING =
+            LOOT_MODIFIER_SERIALIZERS.register("remove_mending", RemoveMendingModifier.CODEC);
+
+    public static final RegistryObject<Codec<? extends IGlobalLootModifier>> CLEAR_ENCHANTS =
+            LOOT_MODIFIER_SERIALIZERS.register("clear_enchants", ClearGeneratedEnchantsModifier.CODEC);
+
+
 
     public static void register(IEventBus eventBus) {
         LOOT_MODIFIER_SERIALIZERS.register(eventBus);
     }
+
+
 }
