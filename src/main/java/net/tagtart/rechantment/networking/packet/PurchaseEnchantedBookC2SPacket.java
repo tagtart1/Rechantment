@@ -171,10 +171,13 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
                 rootTag.put("Enchantment", enchantmentTag);
                 rootTag.put("SuccessRate", successTag);
 
+                if (UtilFunctions.shouldAnnounceDrop(randomEnchantment.enchantment, randomEnchantmentLevel))
+                    rootTag.putBoolean("Announce", true);
 
 
                 // Give enchanted book
-                player.addItem(toGive);
+                // Note: had to make the call to set the item directly in inventory to have announced message
+                player.getInventory().setItem(player.getInventory().getFreeSlot(), toGive);
 
                 // Roll for gem of chance
                 double gemOfChanceDropRate = bookProperties.rerollGemChance;
@@ -189,18 +192,6 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
                     }
                 }
 
-
-                if (UtilFunctions.shouldAnnounceDrop(randomEnchantment.enchantment, randomEnchantmentLevel)) {
-                    String enchantmentFormatted = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(randomEnchantment.enchantment)).getFullname(randomEnchantmentLevel).getString();
-                    Component announceMessage = Component.literal(player.getName().getString() + " found ")
-                            .append(Component.literal(enchantmentFormatted).withStyle(Style.EMPTY.withColor(bookProperties.color)))
-                            .append(" at ")
-                            .append(Component.literal(successRate + "%").withStyle(Style.EMPTY.withColor(bookProperties.color)))
-                            .append("!");
-                    for (ServerPlayer otherPlayer: level.players()) {
-                        otherPlayer.sendSystemMessage(announceMessage);
-                    }
-                }
 
                 level.playSound(null, enchantTablePos, soundToPlay, SoundSource.BLOCKS, 1f, 1f);
             }
