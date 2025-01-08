@@ -47,7 +47,7 @@ public class InventoryMixin {
 
                 if (inventory.player.level() instanceof ServerLevel serverLevel) {
                     Component displayName = pStack.getDisplayName();
-                    Style displayStyle = displayName.getStyle();
+                    Style displayHoverStyle = displayName.getStyle();
                     String displayNameString = displayName.getString();
                     StringBuilder sb = new StringBuilder(displayNameString);
                     sb.delete(0, 3);
@@ -60,7 +60,7 @@ public class InventoryMixin {
                         for (ServerPlayer otherPlayer : serverLevel.players()) {
 
                             otherPlayer.sendSystemMessage(Component.literal(playerName.getString() + " found ")
-                                    .append(Component.literal(displayNameString).withStyle(displayStyle.withColor(bookProps.color).withUnderlined(true)))
+                                    .append(Component.literal(displayNameString).withStyle(displayHoverStyle.withColor(bookProps.color).withUnderlined(true)))
                                     .append(" at ")
                                     .append(Component.literal(successRate + "%").withStyle(Style.EMPTY.withColor(bookProps.color)))
                                     .append("!"));
