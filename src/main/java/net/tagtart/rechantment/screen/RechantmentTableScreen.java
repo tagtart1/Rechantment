@@ -192,14 +192,14 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
                     BlockPos pos = menu.blockEntity.getBlockPos();
 
                     if (!floorRequirementsMet(properties, cachedFloorBlocksInRange) || !bookshelfRequirementsMet(properties, cachedBookshelvesInRange) || !lapisRequirementsMet(properties)) {
-                        Minecraft.getInstance().player.playSound(ModSounds.ENCHANTED_BOOK_FAIL.get(), 0.5F, 1.0f);
+                        Minecraft.getInstance().player.playSound(SoundEvents.LODESTONE_COMPASS_LOCK, 0.7F, 1.0f);
                         break;
                     }
 
                     if (playerInventory.getFreeSlot() == -1) {
                         // Send warning message to player, and close screen.
                         player.closeContainer();
-                        Minecraft.getInstance().player.playSound(ModSounds.ENCHANTED_BOOK_FAIL.get(), 0.5F, 1.0f);
+                        Minecraft.getInstance().player.playSound(SoundEvents.LODESTONE_COMPASS_LOCK, 0.7F, 1.0f);
 
                         Component translatedMsg = Component.translatable("message.rechantment.inventory_full").withStyle(ChatFormatting.RED);
                         player.sendSystemMessage(translatedMsg);
@@ -209,7 +209,7 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
                     if (!expRequirementMet(properties)) {
                         // Also send warning message to player, and close screen.
                         player.closeContainer();
-                        Minecraft.getInstance().player.playSound(ModSounds.ENCHANTED_BOOK_FAIL.get(), 0.5F, 1.0f);
+                        Minecraft.getInstance().player.playSound(SoundEvents.LODESTONE_COMPASS_LOCK, 0.7F, 1.0f);
 
                         String translatedMsg = Component.translatable("message.rechantment.insufficient_exp").getString();
                         String argsAdded = String.format(translatedMsg, player.totalExperience, properties.requiredExp);
