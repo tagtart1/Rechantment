@@ -161,8 +161,9 @@ public class RechantmentTablePoolDisplayScreen extends AbstractContainerScreen<R
         scissorMaxX = scissorMinX + VISIBLE_WIDTH;
         scissorMaxY = scissorMinY + VISIBLE_HEIGHT;
 
-        // Render all entries within scissored view
+        // Render all entries within scissored view; apply scroll pos, then render background first
         guiGraphics.enableScissor(scissorMinX, scissorMinY, scissorMaxX, scissorMaxY);
+        HoverableLootTablePoolEntryRenderable.globalTimeElapsed += pPartialTick;
         for (HoverableLootTablePoolEntryRenderable table_entry : entry_hoverables) {
             table_entry.scrollOffset = (int)scrollPosition;
             table_entry.render(guiGraphics, pMouseX, pMouseY, pPartialTick);
