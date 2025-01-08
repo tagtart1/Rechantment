@@ -9,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -50,9 +51,7 @@ import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.*;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.*;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -70,6 +69,7 @@ import oshi.util.tuples.Pair;
 
 import javax.annotation.Nullable;
 import java.awt.*;
+import java.awt.event.ContainerEvent;
 import java.util.*;
 import java.util.List;
 
@@ -664,6 +664,43 @@ public class ModEvents {
             else {
                 player.sendSystemMessage(Component.literal("Your item failed to be reborn!").withStyle(ChatFormatting.RED));
             }
+        }
+
+        @SubscribeEvent
+        public static void onPickup(PlayerEvent.ItemPickupEvent event) {
+            ItemStack pStack = event.getStack();
+            if (!(event.getEntity().level() instanceof ServerLevel level)) return;
+            if (!pStack.hasTag()) return;
+            CompoundTag tag = pStack.getTag();
+            if (tag == null) return;
+            boolean shouldAnnounce = tag.getBoolean("Announce");
+            if (!shouldAnnounce) return;
+
+            tag.remove("Announce");
+            int successRate = tag.getInt("SuccessRate");
+            String enchantmentRaw = tag.getCompound("Enchantment").getString("id");
+            Style displayHoverStyle = pStack.getDisplayName().getStyle();
+            String displayNameString;
+            StringBuilder sb = new StringBuilder(pStack.getDisplayName().getString());
+            sb.delete(0, 3);
+            sb.deleteCharAt(sb.length() - 1);
+            displayNameString = sb.toString();
+            Component playerName = event.getEntity().getDisplayName();
+            BookRarityProperties bookProps = UtilFunctions.getPropertiesFromEnchantment(enchantmentRaw);
+            if (bookProps == null) return;
+
+            for (ServerPlayer otherPlayer : level.players()) {
+                otherPlayer.sendSystemMessage(Component.literal(playerName.getString() + " found ")
+                        .append(Component.literal(displayNameString).withStyle(displayHoverStyle.withColor(bookProps.color).withUnderlined(true)))
+                        .append(" at ")
+                        .append(Component.literal(successRate + "%").withStyle(Style.EMPTY.withColor(bookProps.color)))
+                        .append("!"));
+            }
+
+            level.playSound(null, event.getEntity().getOnPos(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1f, 1f);
+
+
+
         }
     }
 }

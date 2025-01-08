@@ -5,6 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -19,6 +20,7 @@ import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.item.ModItems;
 import net.tagtart.rechantment.util.BookRarityProperties;
 import net.tagtart.rechantment.util.EnchantmentPoolEntry;
+import net.tagtart.rechantment.util.UtilFunctions;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
@@ -40,14 +42,13 @@ public class ReplaceItemModifier extends LootModifier {
 
             boolean replaceEnchantedLoot = RechantmentCommonConfigs.REPLACE_ENCHANTED_LOOT.get();
             boolean excludeLowerTiers = RechantmentCommonConfigs.EXCLUDE_LOWER_TIER_LOOT.get();
-            boolean excludeFishing = RechantmentCommonConfigs.EXCLUDE_FISHING_LOOT.get();
+            boolean nerfFishing = RechantmentCommonConfigs.NERF_FISHING_LOOT.get();
             String lootTableId = lootContext.getQueriedLootTableId().toString();
 
             // Removes vanilla enchanted books from loot pools
             // Happens by default - not configurable
             if (stack.getItem() instanceof EnchantedBookItem) {
                 ItemStack replacementBook = rollModdedBook();
-
                 generatedLoot.set(i, replacementBook);
             }
 
@@ -56,8 +57,9 @@ public class ReplaceItemModifier extends LootModifier {
             // Gold, leather, chainmail tiers remain with their enchants
             else if (replaceEnchantedLoot && stack.isEnchanted()) {
                 Item item = stack.getItem();
-                if ((lootTableId.contains("minecraft:gameplay/fishing") && excludeFishing)) {
+                if ((lootTableId.contains("minecraft:gameplay/fishing") && nerfFishing)) {
                     stack.removeTagKey("Enchantments");
+                    EnchantmentHelper.enchantItem(RandomSource.create(),stack, 5, false);
                     continue;
                 }
                 if (excludeLowerTiers) {
@@ -114,6 +116,11 @@ public class ReplaceItemModifier extends LootModifier {
 
         rootTag.put("Enchantment", enchantmentTag);
         rootTag.putInt("SuccessRate", successRate);
+
+        if (UtilFunctions.shouldAnnounceDrop(randomEnchantment.enchantment, enchantmentLevel)) {
+            rootTag.putBoolean("Announce", true);
+        }
+
 
         return replacementBook;
     }

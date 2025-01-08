@@ -30,6 +30,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.event.ParticleEmitter;
 import net.tagtart.rechantment.sound.ModSounds;
+import org.apache.logging.log4j.core.jmx.Server;
 import org.joml.Matrix4f;
 import oshi.util.tuples.Pair;
 
@@ -86,6 +87,21 @@ public class UtilFunctions {
         }
 
         return null;
+    }
+
+    public static void announceDrop(String enchantmentRaw, int enchantmentLevel, ServerPlayer player, BookRarityProperties bookProperties, int successRate) {
+        if (shouldAnnounceDrop(enchantmentRaw, enchantmentLevel)) {
+            ServerLevel level = (ServerLevel) player.level();
+            String enchantmentFormatted = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(enchantmentRaw)).getFullname(enchantmentLevel).getString();
+            Component announceMessage = Component.literal(player.getName().getString() + " found ")
+                    .append(Component.literal(enchantmentFormatted).withStyle(Style.EMPTY.withColor(bookProperties.color)))
+                    .append(" at ")
+                    .append(Component.literal(successRate + "%").withStyle(Style.EMPTY.withColor(bookProperties.color)))
+                    .append("!");
+            for (ServerPlayer otherPlayer: level.players()) {
+                otherPlayer.sendSystemMessage(announceMessage);
+            }
+        }
     }
 
     public static boolean shouldAnnounceDrop(String enchantmentRaw, int enchantmentLevel) {

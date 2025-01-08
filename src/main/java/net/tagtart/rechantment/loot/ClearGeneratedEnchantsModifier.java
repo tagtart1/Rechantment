@@ -27,10 +27,7 @@ public class ClearGeneratedEnchantsModifier extends LootModifier {
     protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext lootContext) {
         if (RechantmentCommonConfigs.CLEAR_ENCHANTED_LOOT.get()) {
             boolean excludeLowerTiers = RechantmentCommonConfigs.EXCLUDE_LOWER_TIER_LOOT.get();
-            boolean excludeFishing = RechantmentCommonConfigs.EXCLUDE_FISHING_LOOT.get();
-            String lootTableId = lootContext.getQueriedLootTableId().toString();
 
-            if ((lootTableId.contains("minecraft:gameplay/fishing") && excludeFishing)) return generatedLoot;
             for (ItemStack itemStack : generatedLoot) {
                 Item item = itemStack.getItem();
                 if (itemStack.isEnchanted()) {
