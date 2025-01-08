@@ -191,7 +191,9 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
                     BookRarityProperties properties = BookRarityProperties.getAllProperties()[i];
                     BlockPos pos = menu.blockEntity.getBlockPos();
 
-                    if (!floorRequirementsMet(properties, cachedFloorBlocksInRange) || !bookshelfRequirementsMet(properties, cachedBookshelvesInRange) || !lapisRequirementsMet(properties)) {
+                    if (!floorRequirementsMet(properties, cachedFloorBlocksInRange)
+                            || !bookshelfRequirementsMet(properties, cachedBookshelvesInRange)
+                            || !lapisRequirementsMet(properties)) {
                         Minecraft.getInstance().player.playSound(SoundEvents.LODESTONE_COMPASS_LOCK, 0.7F, 1.0f);
                         break;
                     }

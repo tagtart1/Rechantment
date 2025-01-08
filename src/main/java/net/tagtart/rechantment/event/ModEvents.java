@@ -697,7 +697,7 @@ public class ModEvents {
                         .append("!"));
             }
 
-            level.playSound(null, event.getEntity().getOnPos(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1f, 1f);
+            level.playSound(null, event.getEntity().getOnPos(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1f, 1f);
 
 
 

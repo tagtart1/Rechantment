@@ -322,9 +322,10 @@ public class RechantmentCommonConfigs {
         BUILDER.comment("Example: Gold tools and armor from nether portal ruins will remain and not be replaced by Rechantment books");
         EXCLUDE_LOWER_TIER_LOOT = BUILDER.define("exclude_lower_tier_loot", false);
 
-        BUILDER.comment("Makes enchanted fished treasure have weaker enchants (level 5 enchants)");
+        BUILDER.comment("Makes enchanted fished treasure have weaker enchants (level 5 enchants) and excludes it from REPLACE_ENCHANTED_LOOT");
         BUILDER.comment("Example: Enchanted bows and fishing rods will commonly have Power I or Lure I respectively unless CLEAR_ENCHANTED_LOOT is enabled");
-        BUILDER.comment("This effect is applied after REPLACE_ENCHANTED_LOOT but before CLEAR_ENCHANTED_LOOT");
+        BUILDER.comment("This setting is applied logically before CLEAR_ENCHANTED_LOOT");
+        BUILDER.comment("Without this enabled, fishing loot becomes an overpowered source for enchanted books with REPLACE_ENCHANTED_LOOT");
         NERF_FISHING_LOOT = BUILDER.define("nerf_fishing_loot", false);
 
         BUILDER.pop();

@@ -66,7 +66,7 @@ public class InventoryMixin {
                                     .append("!"));
                         }
                     }
-                    inventory.player.level().playSound(null, inventory.player.getOnPos(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1f, 1f);
+                    inventory.player.level().playSound(null, inventory.player.getOnPos(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1f, 1f);
                 }
             }
            }

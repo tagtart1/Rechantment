@@ -219,8 +219,6 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
                 break;
             // Not enough lapis.
             case INSUFFICIENT_LAPIS:
-                player.sendSystemMessage(Component.literal("Insufficient Lapis!").withStyle(ChatFormatting.RED));
-                player.level().playSound(null, player.getOnPos(), SoundEvents.LODESTONE_COMPASS_LOCK, SoundSource.BLOCKS, .7f, 1f);
                 break;
         }
 
