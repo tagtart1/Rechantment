@@ -1,8 +1,10 @@
 package net.tagtart.rechantment.screen;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -21,6 +23,9 @@ public class HoverableLootTablePoolEntryRenderable extends HoverableGuiRenderabl
     private static final ResourceLocation TABLE_ENTRY_BOX_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/gui/enchant_table_loot_pool_entry_box.png");
     private static final ResourceLocation INFO_ICON_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "textures/gui/info_button.png");
 
+    private static final ResourceLocation GRID_SHADER_LOCATION = new ResourceLocation(Rechantment.MOD_ID, "shaders/program/ench_table_grid_shader");
+    private ShaderInstance gridShader;
+
     private final int enchantmentInfoOffsetY = 13;
     private HoverableWithTooltipGuiRenderable nestedInfoHoverable;
 
@@ -37,6 +42,8 @@ public class HoverableLootTablePoolEntryRenderable extends HoverableGuiRenderabl
     private ArrayList<String> levelDropRates;
 
     public int scrollOffset = 0;
+
+    public static float globalTimeElapsed = 0f; // Will be relative to the screen being used.
 
     public HoverableLootTablePoolEntryRenderable(RechantmentTablePoolDisplayScreen pScreen, Font pFont, EnchantmentPoolEntry pPoolEntry, int pPropertiesIndex, int posX, int posY) {
         super(TABLE_ENTRY_BOX_LOCATION, posX, posY);
@@ -58,6 +65,8 @@ public class HoverableLootTablePoolEntryRenderable extends HoverableGuiRenderabl
         nestedInfoHoverable.imageViewWidth = 9;
         nestedInfoHoverable.imageViewHeight = 9;
         nestedInfoHoverable.tooltipEnabled = false;  // Manually rendering tooltip later due to scissoring conflicts.
+
+        this.gridShader = UtilFunctions.loadShader(GRID_SHADER_LOCATION);
 
         levelDropRates = new ArrayList<>();
         generatePoolEntryInfo();
@@ -99,9 +108,28 @@ public class HoverableLootTablePoolEntryRenderable extends HoverableGuiRenderabl
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         super.render(guiGraphics, mouseX, mouseY, delta);
+        renderBackground(guiGraphics, mouseX, mouseY, delta);
+        renderText(guiGraphics, mouseX, mouseY, delta);
+    }
 
+    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         guiGraphics.blitNineSlicedSized(renderTexture, renderOffsetPosX, renderOffsetPosY - scrollOffset, imageWidth, getEntryLabelBottomY(), 2, imageWidth, imageHeight, 0, 0, imageWidth, imageHeight);
 
+        gridShader.safeGetUniform("Time").set(globalTimeElapsed);
+        gridShader.safeGetUniform("Resolution").set((float)imageWidth, (float)getEntryLabelBottomY());
+
+        RenderSystem.setShader(() -> gridShader);
+
+        Minecraft.getInstance().getTextureManager().bindForSetup(renderTexture);
+        gridShader.safeGetUniform("MainDiffuse").set(0);
+
+        gridShader.apply();
+
+        UtilFunctions.fakeInnerBlit(guiGraphics, renderOffsetPosX, renderOffsetPosX + imageWidth, renderOffsetPosY - scrollOffset, (renderOffsetPosY - scrollOffset) + getEntryLabelBottomY(), 0,
+                0.0f, 1.0f, 0.0f, 1.0f);
+    }
+
+    public void renderText(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         guiGraphics.pose().pushPose();
         float scaleFac = 0.75f;
         float invScaleFac = 1.0f / scaleFac;
@@ -150,6 +178,7 @@ public class HoverableLootTablePoolEntryRenderable extends HoverableGuiRenderabl
         guiGraphics.enableScissor(screen.getScissorMinX(), screen.getScissorMinY(), screen.getScissorMaxX(), screen.getScissorMaxY());
         nestedInfoHoverable.render(guiGraphics, mouseX, mouseY, delta);
     }
+
 
     private boolean displayShortenedVersion() {
         return levelDropRates.size() <= 1 && enchantment.getMaxLevel() <= 1;

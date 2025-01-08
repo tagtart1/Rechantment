@@ -61,7 +61,7 @@ public class EnchantmentTableBlockMixin
         cir.setReturnValue(new RechantmentTableBlockEntity(pPos, pState));
     }
 
-    @Inject(method = "animateTick", at = @At("TAIL"), cancellable = false)
+    @Inject(method = "animateTick", at = @At("HEAD"), cancellable = true)
     public void animateTick(BlockState pState, Level pLevel, BlockPos pPos, RandomSource pRandom, CallbackInfo ci) {
 
         BlockEntity be = pLevel.getBlockEntity(pPos);
@@ -72,6 +72,8 @@ public class EnchantmentTableBlockMixin
                 }
             }
         }
+
+        ci.cancel();
     }
 
     @Inject(method = "getTicker", at = @At("HEAD"), cancellable = true)

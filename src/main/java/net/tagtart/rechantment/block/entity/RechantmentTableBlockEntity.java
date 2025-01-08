@@ -41,7 +41,6 @@ public class RechantmentTableBlockEntity extends EnchantmentTableBlockEntity imp
 
     private long totalTicks = 0;
     private int currentIndexRequirementsMet = -1;
-    public boolean firstRequirementsCheckOnLoad = true;
 
     LoopingAmbientSound ambientSound;
 
@@ -245,27 +244,25 @@ public class RechantmentTableBlockEntity extends EnchantmentTableBlockEntity imp
 
         // Requirements have started being met on this tick.
         if (currentIndexRequirementsMet >= 0 && prevIndexRequirementsMet == -1) {
-            if (!firstRequirementsCheckOnLoad) {
-                pLevel.playSound(null, pPos, ModSounds.ENCHANT_TABLE_CHARGE.get(), SoundSource.BLOCKS, 0.4f, 1.0f);
-                pLevel.playSound(null, pPos, ModSounds.ENCHANT_TABLE_OPEN.get(), SoundSource.BLOCKS, 0.8f, 1.0f);
+            if (totalTicks != 0) {
+                pLevel.playSound(null, pPos, ModSounds.ENCHANT_TABLE_CHARGE.get(), SoundSource.BLOCKS, 0.5f, 1.0f);
+                pLevel.playSound(null, pPos, ModSounds.ENCHANT_TABLE_OPEN.get(), SoundSource.BLOCKS, 1.0f, 1.0f);
             }
 
             if (pLevel.isClientSide()) {
                 ambientSound = new LoopingAmbientSound(ModSounds.ENCHANT_TABLE_AMBIENT.get(), SoundSource.AMBIENT, pPos.getX() + 0.5f, pPos.getY() + 0.5f, pPos.getZ() + 0.5f);
-                ambientSound.setVolume(0.4f);
+                ambientSound.setVolume(0.5f);
                 Minecraft.getInstance().getSoundManager().play(ambientSound);
             }
-            firstRequirementsCheckOnLoad = false;
         }
 
         // Requirements no longer being met on this tick.
         else if (currentIndexRequirementsMet == -1 && prevIndexRequirementsMet != -1) {
-            if (!firstRequirementsCheckOnLoad) {
-                pLevel.playSound(null, pPos, ModSounds.ENCHANT_TABLE_DISCHARGE.get(), SoundSource.BLOCKS, 0.4f, 1.0f);
-                pLevel.playSound(null, pPos, ModSounds.ENCHANT_TABLE_CLOSE.get(), SoundSource.BLOCKS, 0.8f, 1.0f);
+            if (totalTicks != 0) {
+                pLevel.playSound(null, pPos, ModSounds.ENCHANT_TABLE_DISCHARGE.get(), SoundSource.BLOCKS, 0.5f, 1.0f);
+                pLevel.playSound(null, pPos, ModSounds.ENCHANT_TABLE_CLOSE.get(), SoundSource.BLOCKS, 1.0f, 1.0f);
                 stopAmbientSound();
             }
-            firstRequirementsCheckOnLoad = false;
         }
     }
 
