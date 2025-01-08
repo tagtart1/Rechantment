@@ -308,7 +308,7 @@ public class RechantmentCommonConfigs {
         BUILDER.comment("Note: Having this and REPLACE_ENCHANTED_LOOT both set to true may cause issues!");
         CLEAR_ENCHANTED_LOOT = BUILDER.define("clear_enchanted_loot", false);
 
-        BUILDER.comment("Replace all enchanted loot into Rechantment books (based on world_spawn_weight config from each rarity section");
+        BUILDER.comment("Replace all enchanted loot into Rechantment books based on world_spawn_weight config from each rarity section");
         BUILDER.comment("Example: A chest plate found with enchants will be replaced entirely with a rolled enchanted book based on the rarity configs");
         BUILDER.comment("Note: Having this and CLEAR_ENCHANTED_LOOT both set to true may cause issues!");
         REPLACE_ENCHANTED_LOOT = BUILDER.define("replace_enchanted_loot", false);

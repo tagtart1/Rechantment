@@ -51,6 +51,7 @@ import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
@@ -70,6 +71,7 @@ import oshi.util.tuples.Pair;
 
 import javax.annotation.Nullable;
 import java.awt.*;
+import java.awt.event.ContainerEvent;
 import java.util.*;
 import java.util.List;
 

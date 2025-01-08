@@ -19,6 +19,7 @@ import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.item.ModItems;
 import net.tagtart.rechantment.util.BookRarityProperties;
 import net.tagtart.rechantment.util.EnchantmentPoolEntry;
+import net.tagtart.rechantment.util.UtilFunctions;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
@@ -47,7 +48,6 @@ public class ReplaceItemModifier extends LootModifier {
             // Happens by default - not configurable
             if (stack.getItem() instanceof EnchantedBookItem) {
                 ItemStack replacementBook = rollModdedBook();
-
                 generatedLoot.set(i, replacementBook);
             }
 
@@ -114,6 +114,11 @@ public class ReplaceItemModifier extends LootModifier {
 
         rootTag.put("Enchantment", enchantmentTag);
         rootTag.putInt("SuccessRate", successRate);
+
+        if (UtilFunctions.shouldAnnounceDrop(randomEnchantment.enchantment, enchantmentLevel)) {
+            rootTag.putBoolean("Announce", true);
+        }
+
 
         return replacementBook;
     }

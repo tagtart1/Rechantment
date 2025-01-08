@@ -6,7 +6,8 @@
   "refmap": "mixins.rechantment.refmap.json",
   "mixins": [
     "EnchantmentTableBlockMixin",
-    "ItemStackMixin"
+    "ItemStackMixin",
+    "InventoryMixin"
   ],
   "injectors": {
     "defaultRequire": 1
