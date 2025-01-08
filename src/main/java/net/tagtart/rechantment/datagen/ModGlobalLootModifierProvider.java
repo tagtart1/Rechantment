@@ -16,7 +16,7 @@ public class ModGlobalLootModifierProvider extends GlobalLootModifierProvider {
 
     @Override
     protected void start() {
-        add("replace_vanilla_books", new ReplaceItemModifier(new LootItemCondition[]{
+        add("replace_enchanted_items", new ReplaceItemModifier(new LootItemCondition[]{
         }));
 
         add("remove_mending_from_items", new RemoveMendingModifier(new LootItemCondition[]{}));

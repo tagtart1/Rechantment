@@ -104,7 +104,7 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      CLEAR_ENCHANTED_LOOT;
     public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      REPLACE_ENCHANTED_LOOT;
     public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      EXCLUDE_LOWER_TIER_LOOT;
-    public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      EXCLUDE_FISHING_LOOT;
+    public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      NERF_FISHING_LOOT;
     // Fortune nerf configs
     public static final ForgeConfigSpec.ConfigValue<? extends Boolean>      FORTUNE_NERF_ENABLED;
     public static final ForgeConfigSpec.DoubleValue                         FORTUNE_1_CHANCE;
@@ -322,10 +322,10 @@ public class RechantmentCommonConfigs {
         BUILDER.comment("Example: Gold tools and armor from nether portal ruins will remain and not be replaced by Rechantment books");
         EXCLUDE_LOWER_TIER_LOOT = BUILDER.define("exclude_lower_tier_loot", false);
 
-        BUILDER.comment("Excludes fishing drops from being affected by the REPLACE_ENCHANTED_LOOT and CLEAR_ENCHANTED_LOOT configurations");
-        BUILDER.comment("Example: Enchanted bows and fishing rods will not be replaced with Rechantment books BUT still wont have enchantments");
-        BUILDER.comment("This setting is recommended as the default behavior with REPLACE_ENCHANTED_LOOT causes book drops from fishing to be common, may cause inflation and removes the need of the cool enchantment table");
-        EXCLUDE_FISHING_LOOT = BUILDER.define("exclude_fishing_loot", false);
+        BUILDER.comment("Makes enchanted fished treasure have weaker enchants (level 5 enchants)");
+        BUILDER.comment("Example: Enchanted bows and fishing rods will commonly have Power I or Lure I respectively unless CLEAR_ENCHANTED_LOOT is enabled");
+        BUILDER.comment("This effect is applied after REPLACE_ENCHANTED_LOOT but before CLEAR_ENCHANTED_LOOT");
+        NERF_FISHING_LOOT = BUILDER.define("nerf_fishing_loot", false);
 
         BUILDER.pop();
 
