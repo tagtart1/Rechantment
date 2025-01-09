@@ -31,9 +31,9 @@ public class RebirthEnchantment extends Enchantment {
 
     @Override
     public void doPostHurt(LivingEntity pTarget, Entity pAttacker, int pLevel) {
-        if (pTarget instanceof Player) {
-            System.out.println(pAttacker);
-        }
+//        if (pTarget instanceof Player) {
+//            System.out.println(pAttacker);
+//        }
         super.doPostHurt(pTarget, pAttacker, pLevel);
     }
 

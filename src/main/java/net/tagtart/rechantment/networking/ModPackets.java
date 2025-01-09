@@ -7,10 +7,8 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.tagtart.rechantment.Rechantment;
-import net.tagtart.rechantment.networking.packet.EnchantItemC2SPacket;
 import net.tagtart.rechantment.networking.packet.OpenEnchantTableScreenC2SPacket;
 import net.tagtart.rechantment.networking.packet.PurchaseEnchantedBookC2SPacket;
-import net.tagtart.rechantment.networking.packet.ActivateItemS2CPacket;
 
 // EVERYTHING IN HERE IS NOT USED CURRENTLY, JUST BOILERPLATE
 public class ModPackets {
@@ -31,18 +29,6 @@ public class ModPackets {
                 .simpleChannel();
 
         INSTANCE = net;
-
-        net.messageBuilder(EnchantItemC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(EnchantItemC2SPacket::new)
-                .encoder(EnchantItemC2SPacket::toBytes)
-                .consumerMainThread(EnchantItemC2SPacket::handle)
-                .add();
-
-        net.messageBuilder(ActivateItemS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(ActivateItemS2CPacket::new)
-                .encoder(ActivateItemS2CPacket::toBytes)
-                .consumerMainThread(ActivateItemS2CPacket::handle)
-                .add();
 
         net.messageBuilder(PurchaseEnchantedBookC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .decoder(PurchaseEnchantedBookC2SPacket::new)

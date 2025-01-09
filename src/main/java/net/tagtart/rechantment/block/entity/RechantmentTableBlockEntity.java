@@ -18,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.EnchantmentTableBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -25,6 +26,7 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.tagtart.rechantment.screen.RechantmentTableMenu;
+import net.tagtart.rechantment.sound.CustomClientSoundInstanceHandler;
 import net.tagtart.rechantment.sound.LoopingAmbientSound;
 import net.tagtart.rechantment.sound.ModSounds;
 import net.tagtart.rechantment.util.BookRarityProperties;
@@ -43,8 +45,6 @@ public class RechantmentTableBlockEntity extends EnchantmentTableBlockEntity imp
 
     private long totalTicks = 0;
     private int currentIndexRequirementsMet = -1;
-
-    LoopingAmbientSound ambientSound;
 
     public RechantmentTableBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(pPos, pBlockState);
@@ -134,8 +134,8 @@ public class RechantmentTableBlockEntity extends EnchantmentTableBlockEntity imp
     }
 
     public void stopAmbientSound() {
-        if (ambientSound != null) {
-            ambientSound.stopPlaying();
+        if (level.isClientSide()) {
+            UtilFunctions.tryStopAmbientSound(getBlockPos());
         }
     }
 
@@ -252,12 +252,7 @@ public class RechantmentTableBlockEntity extends EnchantmentTableBlockEntity imp
             }
 
             if (pLevel.isClientSide()) {
-                ambientSound = new LoopingAmbientSound(ModSounds.ENCHANT_TABLE_AMBIENT.get(), SoundSource.AMBIENT, pPos.getX() + 0.5f, pPos.getY() + 0.5f, pPos.getZ() + 0.5f);
-                ambientSound.setVolume(0.5f);
-
-                DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
-                    Minecraft.getInstance().getSoundManager().play(ambientSound);
-                });
+                UtilFunctions.createAndPlayAmbientSound(ModSounds.ENCHANT_TABLE_AMBIENT.get(), pPos, 0.5f);
             }
         }
 

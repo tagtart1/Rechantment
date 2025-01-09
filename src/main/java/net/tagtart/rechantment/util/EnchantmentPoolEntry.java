@@ -69,7 +69,6 @@ public class EnchantmentPoolEntry {
         Random rand = new Random();
         int randVal = rand.nextInt(levelWeightsSum);
 
-        System.out.println(randVal);
         int cumulativeSum = 0;
         for (int i = 0; i < levelWeights.size(); ++i) {
             cumulativeSum += levelWeights.get(i);

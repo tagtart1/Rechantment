@@ -15,6 +15,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Player;
@@ -26,9 +27,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.event.ParticleEmitter;
+import net.tagtart.rechantment.sound.CustomClientSoundInstanceHandler;
 import net.tagtart.rechantment.sound.ModSounds;
 import org.apache.logging.log4j.core.jmx.Server;
 import org.joml.Matrix4f;
@@ -352,7 +356,10 @@ public class UtilFunctions {
 
         };
         ParticleEmitter.emitParticlesOverTime(player, level, 100, 60, particlesArray);
-        Minecraft.getInstance().gameRenderer.displayItemActivation(itemToActivate);
+
+        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
+            Minecraft.getInstance().gameRenderer.displayItemActivation(itemToActivate);
+        });
         level.playSound(null,  player.blockPosition(), ModSounds.REBIRTH_ITEM.get(), SoundSource.PLAYERS, 0.7F, 1.0F);
     }
 
@@ -386,5 +393,14 @@ public class UtilFunctions {
 
     public static double remap(double fromMin, double fromMax, double toMin, double toMax, double value) {
         return lerp(toMin, toMax, inverseLerp(fromMin, fromMax, value));
+    }
+
+    // If EVER called on server, game will shit its pants. Do not do that.
+    public static void createAndPlayAmbientSound(SoundEvent pSoundEvent, BlockPos pPos, float volume) {
+        CustomClientSoundInstanceHandler.createAnyPlayAmbientSound(pSoundEvent, pPos, volume);
+    }
+
+    public static void tryStopAmbientSound(BlockPos pPos) {
+        CustomClientSoundInstanceHandler.tryStopAmbientSound(pPos);
     }
 }
