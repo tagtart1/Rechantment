@@ -17,9 +17,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.EnchantmentTableBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.tagtart.rechantment.screen.RechantmentTableMenu;
@@ -252,7 +254,10 @@ public class RechantmentTableBlockEntity extends EnchantmentTableBlockEntity imp
             if (pLevel.isClientSide()) {
                 ambientSound = new LoopingAmbientSound(ModSounds.ENCHANT_TABLE_AMBIENT.get(), SoundSource.AMBIENT, pPos.getX() + 0.5f, pPos.getY() + 0.5f, pPos.getZ() + 0.5f);
                 ambientSound.setVolume(0.5f);
-                Minecraft.getInstance().getSoundManager().play(ambientSound);
+
+                DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
+                    Minecraft.getInstance().getSoundManager().play(ambientSound);
+                });
             }
         }
 
