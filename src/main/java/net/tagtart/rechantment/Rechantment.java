@@ -2,6 +2,8 @@ package net.tagtart.rechantment;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.blockentity.EnchantTableRenderer;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -92,6 +94,8 @@ public class Rechantment
             ModItemProperties.addCustomItemProperties();
             MenuScreens.register(ModMenuTypes.RECHANTMENT_TABLE_MENU.get(), RechantmentTableScreen::new);
             MenuScreens.register(ModMenuTypes.RECHANTMENT_TABLE_POOL_DISPLAY_MENU.get(), RechantmentTablePoolDisplayScreen::new);
+
+            BlockEntityRenderers.register(ModReplacementBlockEntities.RECHANTMENT_TABLE_BE.get(), EnchantTableRenderer::new);
         }
     }
 }

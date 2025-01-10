@@ -16,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.EnchantmentTableBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
@@ -47,7 +48,8 @@ public class RechantmentTableBlockEntity extends EnchantmentTableBlockEntity imp
     private long totalTicks = 0;
     private int currentIndexRequirementsMet = -1;
 
-    public RechantmentTableBlockEntity(BlockPos pPos, BlockState pBlockState) {
+    public RechantmentTableBlockEntity(BlockPos pPos, BlockState pBlockState)
+    {
         super(pPos, pBlockState);
     }
 
@@ -72,6 +74,11 @@ public class RechantmentTableBlockEntity extends EnchantmentTableBlockEntity imp
     public void invalidateCaps() {
         super.invalidateCaps();
         lazyItemHandler.invalidate();
+    }
+
+    @Override
+    public BlockEntityType<?> getType() {
+        return ModReplacementBlockEntities.RECHANTMENT_TABLE_BE.get();
     }
 
     // Makes the object drop the items currently inside the itemHandler slots.
