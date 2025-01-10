@@ -1,6 +1,7 @@
 package net.tagtart.rechantment.block.entity;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.blockentity.EnchantTableRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -56,7 +57,7 @@ public class RechantmentTableBlockEntity extends EnchantmentTableBlockEntity imp
             return lazyItemHandler.cast();
         }
 
-        return super.getCapability(cap);
+        return LazyOptional.empty();
     }
 
     // Ties forge's lazyItemHandler to the itemHandler we defined.
@@ -65,6 +66,7 @@ public class RechantmentTableBlockEntity extends EnchantmentTableBlockEntity imp
         super.onLoad();
         lazyItemHandler = LazyOptional.of(() -> itemHandler);
     }
+
 
     @Override
     public void invalidateCaps() {
@@ -110,7 +112,6 @@ public class RechantmentTableBlockEntity extends EnchantmentTableBlockEntity imp
         if (totalTicks == 0) {
             soundLogicOnTick(pPos, pLevel);
         }
-
         totalTicks++;
         newBookAnimationTick(pLevel, pPos, pState);
 
