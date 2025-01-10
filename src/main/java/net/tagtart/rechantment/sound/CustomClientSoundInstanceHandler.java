@@ -27,6 +27,7 @@ public class CustomClientSoundInstanceHandler {
     public static void tryStopAmbientSound(BlockPos pPos) {
         if (playingAmbientSounds.containsKey(pPos)) {
             playingAmbientSounds.get(pPos).stopPlaying();
+            playingAmbientSounds.remove(pPos);
         }
     }
 }

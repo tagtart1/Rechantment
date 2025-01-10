@@ -271,14 +271,11 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         tooltipLines.add(Component.literal(" "));
 
         // Experience requirement
-        Component experienceTitle = Component.translatable("tooltip.rechantment.enchantment_table.experience").withStyle(MID_GRAY_COLOR_STYLE);
-        Component experienceFrac = Component.literal(playerInventory.player.totalExperience + "/" + properties.requiredExp + " EXP").withStyle(ChatFormatting.WHITE);
-        tooltipLines.add(experienceTitle.copy().append(": ").append(experienceFrac));
-        tooltipLines.add(Component.literal(" "));
-
-        // Other requirements:
-        Component requirementsTitle = Component.translatable("tooltip.rechantment.enchantment_table.requirements").append(": ").withStyle(MID_GRAY_COLOR_STYLE);
-        tooltipLines.add(requirementsTitle);
+        Component experienceTitle = Component.translatable("tooltip.rechantment.enchantment_table.cost").withStyle(MID_GRAY_COLOR_STYLE);
+        ChatFormatting expReqMetColor = expRequirementMet(properties) ? ChatFormatting.GREEN : ChatFormatting.RED;
+        Component experienceFrac = Component.literal(playerInventory.player.totalExperience + " / " + properties.requiredExp + " EXP").withStyle(expReqMetColor);
+        tooltipLines.add(experienceTitle.copy().append(":"));
+        tooltipLines.add(grayHyphen.copy().append(experienceFrac));
 
         // Lapis Lazuli count requirement.
         String lapisCount = String.valueOf(properties.requiredLapis);
@@ -286,6 +283,11 @@ public class RechantmentTableScreen extends AbstractContainerScreen<RechantmentT
         ChatFormatting lapisReqMetColor = lapisRequirementsMet(properties) ? ChatFormatting.GREEN : ChatFormatting.RED;
         Component fullLapisRequirementColored = Component.literal(lapisCount + " " + lapisName).withStyle(lapisReqMetColor);
         tooltipLines.add(grayHyphen.copy().append(fullLapisRequirementColored));
+        tooltipLines.add(Component.literal(" "));
+
+        // Block requirements:
+        Component requirementsTitle = Component.translatable("tooltip.rechantment.enchantment_table.requirements").append(": ").withStyle(MID_GRAY_COLOR_STYLE);
+        tooltipLines.add(requirementsTitle);
 
         // Bookshelf count requirement. Green color if requirement met.
         String bookshelfCount = String.valueOf(properties.requiredBookShelves);

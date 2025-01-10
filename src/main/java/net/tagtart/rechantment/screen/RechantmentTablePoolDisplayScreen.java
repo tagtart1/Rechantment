@@ -305,24 +305,24 @@ public class RechantmentTablePoolDisplayScreen extends AbstractContainerScreen<R
         tooltipLines.add(Component.literal(" "));
 
         // Experience cost
-        Component experienceTitle = Component.translatable("tooltip.rechantment.enchantment_table.experience_cost").withStyle(MID_GRAY_COLOR_STYLE);
+        Component experienceTitle = Component.translatable("tooltip.rechantment.enchantment_table.cost").withStyle(MID_GRAY_COLOR_STYLE);
         tooltipLines.add(experienceTitle);
 
         // Experience cost value, including number of levels to reach that amount.
         String totalExperienceLvl = String.format("%.1f", UtilFunctions.getTotalLevelFromEXP(properties.requiredExp));
         Component experienceAmt = Component.literal(properties.requiredExp + " EXP (" + totalExperienceLvl + " Levels)").withStyle(currentBookStyle);
         tooltipLines.add(grayHyphen.copy().append(experienceAmt));
+
+        // Lapis Lazuli cost value
+        String lapisCount = String.valueOf(properties.requiredLapis);
+        String lapisName = Component.translatable("tooltip.rechantment.enchantment_table.lapis").getString();
+        Component fullLapisRequirementColored = Component.literal(lapisCount + " " + lapisName).withStyle(currentBookStyle);
+        tooltipLines.add(grayHyphen.copy().append(fullLapisRequirementColored));
         tooltipLines.add(Component.literal(" "));
 
         // Other requirements:
         Component requirementsTitle = Component.translatable("tooltip.rechantment.enchantment_table.requirements").append(": ").withStyle(MID_GRAY_COLOR_STYLE);
         tooltipLines.add(requirementsTitle);
-
-        // Lapis Lazuli count requirement.
-        String lapisCount = String.valueOf(properties.requiredLapis);
-        String lapisName = Component.translatable("tooltip.rechantment.enchantment_table.lapis").getString();
-        Component fullLapisRequirementColored = Component.literal(lapisCount + " " + lapisName).withStyle(currentBookStyle);
-        tooltipLines.add(grayHyphen.copy().append(fullLapisRequirementColored));
 
         // Bookshelf count requirement. Green color if requirement met.
         String bookshelfCount = String.valueOf(properties.requiredBookShelves);
