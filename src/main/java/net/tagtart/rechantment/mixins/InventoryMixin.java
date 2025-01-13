@@ -50,14 +50,7 @@ public class InventoryMixin {
                 if (inventory.player.level() instanceof ServerLevel serverLevel) {
                     Component displayName = pStack.getDisplayName();
                     Style displayHoverStyle = displayName.getStyle();
-                    String displayNameString = displayName.getString();
-                    /**
-                    StringBuilder sb = new StringBuilder(displayNameString);
-                    sb.delete(0, 3);
 
-                    sb.deleteCharAt(sb.length() - 1);
-
-                    displayNameString = sb.toString(); **/
                     Component playerName = inventory.player.getDisplayName();
                     BookRarityProperties bookProps = UtilFunctions.getPropertiesFromEnchantment(enchantmentRaw);
                     if (bookProps != null) {
