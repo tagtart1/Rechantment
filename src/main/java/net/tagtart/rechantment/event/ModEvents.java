@@ -29,6 +29,8 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -49,6 +51,7 @@ import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.loot.LootModifier;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.*;
@@ -565,43 +568,9 @@ public class ModEvents {
             }
         }
 
-        @SubscribeEvent
-        public static void onArmorEquip(LivingEquipmentChangeEvent event) {
-            if (event.getSlot().getType() != EquipmentSlot.Type.ARMOR) return;
-            if (!(event.getEntity() instanceof  Player player)) return;
-
-            ItemStack newArmor = event.getTo();
-            ItemStack oldArmor = event.getFrom();
-            Pair<OverloadEnchantment, Integer> overloadEnchantment = UtilFunctions.getEnchantmentFromItem(
-                    "rechantment:overload",
-                    newArmor,
-                    OverloadEnchantment.class
-            );
 
 
 
-            if (overloadEnchantment != null) {
-
-                float newMaxHealth =  overloadEnchantment.getA().getMaxHealthTier(overloadEnchantment.getB());
-                if (player.getMaxHealth() != newMaxHealth) {
-
-                    player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(newMaxHealth);
-                    if (player.getHealth() > player.getMaxHealth()) {
-                        player.setHealth(player.getMaxHealth());
-                    }
-                    // Make sure this plays
-                    player.level().playSound(null, player.getOnPos(), SoundEvents.TRIDENT_RETURN, SoundSource.PLAYERS, 1.15f, 1f);
-                }
-
-            } else {
-                player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(20f);
-
-                if (player.getHealth() > player.getMaxHealth()) {
-                    player.setHealth(player.getMaxHealth());
-                    player.level().playSound(null, player.getEyePosition().x, player.getEyePosition().y, player.getEyePosition().z, SoundEvents.PLAYER_HURT, SoundSource.PLAYERS, 1f, 1f);
-                }
-            }
-        }
 
         @SubscribeEvent
         public static void onAnvilUpdate(AnvilUpdateEvent event) {
