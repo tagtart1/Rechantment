@@ -53,7 +53,8 @@ public abstract class PlayerMixin extends LivingEntity {
         Player player = (Player)(Object)this;
 
         int i = 0;
-
+        // CURRENT BUG: if you leave with overload equipped and unequip to no armor then the overload modifier remains. no idea why
+        // as if the cache and the getArmorSlots are not syncing right or something....
         for (ItemStack armorStack : this.getArmorSlots()) {
             ItemStack cachedStack = (ItemStack)this.ARMOR_CACHE.get(i);
             System.out.println((cachedStack.getItem() != armorStack.getItem()));
