@@ -28,6 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.awt.*;
 
+// This mixin handles announcements for rare found books
 @Mixin(Inventory.class)
 public class InventoryMixin {
 
@@ -43,24 +44,20 @@ public class InventoryMixin {
                 tag.remove("Announce");
                 int successRate = tag.getInt("SuccessRate");
                 String enchantmentRaw = tag.getCompound("Enchantment").getString("id");
-                String enchantmentFormatted = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(enchantmentRaw)).getFullname(1).getString();
+                int enchantLevel = tag.getCompound("Enchantment").getInt("lvl");
+                String enchantmentFormatted = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(enchantmentRaw)).getFullname(enchantLevel).getString();
 
                 if (inventory.player.level() instanceof ServerLevel serverLevel) {
                     Component displayName = pStack.getDisplayName();
                     Style displayHoverStyle = displayName.getStyle();
-                    String displayNameString = displayName.getString();
-                    StringBuilder sb = new StringBuilder(displayNameString);
-                    sb.delete(0, 3);
-                    sb.deleteCharAt(sb.length() - 1);
 
-                    displayNameString = sb.toString();
                     Component playerName = inventory.player.getDisplayName();
                     BookRarityProperties bookProps = UtilFunctions.getPropertiesFromEnchantment(enchantmentRaw);
                     if (bookProps != null) {
                         for (ServerPlayer otherPlayer : serverLevel.players()) {
 
                             otherPlayer.sendSystemMessage(Component.literal(playerName.getString() + " found ")
-                                    .append(Component.literal(displayNameString).withStyle(displayHoverStyle.withColor(bookProps.color).withUnderlined(true)))
+                                    .append(Component.literal(enchantmentFormatted).withStyle(displayHoverStyle.withColor(bookProps.color).withUnderlined(true)))
                                     .append(" at ")
                                     .append(Component.literal(successRate + "%").withStyle(Style.EMPTY.withColor(bookProps.color)))
                                     .append("!"));

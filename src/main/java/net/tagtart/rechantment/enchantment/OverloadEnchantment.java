@@ -12,14 +12,10 @@ public class OverloadEnchantment extends Enchantment {
         super(pRarity, pCategory, pSlots);
     }
 
-    private final List<Float> maxHealthTiers =Arrays.asList(
-            22f,
-            24f,
-            26f
-    );
 
-    public float getMaxHealthTier(int level) {
-        return maxHealthTiers.get(level - 1);
+
+    public static float getAdditionalHearts(int level) {
+        return level * 2;
     }
 
     @Override
