@@ -1,6 +1,8 @@
 package net.tagtart.rechantment.enchantment;
 
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -16,17 +18,22 @@ public class ModEnchantments {
     public static final DeferredRegister<Enchantment> ENCHANTMENTS =
             DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, Rechantment.MOD_ID);
 
+    private static final EnchantmentCategory SHIELD_CATEGORY = EnchantmentCategory.create(
+            "shield",
+            item -> item instanceof ShieldItem
+    );
+
     public static RegistryObject<Enchantment> THUNDER_STRIKE =
             ENCHANTMENTS.register("thunder_strike", () -> new ThunderStrikeEnchantment(
                     Enchantment.Rarity.COMMON, EnchantmentCategory.WEAPON, EquipmentSlot.MAINHAND));
 
     public static RegistryObject<Enchantment> BASH =
             ENCHANTMENTS.register("bash", () -> new BashEnchantment(
-                    Enchantment.Rarity.COMMON, EnchantmentCategory.BREAKABLE, EquipmentSlot.OFFHAND));
+                    Enchantment.Rarity.COMMON, SHIELD_CATEGORY, EquipmentSlot.OFFHAND));
 
     public static RegistryObject<Enchantment> COURAGE =
             ENCHANTMENTS.register("courage", () -> new CourageEnchantment(
-                    Enchantment.Rarity.COMMON, EnchantmentCategory.BREAKABLE, EquipmentSlot.OFFHAND));
+                    Enchantment.Rarity.COMMON, SHIELD_CATEGORY, EquipmentSlot.OFFHAND));
 
     public static RegistryObject<Enchantment> VOIDS_BANE =
             ENCHANTMENTS.register("voids_bane", () -> new VoidsBaneEnchantment(

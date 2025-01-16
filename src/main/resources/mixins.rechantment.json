@@ -3,11 +3,12 @@
   "minVersion": "0.8",
   "package": "net.tagtart.rechantment.mixins",
   "compatibilityLevel": "JAVA_17",
-  "refmap": "mixins.rechantment.refmap.json",
+  "refmap": "rechantment.mixin-refmap.json",
   "mixins": [
     "EnchantmentTableBlockMixin",
-    "ItemStackMixin",
-    "InventoryMixin"
+    "GrindstoneMenuMixin",
+    "InventoryMixin",
+    "ItemStackMixin"
   ],
   "injectors": {
     "defaultRequire": 1

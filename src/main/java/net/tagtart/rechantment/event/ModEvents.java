@@ -48,6 +48,7 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.loot.LootModifier;
 import net.minecraftforge.event.AnvilUpdateEvent;
+import net.minecraftforge.event.GrindstoneEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.*;
@@ -60,6 +61,7 @@ import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.block.entity.RechantmentTableBlockEntity;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.enchantment.*;
+import net.tagtart.rechantment.item.ModItems;
 import net.tagtart.rechantment.networking.ModPackets;
 import net.tagtart.rechantment.sound.ModSounds;
 import net.tagtart.rechantment.util.BookRarityProperties;
@@ -700,6 +702,15 @@ public class ModEvents {
             level.playSound(null, event.getEntity().getOnPos(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1f, 1f);
 
 
+
+        }
+
+        @SubscribeEvent
+        public static void onGrindstoneChange(GrindstoneEvent.OnPlaceItem event) {
+            if (event.getTopItem().is(ModItems.ENCHANTED_BOOK.get()) && event.getBottomItem().isEmpty()) {
+                event.setOutput(new ItemStack(Items.PAPER));
+                event.setXp(Integer.MIN_VALUE);
+            }
 
         }
     }

@@ -27,6 +27,8 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.IntValue                            RARITY_0_REQUIRED_LAPIS;
     public static final ForgeConfigSpec.ConfigValue<? extends String>       RARITY_0_FLOOR_BLOCK_TYPE;
     public static final ForgeConfigSpec.DoubleValue                         RARITY_0_REROLL_GEM_CHANCE;
+    public static final ForgeConfigSpec.IntValue                            RARITY_0_GRINDSTONE_XP_MIN;
+    public static final ForgeConfigSpec.IntValue                            RARITY_0_GRINDSTONE_XP_MAX;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> RARITY_0_ENCHANTMENTS;
 
     // Unique tier configs.
@@ -44,6 +46,8 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.IntValue                            RARITY_1_REQUIRED_LAPIS;
     public static final ForgeConfigSpec.ConfigValue<? extends String>       RARITY_1_FLOOR_BLOCK_TYPE;
     public static final ForgeConfigSpec.DoubleValue                         RARITY_1_REROLL_GEM_CHANCE;
+    public static final ForgeConfigSpec.IntValue                            RARITY_1_GRINDSTONE_XP_MIN;
+    public static final ForgeConfigSpec.IntValue                            RARITY_1_GRINDSTONE_XP_MAX;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> RARITY_1_ENCHANTMENTS;
 
     // Elite tier configs.
@@ -61,6 +65,8 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.IntValue                            RARITY_2_REQUIRED_LAPIS;
     public static final ForgeConfigSpec.ConfigValue<? extends String>       RARITY_2_FLOOR_BLOCK_TYPE;
     public static final ForgeConfigSpec.DoubleValue                         RARITY_2_REROLL_GEM_CHANCE;
+    public static final ForgeConfigSpec.IntValue                            RARITY_2_GRINDSTONE_XP_MIN;
+    public static final ForgeConfigSpec.IntValue                            RARITY_2_GRINDSTONE_XP_MAX;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> RARITY_2_ENCHANTMENTS;
 
     // Ultimate tier configs.
@@ -78,6 +84,8 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.IntValue                            RARITY_3_REQUIRED_LAPIS;
     public static final ForgeConfigSpec.ConfigValue<? extends String>       RARITY_3_FLOOR_BLOCK_TYPE;
     public static final ForgeConfigSpec.DoubleValue                         RARITY_3_REROLL_GEM_CHANCE;
+    public static final ForgeConfigSpec.IntValue                            RARITY_3_GRINDSTONE_XP_MIN;
+    public static final ForgeConfigSpec.IntValue                            RARITY_3_GRINDSTONE_XP_MAX;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> RARITY_3_ENCHANTMENTS;
 
     // Legendary tier configs.
@@ -95,7 +103,11 @@ public class RechantmentCommonConfigs {
     public static final ForgeConfigSpec.IntValue                            RARITY_4_REQUIRED_LAPIS;
     public static final ForgeConfigSpec.ConfigValue<? extends String>       RARITY_4_FLOOR_BLOCK_TYPE;
     public static final ForgeConfigSpec.DoubleValue                         RARITY_4_REROLL_GEM_CHANCE;
+    public static final ForgeConfigSpec.IntValue                            RARITY_4_GRINDSTONE_XP_MIN;
+    public static final ForgeConfigSpec.IntValue                            RARITY_4_GRINDSTONE_XP_MAX;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> RARITY_4_ENCHANTMENTS;
+
+    public static final ForgeConfigSpec.ConfigValue<? extends String>       GRINDSTONE_RESULT_ITEM;
 
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ANNOUNCEMENT_ENCHANTMENTS;
 
@@ -124,7 +136,7 @@ public class RechantmentCommonConfigs {
         BUILDER.push("Simple");
         RARITY_0_KEY = BUILDER.define("key", "simple");
         RARITY_0_COLOR = BUILDER.defineInRange("color", 11184810, 0, Integer.MAX_VALUE);
-        RARITY_0_EXP_COST = BUILDER.defineInRange("exp_cost", 100, 0, Integer.MAX_VALUE);
+        RARITY_0_EXP_COST = BUILDER.defineInRange("exp_cost", 75, 0, Integer.MAX_VALUE);
         RARITY_0_WORLD_SPAWN_WEIGHT = BUILDER.defineInRange("world_spawn_weight", 40, 0, Integer.MAX_VALUE);
         RARITY_0_MIN_SUCCESS = BUILDER.defineInRange("min_success", 25, 0, 100);
         RARITY_0_MAX_SUCCESS = BUILDER.defineInRange("max_success", 90, 0, 100);
@@ -136,6 +148,13 @@ public class RechantmentCommonConfigs {
         RARITY_0_REQUIRED_LAPIS = BUILDER.defineInRange("required_lapis", 2, 0, 64);
         RARITY_0_FLOOR_BLOCK_TYPE = BUILDER.define("floor_block_type", "minecraft:iron_block");
         RARITY_0_REROLL_GEM_CHANCE = BUILDER.defineInRange("reroll_gem_chance", 0.01, 0.0, 1.0);
+
+        BUILDER.comment(
+                "Minimum and maximum amount of xp orbs this tier provides when put into a grindstone",
+                "Make sure min is less than max, or problems may occur"
+        );
+        RARITY_0_GRINDSTONE_XP_MIN = BUILDER.defineInRange("grindstone_xp_min", 3, 0, Integer.MAX_VALUE);
+        RARITY_0_GRINDSTONE_XP_MAX = BUILDER.defineInRange("grindstone_xp_max", 7, 0, Integer.MAX_VALUE);
         BUILDER.comment(
                 "List of potential enchantments with weights, levels, and per-level weights.",
                 "Format: <enchantment>|<weight>|<level-range>|<level-weights>",
@@ -159,7 +178,7 @@ public class RechantmentCommonConfigs {
         BUILDER.push("unique");
         RARITY_1_KEY = BUILDER.define("key", "unique");
         RARITY_1_COLOR = BUILDER.defineInRange("color", 5635925, 0, Integer.MAX_VALUE);
-        RARITY_1_EXP_COST = BUILDER.defineInRange("exp_cost", 200, 0, Integer.MAX_VALUE);
+        RARITY_1_EXP_COST = BUILDER.defineInRange("exp_cost", 100, 0, Integer.MAX_VALUE);
         RARITY_1_WORLD_SPAWN_WEIGHT = BUILDER.defineInRange("world_spawn_weight", 30, 0, Integer.MAX_VALUE);
         RARITY_1_MIN_SUCCESS = BUILDER.defineInRange("min_success", 25, 0, 100);
         RARITY_1_MAX_SUCCESS = BUILDER.defineInRange("max_success", 90, 0, 100);
@@ -171,6 +190,8 @@ public class RechantmentCommonConfigs {
         RARITY_1_REQUIRED_LAPIS = BUILDER.defineInRange("required_lapis", 3, 0, 64);
         RARITY_1_FLOOR_BLOCK_TYPE = BUILDER.define("floor_block_type", "minecraft:gold_block");
         RARITY_1_REROLL_GEM_CHANCE = BUILDER.defineInRange("reroll_gem_chance", 0.01, 0.0, 1.0);
+        RARITY_1_GRINDSTONE_XP_MIN = BUILDER.defineInRange("grindstone_xp_min", 5, 0, Integer.MAX_VALUE);
+        RARITY_1_GRINDSTONE_XP_MAX = BUILDER.defineInRange("grindstone_xp_max", 10, 0, Integer.MAX_VALUE);
         ArrayList<String> rarity_1_default_enchantments = new ArrayList<>();
         rarity_1_default_enchantments.add("minecraft:bane_of_arthropods|1|4|1");
         rarity_1_default_enchantments.add("minecraft:loyalty|1|3|1");
@@ -191,7 +212,7 @@ public class RechantmentCommonConfigs {
         BUILDER.comment("Configs for Elite Rarity Enchantments").push("elite");
         RARITY_2_KEY = BUILDER.define("key", "elite");
         RARITY_2_COLOR = BUILDER.defineInRange("color", 5636095, 0, Integer.MAX_VALUE);
-        RARITY_2_EXP_COST = BUILDER.defineInRange("exp_cost", 400, 0, Integer.MAX_VALUE);
+        RARITY_2_EXP_COST = BUILDER.defineInRange("exp_cost", 200, 0, Integer.MAX_VALUE);
         RARITY_2_WORLD_SPAWN_WEIGHT = BUILDER.defineInRange("world_spawn_weight", 15, 0, Integer.MAX_VALUE);
         RARITY_2_MIN_SUCCESS = BUILDER.defineInRange("min_success", 25, 0, 100);
         RARITY_2_MAX_SUCCESS = BUILDER.defineInRange("max_success", 90, 0, 100);
@@ -203,7 +224,8 @@ public class RechantmentCommonConfigs {
         RARITY_2_REQUIRED_LAPIS = BUILDER.defineInRange("required_lapis", 3, 0, 64);
         RARITY_2_FLOOR_BLOCK_TYPE = BUILDER.define("floor_block_type", "minecraft:diamond_block");
         RARITY_2_REROLL_GEM_CHANCE = BUILDER.defineInRange("reroll_gem_chance", 0.02, 0.0, 1.0);
-
+        RARITY_2_GRINDSTONE_XP_MIN = BUILDER.defineInRange("grindstone_xp_min", 10, 0, Integer.MAX_VALUE);
+        RARITY_2_GRINDSTONE_XP_MAX = BUILDER.defineInRange("grindstone_xp_max", 20, 0, Integer.MAX_VALUE);
         ArrayList<String> rarity_2_default_enchantments = new ArrayList<>();
         rarity_2_default_enchantments.add("minecraft:looting|1|1-3|3,2,1");
         rarity_2_default_enchantments.add("minecraft:flame|1|1|1");
@@ -237,7 +259,8 @@ public class RechantmentCommonConfigs {
         RARITY_3_REQUIRED_LAPIS = BUILDER.defineInRange("required_lapis", 4, 0, 64);
         RARITY_3_FLOOR_BLOCK_TYPE = BUILDER.define("floor_block_type", "minecraft:emerald_block");
         RARITY_3_REROLL_GEM_CHANCE = BUILDER.defineInRange("reroll_gem_chance", 0.03, 0.0, 1.0);
-
+        RARITY_3_GRINDSTONE_XP_MIN = BUILDER.defineInRange("grindstone_xp_min", 20, 0, Integer.MAX_VALUE);
+        RARITY_3_GRINDSTONE_XP_MAX = BUILDER.defineInRange("grindstone_xp_max", 50, 0, Integer.MAX_VALUE);
         ArrayList<String> rarity_3_default_enchantments = new ArrayList<>();
         rarity_3_default_enchantments.add("minecraft:swift_sneak|1|1-3|3,2,1");
         rarity_3_default_enchantments.add("minecraft:luck_of_the_sea|1|2-3|2,1");
@@ -246,6 +269,7 @@ public class RechantmentCommonConfigs {
         rarity_3_default_enchantments.add("rechantment:ice_aspect|1|1-2|2,1");
         rarity_3_default_enchantments.add("rechantment:vein_miner|1|1|1");
         rarity_3_default_enchantments.add("rechantment:timber|1|1|1");
+        rarity_3_default_enchantments.add("rechantment:wisdom|1|1-2|2,1");
         rarity_3_default_enchantments.add("minecraft:multishot|1|1|1");
         rarity_3_default_enchantments.add("minecraft:channeling|1|1|1");
         rarity_3_default_enchantments.add("rechantment:courage|1|1|1");
@@ -259,7 +283,7 @@ public class RechantmentCommonConfigs {
         BUILDER.comment("Configs for Legendary Rarity Enchantments").push("legendary");
         RARITY_4_KEY = BUILDER.define("key", "legendary");
         RARITY_4_COLOR = BUILDER.defineInRange("color", 16755200, 0, Integer.MAX_VALUE);
-        RARITY_4_EXP_COST = BUILDER.defineInRange("exp_cost", 2000, 0, Integer.MAX_VALUE);
+        RARITY_4_EXP_COST = BUILDER.defineInRange("exp_cost", 1500, 0, Integer.MAX_VALUE);
         RARITY_4_WORLD_SPAWN_WEIGHT = BUILDER.defineInRange("world_spawn_weight", 5, 0, Integer.MAX_VALUE);
         RARITY_4_MIN_SUCCESS = BUILDER.defineInRange("min_success", 35, 0, 100);
         RARITY_4_MAX_SUCCESS = BUILDER.defineInRange("max_success", 90, 0, 100);
@@ -271,18 +295,22 @@ public class RechantmentCommonConfigs {
         RARITY_4_REQUIRED_LAPIS = BUILDER.defineInRange("required_lapis", 5, 0, 64);
         RARITY_4_FLOOR_BLOCK_TYPE = BUILDER.define("floor_block_type", "minecraft:ancient_debris");
         RARITY_4_REROLL_GEM_CHANCE = BUILDER.defineInRange("reroll_gem_chance", 0.05, 0.0, 1.0);
+        RARITY_4_GRINDSTONE_XP_MIN = BUILDER.defineInRange("grindstone_xp_min", 75, 0, Integer.MAX_VALUE);
+        RARITY_4_GRINDSTONE_XP_MAX = BUILDER.defineInRange("grindstone_xp_max", 150, 0, Integer.MAX_VALUE);
         ArrayList<String> rarity_4_default_enchantments = new ArrayList<>();
         rarity_4_default_enchantments.add("minecraft:infinity|1|1|1");
         rarity_4_default_enchantments.add("rechantment:inquisitive|1|1-4|4,3,2,1");
-        rarity_4_default_enchantments.add("rechantment:wisdom|1|1-2|2,1");
         rarity_4_default_enchantments.add("rechantment:overload|1|1-3|4,2,1");
-        rarity_4_default_enchantments.add("minecraft:mending|1|1|1");
         rarity_4_default_enchantments.add("rechantment:thunder_strike|1|1-2|2,1");
         rarity_4_default_enchantments.add("rechantment:rebirth|1|1-3|1,1,1");
         RARITY_4_ENCHANTMENTS = BUILDER.defineList("enchantments", rarity_4_default_enchantments, s -> s instanceof String);
 
-
         BUILDER.pop();
+        BUILDER.pop();
+
+        BUILDER.push("Configs for all rarities");
+        GRINDSTONE_RESULT_ITEM = BUILDER.define("grindstone_result_item", "minecraft:paper");
+
         BUILDER.pop();
 
         BUILDER.push("Announce Rare Drop List");
@@ -297,8 +325,6 @@ public class RechantmentCommonConfigs {
         ANNOUNCEMENT_ENCHANTMENTS = BUILDER.defineList("announce_enchantments", announce_enchantments, s -> s instanceof String);
 
         BUILDER.pop();
-
-
 
         BUILDER.comment("Configurations for all things related to generated loot drops. Ex: end_city_treasure");
         BUILDER.push("Loot Table Enhancements");

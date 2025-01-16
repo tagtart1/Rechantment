@@ -28,6 +28,8 @@ public class BookRarityProperties {
     public int requiredLapis;
     public Block floorBlock;
     public double rerollGemChance;
+    public int minGrindstoneXP;
+    public int maxGrindstoneXP;
     public List<EnchantmentPoolEntry> enchantmentPool;
     public int enchantmentPoolTotalWeights;
     public ResourceLocation iconResourceLocation;
@@ -127,6 +129,8 @@ public class BookRarityProperties {
         simpleProperties.requiredBookShelves =  RechantmentCommonConfigs.RARITY_0_REQUIRED_BOOKSHELVES.get();
         simpleProperties.requiredLapis =        RechantmentCommonConfigs.RARITY_0_REQUIRED_LAPIS.get();
         simpleProperties.rerollGemChance =      RechantmentCommonConfigs.RARITY_0_REROLL_GEM_CHANCE.get();
+        simpleProperties.minGrindstoneXP =      RechantmentCommonConfigs.RARITY_0_GRINDSTONE_XP_MIN.get();
+        simpleProperties.maxGrindstoneXP =      RechantmentCommonConfigs.RARITY_0_GRINDSTONE_XP_MAX.get();
         simpleProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_0_ENCHANTMENTS.get());
         simpleProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(simpleProperties.enchantmentPool);
         simpleProperties.iconResourceLocation = new ResourceLocation(Rechantment.MOD_ID, "textures/item/simple.png");
@@ -149,6 +153,8 @@ public class BookRarityProperties {
         uniqueProperties.requiredLapis =        RechantmentCommonConfigs.RARITY_1_REQUIRED_LAPIS.get();
         uniqueProperties.requiredBookShelves =  RechantmentCommonConfigs.RARITY_1_REQUIRED_BOOKSHELVES.get();
         uniqueProperties.rerollGemChance =      RechantmentCommonConfigs.RARITY_1_REROLL_GEM_CHANCE.get();
+        uniqueProperties.minGrindstoneXP =      RechantmentCommonConfigs.RARITY_1_GRINDSTONE_XP_MIN.get();
+        uniqueProperties.maxGrindstoneXP =      RechantmentCommonConfigs.RARITY_1_GRINDSTONE_XP_MAX.get();
         uniqueProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_1_ENCHANTMENTS.get());
         uniqueProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(uniqueProperties.enchantmentPool);
         uniqueProperties.iconResourceLocation = new ResourceLocation(Rechantment.MOD_ID, "textures/item/unique.png");
@@ -173,6 +179,8 @@ public class BookRarityProperties {
         eliteProperties.requiredBookShelves =  RechantmentCommonConfigs.RARITY_2_REQUIRED_BOOKSHELVES.get();
         eliteProperties.requiredLapis =        RechantmentCommonConfigs.RARITY_2_REQUIRED_LAPIS.get();
         eliteProperties.rerollGemChance =      RechantmentCommonConfigs.RARITY_2_REROLL_GEM_CHANCE.get();
+        eliteProperties.minGrindstoneXP =      RechantmentCommonConfigs.RARITY_2_GRINDSTONE_XP_MIN.get();
+        eliteProperties.maxGrindstoneXP =      RechantmentCommonConfigs.RARITY_2_GRINDSTONE_XP_MAX.get();
         eliteProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_2_ENCHANTMENTS.get());
         eliteProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(eliteProperties.enchantmentPool);
         eliteProperties.iconResourceLocation = new ResourceLocation(Rechantment.MOD_ID, "textures/item/elite.png");
@@ -195,6 +203,8 @@ public class BookRarityProperties {
         ultimateProperties.requiredBookShelves =  RechantmentCommonConfigs.RARITY_3_REQUIRED_BOOKSHELVES.get();
         ultimateProperties.requiredLapis =        RechantmentCommonConfigs.RARITY_3_REQUIRED_LAPIS.get();
         ultimateProperties.rerollGemChance =      RechantmentCommonConfigs.RARITY_3_REROLL_GEM_CHANCE.get();
+        ultimateProperties.minGrindstoneXP =      RechantmentCommonConfigs.RARITY_3_GRINDSTONE_XP_MIN.get();
+        ultimateProperties.maxGrindstoneXP =      RechantmentCommonConfigs.RARITY_3_GRINDSTONE_XP_MAX.get();
         ultimateProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_3_ENCHANTMENTS.get());
         ultimateProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(ultimateProperties.enchantmentPool);
         ultimateProperties.iconResourceLocation = new ResourceLocation(Rechantment.MOD_ID, "textures/item/ultimate.png");
@@ -218,6 +228,8 @@ public class BookRarityProperties {
         legendaryProperties.requiredBookShelves =  RechantmentCommonConfigs.RARITY_4_REQUIRED_BOOKSHELVES.get();
         legendaryProperties.requiredLapis =        RechantmentCommonConfigs.RARITY_4_REQUIRED_LAPIS.get();
         legendaryProperties.rerollGemChance =      RechantmentCommonConfigs.RARITY_4_REROLL_GEM_CHANCE.get();
+        legendaryProperties.minGrindstoneXP =      RechantmentCommonConfigs.RARITY_4_GRINDSTONE_XP_MIN.get();
+        legendaryProperties.maxGrindstoneXP =      RechantmentCommonConfigs.RARITY_4_GRINDSTONE_XP_MAX.get();
         legendaryProperties.enchantmentPool =      EnchantmentPoolEntry.listFromString(RechantmentCommonConfigs.RARITY_4_ENCHANTMENTS.get());
         legendaryProperties.enchantmentPoolTotalWeights = getEnchantmentPoolTotalWeight(legendaryProperties.enchantmentPool);
         legendaryProperties.iconResourceLocation = new ResourceLocation(Rechantment.MOD_ID, "textures/item/legendary.png");
