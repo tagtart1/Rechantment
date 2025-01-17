@@ -58,7 +58,7 @@ public class ModCreativeModeTabs {
 
                                    rootTag.put("Enchantment", enchantmentTag);
                                    rootTag.putInt("SuccessRate", 100);
-
+                                   book.setTag(rootTag);
                                    pOutput.accept(book);
                                }
                             }

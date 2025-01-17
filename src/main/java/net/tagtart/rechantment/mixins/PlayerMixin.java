@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
+/*
 @Mixin(Player.class)
 public abstract class PlayerMixin extends LivingEntity {
     @Unique
@@ -57,9 +57,7 @@ public abstract class PlayerMixin extends LivingEntity {
         // as if the cache and the getArmorSlots are not syncing right or something....
         for (ItemStack armorStack : this.getArmorSlots()) {
             ItemStack cachedStack = (ItemStack)this.ARMOR_CACHE.get(i);
-            System.out.println((cachedStack.getItem() != armorStack.getItem()));
-            System.out.println(cachedStack.getItem());
-            System.out.println(armorStack.getItem());
+
             if ((cachedStack.getItem() != armorStack.getItem()) ||
                     (getOverloadLevel(cachedStack) != getOverloadLevel(armorStack)))  {
                 int armorOverloadLevel = getOverloadLevel(armorStack);
@@ -105,3 +103,4 @@ public abstract class PlayerMixin extends LivingEntity {
     }
 
 }
+*/
