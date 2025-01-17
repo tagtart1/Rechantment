@@ -29,7 +29,6 @@ public abstract class PlayerMixin extends LivingEntity {
     private List<ItemStack> ARMOR_CACHE;
 
 
-    private static final UUID MAX_HEALTH_INCREASE = UUID.fromString("ac527260-8c85-49fc-ab4a-7b7ed7580a18");
     private static final String OVERLOAD_MODIFER = "overload_max_health_increase";
 
     public PlayerMixin(EntityType<? extends LivingEntity> pEntityType, Level pLevel) {
@@ -44,7 +43,8 @@ public abstract class PlayerMixin extends LivingEntity {
     @Shadow
     public abstract Iterable<ItemStack> getArmorSlots();
 
-    @Inject(method = "tick", at = @At("HEAD"))
+    // Leaving this here in case something else breaks and need to try this again.
+    //@Inject(method = "tick", at = @At("HEAD"), cancellable = false)
     private void tick(CallbackInfo ci) {
         if (this.ARMOR_CACHE == null) {
             this.ARMOR_CACHE = StreamSupport.stream(getArmorSlots().spliterator(), false)
@@ -64,10 +64,9 @@ public abstract class PlayerMixin extends LivingEntity {
                     (getOverloadLevel(cachedStack) != getOverloadLevel(armorStack)))  {
                 int armorOverloadLevel = getOverloadLevel(armorStack);
 
+                if (player.getAttributes().hasModifier(Attributes.MAX_HEALTH, player.getUUID())) {
 
-                if (player.getAttributes().hasModifier(Attributes.MAX_HEALTH, MAX_HEALTH_INCREASE)) {
-
-                    player.getAttribute(Attributes.MAX_HEALTH).removeModifier(MAX_HEALTH_INCREASE);
+                    player.getAttribute(Attributes.MAX_HEALTH).removeModifier(player.getUUID());
 
                     if (player.getHealth() > player.getMaxHealth()) {
                         System.out.println("Lowering health!");
@@ -88,9 +87,9 @@ public abstract class PlayerMixin extends LivingEntity {
             int overloadLevel = EnchantmentHelper.getTagEnchantmentLevel(ModEnchantments.OVERLOAD.get(), player.getItemBySlot(EquipmentSlot.CHEST));
 
             System.out.println("player health: "+ player.getHealth());
-            if (overloadLevel > 0 && !player.getAttributes().hasModifier(Attributes.MAX_HEALTH, MAX_HEALTH_INCREASE)) {
+            if (overloadLevel > 0 && !player.getAttributes().hasModifier(Attributes.MAX_HEALTH, player.getUUID())) {
                 System.out.println("Updating attributes");
-                player.getAttribute(Attributes.MAX_HEALTH).addPermanentModifier(new AttributeModifier(MAX_HEALTH_INCREASE, OVERLOAD_MODIFER, OverloadEnchantment.getAdditionalHearts(overloadLevel), AttributeModifier.Operation.ADDITION));
+                player.getAttribute(Attributes.MAX_HEALTH).addPermanentModifier(new AttributeModifier(player.getUUID(), OVERLOAD_MODIFER, OverloadEnchantment.getAdditionalHearts(overloadLevel), AttributeModifier.Operation.ADDITION));
             }
 
 

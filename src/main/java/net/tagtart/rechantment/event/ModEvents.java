@@ -30,6 +30,7 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -559,6 +560,68 @@ public class ModEvents {
             // Turn off vanilla enchanted book from applying
             if (left.getItem() instanceof EnchantedBookItem || right.getItem() instanceof EnchantedBookItem) {
                 event.setCanceled(true);
+            }
+        }
+
+        private static final UUID healthModifierUUID = UUID.fromString("ac527260-8c85-49fc-ab4a-7b7ed7580a18");
+
+        @SubscribeEvent
+        public static void onArmorEquip(LivingEquipmentChangeEvent event) {
+            if (event.getSlot().getType() != EquipmentSlot.Type.ARMOR) return;
+            if (!(event.getEntity() instanceof Player player)) return;
+            ItemStack newArmor = event.getTo();
+            ItemStack oldArmor = event.getFrom();
+            Pair<OverloadEnchantment, Integer> overloadEnchantmentNewArmor = UtilFunctions.getEnchantmentFromItem(
+                    "rechantment:overload",
+                    newArmor,
+                    OverloadEnchantment.class
+            );
+
+            boolean overloadJustEquipped = overloadEnchantmentNewArmor != null && !ItemStack.isSameItem(newArmor, oldArmor);
+
+            float newMaxHealthIncrease = 0f;
+            for (ItemStack armor : player.getInventory().armor) {
+                Pair<OverloadEnchantment, Integer> overloadEnchantment = UtilFunctions.getEnchantmentFromItem(
+                        "rechantment:overload",
+                        armor,
+                        OverloadEnchantment.class
+                );
+
+                if (overloadEnchantment != null) {
+                    newMaxHealthIncrease += overloadEnchantment.getA().getMaxHealthTier(overloadEnchantment.getB());
+                }
+            }
+
+            // Regardless of determined max health increase, remove modifier each update so that health
+            // goes back to normal if no overload exists, or can be properly updated with new value relative to base value.
+            AttributeModifier overloadModifier = new AttributeModifier(
+                    healthModifierUUID,
+                    "overload_max_health_increase",
+                    newMaxHealthIncrease,
+                    AttributeModifier.Operation.ADDITION
+            );
+            AttributeInstance currentMaxHealthAttribute = player.getAttribute(Attributes.MAX_HEALTH);
+            if (currentMaxHealthAttribute.hasModifier(overloadModifier)) {
+                currentMaxHealthAttribute.removeModifier(overloadModifier);
+            }
+
+            if (newMaxHealthIncrease > 0f) {
+                currentMaxHealthAttribute.addPermanentModifier(overloadModifier);
+            }
+
+            // Now apply health increase, and play sound if new max health has left extra hearts.
+            if (player.getHealth() <= player.getMaxHealth() && newMaxHealthIncrease > 0f && overloadJustEquipped) {
+
+                // Make sure this plays
+                player.level().playSound(null, player.getOnPos(), SoundEvents.TRIDENT_RETURN, SoundSource.PLAYERS, 1.15f, 1f);
+
+            } else {
+                // Covers case where overload is unequipped and player would have more health than their max
+                // (which is retained by default).
+                if (player.getHealth() > player.getMaxHealth()) {
+                    player.setHealth(player.getMaxHealth());
+                    player.level().playSound(null, player.getEyePosition().x, player.getEyePosition().y, player.getEyePosition().z, SoundEvents.PLAYER_HURT, SoundSource.PLAYERS, 1f, 1f);
+                }
             }
         }
 
