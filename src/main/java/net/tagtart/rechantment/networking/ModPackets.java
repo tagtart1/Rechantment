@@ -9,6 +9,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 import net.tagtart.rechantment.Rechantment;
 import net.tagtart.rechantment.networking.packet.OpenEnchantTableScreenC2SPacket;
 import net.tagtart.rechantment.networking.packet.PurchaseEnchantedBookC2SPacket;
+import net.tagtart.rechantment.networking.packet.TriggerRebirthItemEffectS2CPacket;
 
 // EVERYTHING IN HERE IS NOT USED CURRENTLY, JUST BOILERPLATE
 public class ModPackets {
@@ -40,6 +41,12 @@ public class ModPackets {
                 .decoder(OpenEnchantTableScreenC2SPacket::new)
                 .encoder(OpenEnchantTableScreenC2SPacket::toBytes)
                 .consumerMainThread(OpenEnchantTableScreenC2SPacket::handle)
+                .add();
+
+        net.messageBuilder(TriggerRebirthItemEffectS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(TriggerRebirthItemEffectS2CPacket::new)
+                .encoder(TriggerRebirthItemEffectS2CPacket::toBytes)
+                .consumerMainThread(TriggerRebirthItemEffectS2CPacket::handle)
                 .add();
     }
 

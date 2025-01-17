@@ -187,8 +187,12 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
                     ItemStack chanceGemToGive = new ItemStack(ModItems.CHANCE_GEM.get());
                     soundToPlay = SoundEvents.PLAYER_LEVELUP;
                     player.sendSystemMessage(Component.literal("You found a Gem of Chance!").withStyle(ChatFormatting.GREEN));
-                    if(!player.addItem(chanceGemToGive)) {
+                    int freeSlot = player.getInventory().getFreeSlot();
+                    if (freeSlot == -1) {
                         player.drop(chanceGemToGive, false);
+                    }
+                    else {
+                        player.getInventory().setItem(freeSlot, chanceGemToGive);
                     }
                 }
 
@@ -204,21 +208,25 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
     // This is specifically for server side checks. If there is a de-sync of some kind, player will always
     // be forced out of their container and a message sent (unlike on client side, where behavior/message is result-dependent).
     private void sendEnchantResultPlayerMessage(Player player, PurchaseBookResultCase failCase) {
+        player.closeContainer();
         switch(failCase) {
             case INVENTORY_FULL:
-                //player.closeContainer();
                 break;
             // Not enough EXP
             case INSUFFICIENT_EXP:
+                player.sendSystemMessage(Component.literal("Server desync error: Player does not have enough XP!"));
                 break;
             // Not enough bookshelves
             case INSUFFICIENT_BOOKS:
+                player.sendSystemMessage(Component.literal("Server desync error: Insufficient book count around table!"));
                 break;
             // Not enough floor blocks.
             case INSUFFICIENT_FLOOR:
+                player.sendSystemMessage(Component.literal("Server desync error: Insufficient 3x3 floor around table!"));
                 break;
             // Not enough lapis.
             case INSUFFICIENT_LAPIS:
+                player.sendSystemMessage(Component.literal("Server desync error: Not enough lapis lazuli in enchantment table!"));
                 break;
         }
 

@@ -32,6 +32,8 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.event.ParticleEmitter;
+import net.tagtart.rechantment.networking.ModPackets;
+import net.tagtart.rechantment.networking.packet.TriggerRebirthItemEffectS2CPacket;
 import net.tagtart.rechantment.sound.CustomClientSoundInstanceHandler;
 import net.tagtart.rechantment.sound.ModSounds;
 import org.apache.logging.log4j.core.jmx.Server;
@@ -347,7 +349,7 @@ public class UtilFunctions {
     }
 
 
-    public static void triggerRebirthClientEffects(Player player, ServerLevel level, ItemStack itemToActivate) {
+    public static void triggerRebirthClientEffects(ServerPlayer player, ServerLevel level, ItemStack itemToActivate) {
         SimpleParticleType[] particlesArray = new SimpleParticleType[] {
                 ParticleTypes.SOUL_FIRE_FLAME,
                 ParticleTypes.FIREWORK,
@@ -357,9 +359,8 @@ public class UtilFunctions {
         };
         ParticleEmitter.emitParticlesOverTime(player, level, 100, 60, particlesArray);
 
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
-            Minecraft.getInstance().gameRenderer.displayItemActivation(itemToActivate);
-        });
+        ModPackets.sentToPlayer(new TriggerRebirthItemEffectS2CPacket(itemToActivate), player);
+
         level.playSound(null,  player.blockPosition(), ModSounds.REBIRTH_ITEM.get(), SoundSource.PLAYERS, 0.7F, 1.0F);
     }
 
