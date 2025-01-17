@@ -3,7 +3,7 @@
   "minVersion": "0.8",
   "package": "net.tagtart.rechantment.mixins",
   "compatibilityLevel": "JAVA_17",
-  "refmap": "rechantment.mixin-refmap.json",
+  "refmap": "mixins.rechantment.refmap.json",
   "mixins": [
     "EnchantmentTableBlockMixin",
     "GrindstoneMenuMixin",
