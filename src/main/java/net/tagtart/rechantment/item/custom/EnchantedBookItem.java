@@ -228,6 +228,10 @@ public class EnchantedBookItem extends Item {
         return true;
     }
 
+    @Override
+    public boolean canGrindstoneRepair(ItemStack stack) {
+        return true;
+    }
 
     private void applyEnchantsSafely(Map<Enchantment, Integer> enchants, ItemStack item, Player pPlayer, Level level, ItemStack enchantedBook) {
         if (enchantedBook.getTag() == null) return;

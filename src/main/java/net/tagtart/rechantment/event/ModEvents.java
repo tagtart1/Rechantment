@@ -705,9 +705,26 @@ public class ModEvents {
 
         @SubscribeEvent
         public static void onGrindstoneChange(GrindstoneEvent.OnPlaceItem event) {
-            if (event.getTopItem().is(ModItems.ENCHANTED_BOOK.get()) && event.getBottomItem().isEmpty()) {
-                event.setOutput(new ItemStack(Items.PAPER));
-                event.setXp(Integer.MIN_VALUE);
+
+            ItemStack topSlot = event.getTopItem();
+            ItemStack bottomSlot = event.getBottomItem();
+
+            boolean rechantmentBookInTopOnly = (!topSlot.isEmpty() && topSlot.is(ModItems.ENCHANTED_BOOK.get()) && bottomSlot.isEmpty());
+            boolean rechantmentBookInBottomOnly = (!bottomSlot.isEmpty() && bottomSlot.is(ModItems.ENCHANTED_BOOK.get()) && topSlot.isEmpty());
+
+            if (rechantmentBookInTopOnly || rechantmentBookInBottomOnly) {
+
+                ItemStack currentStack = rechantmentBookInTopOnly ? topSlot : bottomSlot;
+                CompoundTag rootTag = currentStack.getTag();
+                CompoundTag enchantmentTag = rootTag.getCompound("Enchantment");
+                String enchantmentRaw = enchantmentTag.getString("id");
+                BookRarityProperties enchantRarityInfo = UtilFunctions.getPropertiesFromEnchantment(enchantmentRaw);
+
+                Random rand = new Random();
+                event.setXp(rand.nextInt(enchantRarityInfo.minGrindstoneXP, enchantRarityInfo.maxGrindstoneXP + 1));
+
+                ResourceLocation itemLocation = new ResourceLocation(RechantmentCommonConfigs.GRINDSTONE_RESULT_ITEM.get());
+                event.setOutput(new ItemStack(ForgeRegistries.ITEMS.getValue(itemLocation)));
             }
 
         }

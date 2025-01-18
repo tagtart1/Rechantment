@@ -1,3 +1,4 @@
+/*
 package net.tagtart.rechantment.mixins;
 
 import cpw.mods.modlauncher.api.INameMappingService;
@@ -65,21 +66,10 @@ public abstract class GrindstoneMenuMixin extends AbstractContainerMenu {
         return pStack.is(Items.ENCHANTED_BOOK) || pStack.is(ModItems.ENCHANTED_BOOK.get());
     }
 
-    @Inject(method = "<init>*", at = @At("TAIL"), cancellable = true)
     public void constructorOverrideMainSlots(int pContainerId, Inventory pPlayerInventory, final ContainerLevelAccess pAccess, CallbackInfo cir) throws NoSuchMethodException, NoSuchFieldException, IllegalAccessException, InvocationTargetException {
 
-        slots.removeIf((slot) -> slot.container == repairSlots || slot.container == resultSlots);
+        slots.removeIf((slot) -> slot.container == resultSlots);
 
-        Slot topInputSlot = new Slot(repairSlots, 0, 49, 19) {
-            public boolean mayPlace(ItemStack pStack) {
-                return pStack.isDamageableItem() || isEnchantedBook(pStack) || pStack.isEnchanted() || pStack.canGrindstoneRepair();
-            }
-        };
-        Slot bottomInputSlot = new Slot(repairSlots, 1, 49, 40) {
-            public boolean mayPlace(ItemStack pStack) {
-                return pStack.isDamageableItem() || isEnchantedBook(pStack) || pStack.isEnchanted() || pStack.canGrindstoneRepair();
-            }
-        };
         Slot resultSlot = new Slot(resultSlots, 2, 129, 34) {
             public boolean mayPlace(ItemStack p_39630_) {
                 return false;
@@ -134,23 +124,13 @@ public abstract class GrindstoneMenuMixin extends AbstractContainerMenu {
             }
         };
 
-        topInputSlot.index = 0;
-        bottomInputSlot.index = 1;
         resultSlot.index = 2;
 
-        slots.add(topInputSlot);
-        slots.add(bottomInputSlot);
         slots.add(resultSlot);
         slots.sort(Comparator.comparingInt(a -> a.index));
     }
 
-    @Inject(method = "createResult", at = @At("HEAD"), cancellable = true)
     public void createResult(CallbackInfo cir) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        GrindstoneMenu instance = (GrindstoneMenu) (Object) this;
-
-        Method broadcastMethod = AbstractContainerMenu.class.getDeclaredMethod("broadcastChanges");
-        broadcastMethod.setAccessible(true);
-
         ItemStack topSlot = this.repairSlots.getItem(0);
         ItemStack bottomSlot = this.repairSlots.getItem(1);
 
@@ -171,9 +151,10 @@ public abstract class GrindstoneMenuMixin extends AbstractContainerMenu {
 
                 ResourceLocation itemLocation = new ResourceLocation(RechantmentCommonConfigs.GRINDSTONE_RESULT_ITEM.get());
                 this.resultSlots.setItem(0, new ItemStack(ForgeRegistries.ITEMS.getValue(itemLocation)));
-                broadcastMethod.invoke(instance);
+                this.broadcastChanges();
                 cir.cancel();
             }
         }
     }
 }
+*/
