@@ -54,14 +54,14 @@ public class Rechantment
         ModEnchantments.register(modEventBus);
         ModLootModifiers.register(modEventBus);
 
-        ModCreativeModeTabs.register(modEventBus);
+
 
         modEventBus.addListener(this::commonSetup);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, RechantmentCommonConfigs.SPEC, "rechantment-config.toml");
 
         MinecraftForge.EVENT_BUS.register(this);
-
+        ModCreativeModeTabs.register(modEventBus);
         modEventBus.addListener(this::addCreative);
     }
 

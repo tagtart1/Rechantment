@@ -101,10 +101,6 @@ public abstract class GrindstoneMenuMixin {
 
                 if (xp > -1) {
                     return xp;
-                }
-                else if (topInput.is(ModItems.ENCHANTED_BOOK.get()) && bottomInput.isEmpty()) {
-                    return 10;
-                    // Vanilla behavior.
                 } else {
                     int l = 0;
                     l += this.getExperienceFromItem(topInput);
@@ -144,7 +140,7 @@ public abstract class GrindstoneMenuMixin {
         slots.sort(Comparator.comparingInt(a -> a.index));
     }
 
-    @Inject(method = "createResult", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "createResult", at = @At("HEAD"), cancellable = false)
     public void createResult(CallbackInfo cir) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         GrindstoneMenu instance = (GrindstoneMenu) (Object) this;
 
@@ -173,7 +169,6 @@ public abstract class GrindstoneMenuMixin {
             ResourceLocation itemLocation = new ResourceLocation(RechantmentCommonConfigs.GRINDSTONE_RESULT_ITEM.get());
             this.resultSlots.setItem(0, new ItemStack(ForgeRegistries.ITEMS.getValue(itemLocation)));
             broadcastMethod.invoke(instance);
-            cir.cancel();
         }
     }
 }

@@ -20,6 +20,8 @@ import net.tagtart.rechantment.util.BookRarityProperties;
 import net.tagtart.rechantment.util.EnchantmentPoolEntry;
 import net.tagtart.rechantment.util.UtilFunctions;
 
+import java.util.Arrays;
+
 // TODO: REMOVE THIS?
 // Just here in case it's needed for dev.
 public class ModCreativeModeTabs {
@@ -40,9 +42,9 @@ public class ModCreativeModeTabs {
                     .displayItems((pParameters, pOutput) -> {
                         pOutput.accept(ModItems.CHANCE_GEM.get());
                         BookRarityProperties[] bookRarityProperties = BookRarityProperties.getAllProperties();
-
                         for(BookRarityProperties bookRarityProperty : bookRarityProperties) {
                             for(EnchantmentPoolEntry enchantPoolEntry : bookRarityProperty.enchantmentPool) {
+
                                String enchantmentRaw = enchantPoolEntry.enchantment;
                                 Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(enchantmentRaw));
                                 if (enchantment == null) continue;
@@ -58,7 +60,7 @@ public class ModCreativeModeTabs {
 
                                    rootTag.put("Enchantment", enchantmentTag);
                                    rootTag.putInt("SuccessRate", 100);
-
+                                   book.setTag(rootTag);
                                    pOutput.accept(book);
                                }
                             }
