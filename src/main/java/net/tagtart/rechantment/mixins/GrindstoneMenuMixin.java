@@ -1,5 +1,6 @@
 package net.tagtart.rechantment.mixins;
 
+import cpw.mods.modlauncher.api.INameMappingService;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -24,6 +25,7 @@ import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.item.ModItems;
 import net.tagtart.rechantment.util.BookRarityProperties;
 import net.tagtart.rechantment.util.UtilFunctions;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -42,7 +44,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 @Mixin(GrindstoneMenu.class)
-public abstract class GrindstoneMenuMixin {
+public abstract class GrindstoneMenuMixin extends AbstractContainerMenu {
 
     @Shadow @Final private Container repairSlots;
 
@@ -50,9 +52,14 @@ public abstract class GrindstoneMenuMixin {
 
     @Shadow private int xp;
 
+    protected GrindstoneMenuMixin(@Nullable MenuType<?> pMenuType, int pContainerId) {
+        super(pMenuType, pContainerId);
+    }
+
     @Shadow protected abstract ItemStack mergeEnchants(ItemStack pCopyTo, ItemStack pCopyFrom);
 
     @Shadow protected abstract ItemStack removeNonCurses(ItemStack pStack, int pDamage, int pCount);
+
 
     private boolean isEnchantedBook(ItemStack pStack) {
         return pStack.is(Items.ENCHANTED_BOOK) || pStack.is(ModItems.ENCHANTED_BOOK.get());
@@ -60,11 +67,6 @@ public abstract class GrindstoneMenuMixin {
 
     @Inject(method = "<init>*", at = @At("TAIL"), cancellable = true)
     public void constructorOverrideMainSlots(int pContainerId, Inventory pPlayerInventory, final ContainerLevelAccess pAccess, CallbackInfo cir) throws NoSuchMethodException, NoSuchFieldException, IllegalAccessException, InvocationTargetException {
-        GrindstoneMenu instance = (GrindstoneMenu) (Object) this;
-
-        Field field = ObfuscationReflectionHelper.findField(AbstractContainerMenu.class, "slots");
-        field.setAccessible(true);
-        NonNullList<Slot> slots = (NonNullList<Slot>)field.get(instance);
 
         slots.removeIf((slot) -> slot.container == repairSlots || slot.container == resultSlots);
 
