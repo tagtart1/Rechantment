@@ -18,6 +18,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.item.ModItems;
@@ -26,6 +27,7 @@ import net.tagtart.rechantment.util.UtilFunctions;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -60,7 +62,7 @@ public abstract class GrindstoneMenuMixin {
     public void constructorOverrideMainSlots(int pContainerId, Inventory pPlayerInventory, final ContainerLevelAccess pAccess, CallbackInfo cir) throws NoSuchMethodException, NoSuchFieldException, IllegalAccessException, InvocationTargetException {
         GrindstoneMenu instance = (GrindstoneMenu) (Object) this;
 
-        Field field = AbstractContainerMenu.class.getDeclaredField("slots");
+        Field field = ObfuscationReflectionHelper.findField(AbstractContainerMenu.class, "slots");
         field.setAccessible(true);
         NonNullList<Slot> slots = (NonNullList<Slot>)field.get(instance);
 
@@ -140,7 +142,7 @@ public abstract class GrindstoneMenuMixin {
         slots.sort(Comparator.comparingInt(a -> a.index));
     }
 
-    @Inject(method = "createResult", at = @At("HEAD"), cancellable = false)
+    @Inject(method = "createResult", at = @At("HEAD"), cancellable = true)
     public void createResult(CallbackInfo cir) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         GrindstoneMenu instance = (GrindstoneMenu) (Object) this;
 
@@ -161,14 +163,15 @@ public abstract class GrindstoneMenuMixin {
             String[] enchantmentInfo = enchantmentRaw.split(":");
             BookRarityProperties enchantRarityInfo = UtilFunctions.getPropertiesFromEnchantment(enchantmentRaw);
 
-            if (enchantRarityInfo == null) cir.cancel();
+            if (enchantRarityInfo != null) {
+                Random rand = new Random();
+                this.xp = rand.nextInt(enchantRarityInfo.minGrindstoneXP, enchantRarityInfo.maxGrindstoneXP + 1);
 
-            Random rand = new Random();
-            this.xp = rand.nextInt(enchantRarityInfo.minGrindstoneXP, enchantRarityInfo.maxGrindstoneXP + 1);
-
-            ResourceLocation itemLocation = new ResourceLocation(RechantmentCommonConfigs.GRINDSTONE_RESULT_ITEM.get());
-            this.resultSlots.setItem(0, new ItemStack(ForgeRegistries.ITEMS.getValue(itemLocation)));
-            broadcastMethod.invoke(instance);
+                ResourceLocation itemLocation = new ResourceLocation(RechantmentCommonConfigs.GRINDSTONE_RESULT_ITEM.get());
+                this.resultSlots.setItem(0, new ItemStack(ForgeRegistries.ITEMS.getValue(itemLocation)));
+                broadcastMethod.invoke(instance);
+                cir.cancel();
+            }
         }
     }
 }
