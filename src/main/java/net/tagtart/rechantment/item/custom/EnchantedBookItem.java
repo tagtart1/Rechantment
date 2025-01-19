@@ -243,7 +243,7 @@ public class EnchantedBookItem extends Item {
             sendClientMessage(pPlayer, Component.literal("Successfully enchanted.").withStyle(ChatFormatting.GREEN));
         } else {
             // Play bad sound
-            level.playSound(null, pPlayer.getOnPos(), ModSounds.ENCHANTED_BOOK_FAIL.get(), SoundSource.PLAYERS, 10f, 1f);
+            level.playSound(null, pPlayer.getOnPos(), ModSounds.ENCHANTED_BOOK_FAIL.get(), SoundSource.PLAYERS, 1f, 1f);
             sendClientMessage(pPlayer, Component.literal("Enchantment failed to apply to item!").withStyle(ChatFormatting.RED));
         }
         // Break the book regardless of success or not
