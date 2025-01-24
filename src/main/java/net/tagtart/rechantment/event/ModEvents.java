@@ -679,27 +679,25 @@ public class ModEvents {
             tag.remove("Announce");
             int successRate = tag.getInt("SuccessRate");
             String enchantmentRaw = tag.getCompound("Enchantment").getString("id");
-            Style displayHoverStyle = pStack.getDisplayName().getStyle();
-            String displayNameString;
-            StringBuilder sb = new StringBuilder(pStack.getDisplayName().getString());
-            sb.delete(0, 3);
-            sb.deleteCharAt(sb.length() - 1);
-            displayNameString = sb.toString();
+            int enchantLevel = tag.getCompound("Enchantment").getInt("lvl");
+            String enchantmentFormatted = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(enchantmentRaw)).getFullname(enchantLevel).getString();
+
             Component playerName = event.getEntity().getDisplayName();
+            Component displayName = pStack.getDisplayName();
+            Style displayHoverStyle = displayName.getStyle();
+
             BookRarityProperties bookProps = UtilFunctions.getPropertiesFromEnchantment(enchantmentRaw);
             if (bookProps == null) return;
 
             for (ServerPlayer otherPlayer : level.players()) {
                 otherPlayer.sendSystemMessage(Component.literal(playerName.getString() + " found ")
-                        .append(Component.literal(displayNameString).withStyle(displayHoverStyle.withColor(bookProps.color).withUnderlined(true)))
+                        .append(Component.literal(enchantmentFormatted).withStyle(displayHoverStyle.withColor(bookProps.color).withUnderlined(true)))
                         .append(" at ")
                         .append(Component.literal(successRate + "%").withStyle(Style.EMPTY.withColor(bookProps.color)))
                         .append("!"));
             }
 
             level.playSound(null, event.getEntity().getOnPos(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1f, 1f);
-
-
 
         }
 
