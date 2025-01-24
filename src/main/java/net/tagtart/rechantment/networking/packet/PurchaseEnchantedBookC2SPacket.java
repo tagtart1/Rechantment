@@ -208,6 +208,8 @@ public class PurchaseEnchantedBookC2SPacket extends AbstractPacket {
     // This is specifically for server side checks. If there is a de-sync of some kind, player will always
     // be forced out of their container and a message sent (unlike on client side, where behavior/message is result-dependent).
     private void sendEnchantResultPlayerMessage(Player player, PurchaseBookResultCase failCase) {
+        if (failCase == PurchaseBookResultCase.SUCCESS) return;
+
         player.closeContainer();
         switch(failCase) {
             case INVENTORY_FULL:

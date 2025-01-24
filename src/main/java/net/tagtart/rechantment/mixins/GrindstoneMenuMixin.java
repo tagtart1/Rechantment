@@ -1,5 +1,7 @@
+/*
 package net.tagtart.rechantment.mixins;
 
+import cpw.mods.modlauncher.api.INameMappingService;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -18,14 +20,17 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tagtart.rechantment.config.RechantmentCommonConfigs;
 import net.tagtart.rechantment.item.ModItems;
 import net.tagtart.rechantment.util.BookRarityProperties;
 import net.tagtart.rechantment.util.UtilFunctions;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -40,7 +45,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 @Mixin(GrindstoneMenu.class)
-public abstract class GrindstoneMenuMixin {
+public abstract class GrindstoneMenuMixin extends AbstractContainerMenu {
 
     @Shadow @Final private Container repairSlots;
 
@@ -48,34 +53,23 @@ public abstract class GrindstoneMenuMixin {
 
     @Shadow private int xp;
 
+    protected GrindstoneMenuMixin(@Nullable MenuType<?> pMenuType, int pContainerId) {
+        super(pMenuType, pContainerId);
+    }
+
     @Shadow protected abstract ItemStack mergeEnchants(ItemStack pCopyTo, ItemStack pCopyFrom);
 
     @Shadow protected abstract ItemStack removeNonCurses(ItemStack pStack, int pDamage, int pCount);
+
 
     private boolean isEnchantedBook(ItemStack pStack) {
         return pStack.is(Items.ENCHANTED_BOOK) || pStack.is(ModItems.ENCHANTED_BOOK.get());
     }
 
-    @Inject(method = "<init>*", at = @At("TAIL"), cancellable = true)
     public void constructorOverrideMainSlots(int pContainerId, Inventory pPlayerInventory, final ContainerLevelAccess pAccess, CallbackInfo cir) throws NoSuchMethodException, NoSuchFieldException, IllegalAccessException, InvocationTargetException {
-        GrindstoneMenu instance = (GrindstoneMenu) (Object) this;
 
-        Field field = AbstractContainerMenu.class.getDeclaredField("slots");
-        field.setAccessible(true);
-        NonNullList<Slot> slots = (NonNullList<Slot>)field.get(instance);
+        slots.removeIf((slot) -> slot.container == resultSlots);
 
-        slots.removeIf((slot) -> slot.container == repairSlots || slot.container == resultSlots);
-
-        Slot topInputSlot = new Slot(repairSlots, 0, 49, 19) {
-            public boolean mayPlace(ItemStack pStack) {
-                return pStack.isDamageableItem() || isEnchantedBook(pStack) || pStack.isEnchanted() || pStack.canGrindstoneRepair();
-            }
-        };
-        Slot bottomInputSlot = new Slot(repairSlots, 1, 49, 40) {
-            public boolean mayPlace(ItemStack pStack) {
-                return pStack.isDamageableItem() || isEnchantedBook(pStack) || pStack.isEnchanted() || pStack.canGrindstoneRepair();
-            }
-        };
         Slot resultSlot = new Slot(resultSlots, 2, 129, 34) {
             public boolean mayPlace(ItemStack p_39630_) {
                 return false;
@@ -130,23 +124,13 @@ public abstract class GrindstoneMenuMixin {
             }
         };
 
-        topInputSlot.index = 0;
-        bottomInputSlot.index = 1;
         resultSlot.index = 2;
 
-        slots.add(topInputSlot);
-        slots.add(bottomInputSlot);
         slots.add(resultSlot);
         slots.sort(Comparator.comparingInt(a -> a.index));
     }
 
-    @Inject(method = "createResult", at = @At("HEAD"), cancellable = false)
     public void createResult(CallbackInfo cir) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        GrindstoneMenu instance = (GrindstoneMenu) (Object) this;
-
-        Method broadcastMethod = AbstractContainerMenu.class.getDeclaredMethod("broadcastChanges");
-        broadcastMethod.setAccessible(true);
-
         ItemStack topSlot = this.repairSlots.getItem(0);
         ItemStack bottomSlot = this.repairSlots.getItem(1);
 
@@ -161,14 +145,16 @@ public abstract class GrindstoneMenuMixin {
             String[] enchantmentInfo = enchantmentRaw.split(":");
             BookRarityProperties enchantRarityInfo = UtilFunctions.getPropertiesFromEnchantment(enchantmentRaw);
 
-            if (enchantRarityInfo == null) cir.cancel();
+            if (enchantRarityInfo != null) {
+                Random rand = new Random();
+                this.xp = rand.nextInt(enchantRarityInfo.minGrindstoneXP, enchantRarityInfo.maxGrindstoneXP + 1);
 
-            Random rand = new Random();
-            this.xp = rand.nextInt(enchantRarityInfo.minGrindstoneXP, enchantRarityInfo.maxGrindstoneXP + 1);
-
-            ResourceLocation itemLocation = new ResourceLocation(RechantmentCommonConfigs.GRINDSTONE_RESULT_ITEM.get());
-            this.resultSlots.setItem(0, new ItemStack(ForgeRegistries.ITEMS.getValue(itemLocation)));
-            broadcastMethod.invoke(instance);
+                ResourceLocation itemLocation = new ResourceLocation(RechantmentCommonConfigs.GRINDSTONE_RESULT_ITEM.get());
+                this.resultSlots.setItem(0, new ItemStack(ForgeRegistries.ITEMS.getValue(itemLocation)));
+                this.broadcastChanges();
+                cir.cancel();
+            }
         }
     }
 }
+*/

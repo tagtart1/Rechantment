@@ -6,7 +6,6 @@
   "refmap": "mixins.rechantment.refmap.json",
   "mixins": [
     "EnchantmentTableBlockMixin",
-    "GrindstoneMenuMixin",
     "InventoryMixin",
     "ItemStackMixin"
   ],

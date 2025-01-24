@@ -228,6 +228,10 @@ public class EnchantedBookItem extends Item {
         return true;
     }
 
+    @Override
+    public boolean canGrindstoneRepair(ItemStack stack) {
+        return true;
+    }
 
     private void applyEnchantsSafely(Map<Enchantment, Integer> enchants, ItemStack item, Player pPlayer, Level level, ItemStack enchantedBook) {
         if (enchantedBook.getTag() == null) return;
@@ -239,7 +243,7 @@ public class EnchantedBookItem extends Item {
             sendClientMessage(pPlayer, Component.literal("Successfully enchanted.").withStyle(ChatFormatting.GREEN));
         } else {
             // Play bad sound
-            level.playSound(null, pPlayer.getOnPos(), ModSounds.ENCHANTED_BOOK_FAIL.get(), SoundSource.PLAYERS, 10f, 1f);
+            level.playSound(null, pPlayer.getOnPos(), ModSounds.ENCHANTED_BOOK_FAIL.get(), SoundSource.PLAYERS, 1f, 1f);
             sendClientMessage(pPlayer, Component.literal("Enchantment failed to apply to item!").withStyle(ChatFormatting.RED));
         }
         // Break the book regardless of success or not
