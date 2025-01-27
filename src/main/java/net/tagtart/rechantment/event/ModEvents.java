@@ -170,6 +170,8 @@ public class ModEvents {
                     return Float.compare(rarityValue2, rarityValue1);
                 });
 
+
+
                 for(int i = 1; i <= enchantsSorted.size(); i++) {
 
                     Map.Entry<Enchantment, Integer> entry = enchantsSorted.get(i - 1);
@@ -194,8 +196,16 @@ public class ModEvents {
                     String fullEnchantName = entry.getKey().getFullname(entry.getValue()).getString();
 
                     Component modifiedText = Component.literal(fullEnchantName).withStyle(style);
+                    CompoundTag nbt = stack.getTag();
 
-                    tooltip.set(i, modifiedText);
+                    if (nbt != null && nbt.contains("Trim")) {
+
+                        tooltip.set(i + 3, modifiedText);
+
+                    } else {
+                        tooltip.set(i, modifiedText);
+                    }
+
                 }
             }
 
